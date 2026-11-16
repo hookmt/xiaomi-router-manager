@@ -10,6 +10,10 @@
 
 Originally built and optimized for the flagship **Xiaomi Router BE7000 (4x 2.5 Gbps)**, it also provides full compatibility with **BE6500 Pro, AX3600, AX6000, AX9000**, and related models.
 
+<p align="center">
+  <img src="screenshots/01_dashboard_live.png" alt="Xiaomi Router Manager Dashboard" width="850">
+</p>
+
 ---
 
 ## Why Xiaomi Router Manager?
@@ -97,6 +101,76 @@ Lightweight, zero-dependency Python 3 scripts for rapid headless disaster recove
 - **100% Local Communication:** All API calls are made directly between your computer and the router via local HTTP/JSON API (`http://192.168.31.1/cgi-bin/luci/;stok=.../api/`).
 - **Zero Cloud / Telemetry:** No data is sent to external servers or third-party analytical endpoints.
 - **Encrypted Authentication:** Native password authentication uses client-side SHA-256 hashing combined with router-provided nonce and router key calculation.
+
+---
+
+## Screenshots & UI Walkthrough
+
+<details open>
+<summary><b>1. Physical Ports Visualization (4x 2.5 Gbps) & Hardware Roles</b></summary>
+<br>
+<img src="screenshots/08_physical_ports_2.5g.png" alt="Physical Ports 2.5G" width="850">
+</details>
+
+<details>
+<summary><b>2. Wi-Fi & Radio Bands (Wi-Fi 7/6, 160MHz, WPA2/WPA3 Mixed)</b></summary>
+<br>
+<img src="screenshots/06_wifi_settings.png" alt="Wi-Fi Settings" width="850">
+</details>
+
+<details>
+<summary><b>3. Connected Network Devices & Band Telemetry</b></summary>
+<br>
+<img src="screenshots/02_network_devices.png" alt="Network Devices" width="850">
+</details>
+
+<details>
+<summary><b>4. LAN & Static DHCP Reservation Management</b></summary>
+<br>
+<img src="screenshots/05_lan_dhcp_reservations.png" alt="Static DHCP Leases" width="850">
+</details>
+
+<details>
+<summary><b>5. Port Forwarding, NAT & Protected DMZ</b></summary>
+<br>
+<img src="screenshots/07_port_forwarding_nat.png" alt="Port Forwarding" width="850">
+</details>
+
+<details>
+<summary><b>6. Mesh Topology & Nodes</b></summary>
+<br>
+<img src="screenshots/03_mesh_topology.png" alt="Mesh Topology" width="850">
+</details>
+
+<details>
+<summary><b>7. Selective JSON Configuration Restore</b></summary>
+<br>
+<img src="screenshots/11_selective_restore_dialog.png" alt="Selective Restore Dialog" width="850">
+</details>
+
+<details>
+<summary><b>8. First-Time Router Setup Wizard</b></summary>
+<br>
+<img src="screenshots/12_setup_wizard.png" alt="Setup Wizard" width="850">
+</details>
+
+<details>
+<summary><b>9. WAN Settings & PPPoE</b></summary>
+<br>
+<img src="screenshots/04_wan_settings.png" alt="WAN Settings" width="850">
+</details>
+
+<details>
+<summary><b>10. Smart QoS Bandwidth Management</b></summary>
+<br>
+<img src="screenshots/09_smart_qos.png" alt="Smart QoS" width="850">
+</details>
+
+<details>
+<summary><b>11. System Maintenance & Diagnostics</b></summary>
+<br>
+<img src="screenshots/10_system_tools.png" alt="System Tools" width="850">
+</details>
 
 ---
 
