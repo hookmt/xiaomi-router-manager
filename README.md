@@ -1,6 +1,6 @@
 # Xiaomi Router Manager (XRM)
 
-[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](version.py)
+[![Version](https://img.shields.io/badge/version-v1.0.1-blue.svg)](version.py)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-blue.svg)](https://microsoft.com/windows)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![UI](https://img.shields.io/badge/UI-CustomTkinter%20Fluent%20Design-darkgreen.svg)](https://github.com/TomSchimansky/CustomTkinter)
@@ -103,8 +103,8 @@ Lightweight, zero-dependency Python 3 scripts for rapid headless disaster recove
 ## Installation & Usage
 
 ### Option A: Standalone Executable (No Python Required)
-1. Download `Xiaomi_Router_Manager.exe` from the [Releases](https://github.com/hookmt/xiaomi-router-manager/releases) page.
-2. Launch `Xiaomi_Router_Manager.exe`.
+1. Download `Xiaomi_Router_Manager_v1.0.1.exe` from the [Releases](https://github.com/hookmt/xiaomi-router-manager/releases) page.
+2. Launch `Xiaomi_Router_Manager_v1.0.1.exe`.
 3. Enter your router gateway IP (`192.168.31.1` by default) and administrator password (or paste a browser URL containing `;stok=...`).
 4. Click **Connect**.
 
