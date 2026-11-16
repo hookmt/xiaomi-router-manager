@@ -1,21 +1,43 @@
-# ZBIORÓWKA ZADAŃ I POPRAWEK DO WDROŻENIA
-
-Status: Zbieranie uwag i poprawek do wydania patch v1.0.1 (zgodnie z wytyczną użytkownika: nie poprawiać od razu, zbierać do zbiorówki na kolejną wersję).
+# ZBIORÓWKA ZADAŃ I PLANÓW ROZWOJU
 
 ---
 
-## Zadania do wydania v1.0.1 (Poprawki / Patch)
+## Planowane funkcje do wydania v1.1.0 (Minor Release)
 
-### 1. Karta Konserwacja Sprzętowa (Hardware Maintenance / System Time)
-- **Etykieta czasu routera (`lbl_sys_time`):**
-  - Problem: w `gui.py` (linia 4986) string `"Czas routera: {t_str} ({tz_str})"` jest wpisany na sztywno po polsku. W trybie EN powoduje to asymetrię: etykieta wyświetla się po polsku (`Czas routera: ...`), podczas gdy przycisk obok po angielsku (`[🕒 Sync with PC]`).
-  - Rozwiązanie: zamiana na `f"{t('tools_time_label', lg)} {t_str} ({tz_str})"`.
+### 1. Wizualizacja fizycznych portów routera (Physical Ports RJ45 Status)
+- **Koncepcja:**
+  - Panel graficzny prezentujący fizyczne porty routera (np. 4x 2.5 Gbps dla Xiaomi BE6500 Pro / BE7000).
+  - Wyświetlanie aktualnego stanu każdego portu:
+    - Numer portu i typ (np. `1(2.5G)`, `2.5G RJ45`).
+    - Wynegocjowana prędkość połączenia i stan wpięcia kabla:
+      - `Connected (2.5G)` (zielona kontrolka).
+      - `Ready (Auto MDI-X)` (szara kontrolka - port oczekujący / brak kabla).
+      - Ewentualne niższe prędkości (1000M, 100M).
+    - Przypisana rola i usługa:
+      - `Primary Internet (WAN1)` (wyróżniona niebieska etykieta).
+      - `Secondary Internet (WAN2)`.
+      - `Local Network (LAN)`.
+      - `Link Aggregation (LAG)`.
+      - `IPTV / VoIP`.
+      - `Gaming Port`.
+- **Źródło danych w API routera:**
+  - Endpoint `misystem/status` oraz `xqnetwork/ps_status` / `xqnetwork/port_service`.
 
 ---
 
-## Archiwum wdrożeń v1.0.0 (Zrealizowane 2026-11-16)
-- **Karta DMZ:** Komunikat kolizji `nat_dmz_collision_warn` wdrożony dla PL i EN.
-- **Porty fizyczne 2.5G:** Role portów (`port_role_*`) i stany połączeń (`port_link_*`) przetłumaczone dla PL i EN.
-- **Menu rozwijane:** Dual WAN, LAG, Wi-Fi TX Power oraz hinty urządzeń (`hint_manual_entry`, `hint_select_known`) dynamicznie lokalizowane.
-- **Raport Markdown:** Dodano bezpieczny fallback odczytu serwerów DNS dla połączeń PPPoE (`pppoe_status` / `wan_info`).
-- **Wersjonowanie:** Wdrożono SemVer v1.0.0, centralny moduł `version.py` oraz metadane binarne Windows PE (`file_version_info.txt`).
+## Archiwum wdrożeń
+
+### v1.0.1 (Zrealizowane 2026-11-16)
+- **Kompletna lokalizacja okien dialogowych (i18n):**
+  - Spolszczenie i zangielszczenie okien: Dodawanie/edycja rezerwacji DHCP, Przekierowanie pojedynczego portu, Zakresy portów, Dodawanie DDNS, Dodawanie VPN, Zmiana hasła administratora, Karta dostępu Wi-Fi, Selektywne przywracanie konfiguracji.
+  - Zaawansowane ustawienia Wi-Fi: Kompatybilność Wi-Fi 5, TWT, MU-MIMO, Mi Connect, Tryb cichy, Progi roamingu Mesh, Region regulacyjny, Moc nadawania.
+  - Kreator pierwszej konfiguracji: pełna dwujęzyczność kroków 1-4.
+  - Naprawienie etykiety "Czas routera:" w karcie narzędziowej.
+- **Wersjonowanie pliku wykonywalnego:**
+  - Nazwa pliku wydania zawiera wersję: `Xiaomi_Router_Manager_v1.0.1.exe`.
+
+### v1.0.0 (Zrealizowane 2026-11-16)
+- **Inicjalne wydanie:**
+  - Pełna aplikacja desktopowa w CustomTkinter dla routerów Xiaomi BE6500 Pro / BE7000 / BE3600 / AX.
+  - Pulpit, Topologia Mesh, DHCP, NAT, QoS, Narzędzia, Eksport Markdown.
+  - SemVer v1.0.0, moduł `version.py` oraz `file_version_info.txt`.

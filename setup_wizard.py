@@ -116,12 +116,16 @@ class SetupWizardDialog(ctk.CTkToplevel):
         if self.current_step == 1:
             pwd = self.e_pwd.get().strip()
             if not pwd:
-                messagebox.showwarning("Brak hasła", "Wprowadź hasło administratora do konfiguracji routera.", parent=self)
+                title = "Password Required" if self.lang == "en" else "Brak hasła"
+                msg = "Please enter administrator password to configure the router." if self.lang == "en" else "Wprowadź hasło administratora do konfiguracji routera."
+                messagebox.showwarning(title, msg, parent=self)
                 return
         if self.current_step == 3:
             w_pwd = self.e_wifi_pwd.get().strip()
             if len(w_pwd) < 8:
-                messagebox.showwarning("Krótkie hasło Wi-Fi", "Hasło do sieci Wi-Fi musi mieć co najmniej 8 znaków.", parent=self)
+                title = "Wi-Fi Password Too Short" if self.lang == "en" else "Krótkie hasło Wi-Fi"
+                msg = "Wi-Fi password must be at least 8 characters long." if self.lang == "en" else "Hasło do sieci Wi-Fi musi mieć co najmniej 8 znaków."
+                messagebox.showwarning(title, msg, parent=self)
                 return
         if self.current_step < 4:
             self._show_step(self.current_step + 1)
@@ -153,14 +157,14 @@ class SetupWizardDialog(ctk.CTkToplevel):
         # Status probe box
         self.box_probe = ctk.CTkFrame(f, fg_color="#18202f")
         self.box_probe.pack(fill="x", pady=10)
-        self.lbl_probe_status = ctk.CTkLabel(self.box_probe, text="Naciśnij 'Wykryj i Przetestuj Router', aby sprawdzić połączenie.", text_color="#94a3b8", justify="left")
+        self.lbl_probe_status = ctk.CTkLabel(self.box_probe, text=i18n.t("wiz_probe_hint", self.lang), text_color="#94a3b8", justify="left")
         self.lbl_probe_status.pack(padx=15, pady=12, anchor="w")
 
         # Hasło administratora
         f_pwd = ctk.CTkFrame(f)
         f_pwd.pack(fill="x", pady=6)
         ctk.CTkLabel(f_pwd, text=i18n.t("wiz_step1_pwd", self.lang), width=180, anchor="w").pack(side="left", padx=15, pady=10)
-        self.e_pwd = ctk.CTkEntry(f_pwd, width=220, show="•", placeholder_text="Hasło routera...")
+        self.e_pwd = ctk.CTkEntry(f_pwd, width=220, show="•", placeholder_text=i18n.t("pwd_placeholder", self.lang))
         self.e_pwd.pack(side="left", padx=5)
         
         parent_pwd = getattr(self.parent, "auth_entry", None)
@@ -171,7 +175,7 @@ class SetupWizardDialog(ctk.CTkToplevel):
 
     def _probe_router(self):
         target_ip = self.e_ip.get().strip()
-        self.lbl_probe_status.configure(text=f"Łączenie z {target_ip}...", text_color="#eab308")
+        self.lbl_probe_status.configure(text=i18n.t("wiz_connecting", self.lang).format(ip=target_ip), text_color="#eab308")
 
         def run():
             cli = MiWiFiClient(target_ip)
@@ -183,15 +187,18 @@ class SetupWizardDialog(ctk.CTkToplevel):
                 self.probed_model = model
                 self.is_factory_reset = not init_state
 
-                status_txt = f"✔ Wykryto router: {model} ({rname})\nAdres IP: {target_ip}  |  Wersja ROM: {info.get('romversion', '-')}\n"
+                model_lbl = "Detected router" if self.lang == "en" else "Wykryto router"
+                ip_lbl = "IP Address" if self.lang == "en" else "Adres IP"
+                rom_lbl = "ROM Version" if self.lang == "en" else "Wersja ROM"
+                status_txt = f"✔ {model_lbl}: {model} ({rname})\n{ip_lbl}: {target_ip}  |  {rom_lbl}: {info.get('romversion', '-')}\n"
                 if self.is_factory_reset:
-                    status_txt += "Status: NOWY / FABRYCZNIE ZRESETOWANY (wymaga pierwszej inicjalizacji hasła)."
+                    status_txt += i18n.t("wiz_status_factory", self.lang)
                 else:
-                    status_txt += "Status: Router jest już zainicjalizowany (wprowadź aktualne hasło)."
+                    status_txt += i18n.t("wiz_status_initialized", self.lang)
 
                 self.after(0, lambda: self.lbl_probe_status.configure(text=status_txt, text_color="#22c55e"))
             except Exception as e:
-                self.after(0, lambda: self.lbl_probe_status.configure(text=f"❌ Błąd połączenia z {target_ip}: {e}", text_color="#ef4444"))
+                self.after(0, lambda: self.lbl_probe_status.configure(text=i18n.t("wiz_err_connect", self.lang).format(ip=target_ip, err=e), text_color="#ef4444"))
 
         threading.Thread(target=run, daemon=True).start()
 
@@ -233,20 +240,22 @@ class SetupWizardDialog(ctk.CTkToplevel):
         f_mtu = ctk.CTkFrame(f)
         f_mtu.pack(fill="x", pady=6)
         ctk.CTkLabel(f_mtu, text=i18n.t("wiz_step2_mtu", self.lang), width=180, anchor="w").pack(side="left", padx=15, pady=10)
-        self.combo_mtu = ctk.CTkComboBox(f_mtu, values=["1472 (Światłowód)", "1492 (PPPoE)", "1500 (Standard)"], width=200)
-        self.combo_mtu.set("1472 (Światłowód)")
+        mtu_vals = [i18n.t("wiz_mtu_fiber", self.lang), i18n.t("wiz_mtu_pppoe", self.lang), i18n.t("wiz_mtu_std", self.lang)]
+        self.combo_mtu = ctk.CTkComboBox(f_mtu, values=mtu_vals, width=200)
+        self.combo_mtu.set(mtu_vals[0])
         self.combo_mtu.pack(side="left", padx=5)
 
         ctk.CTkLabel(f, text=i18n.t("wiz_step2_mtu_hint", self.lang), font=ctk.CTkFont(size=11), text_color="#64748b").pack(anchor="w", padx=5, pady=(2, 0))
 
     def _on_wan_mode_change(self, choice):
+        mtu_vals = [i18n.t("wiz_mtu_fiber", self.lang), i18n.t("wiz_mtu_pppoe", self.lang), i18n.t("wiz_mtu_std", self.lang)]
         if "PPPoE" in choice:
             self.f_pppoe.pack(fill="x", pady=6)
-            self.combo_mtu.set("1492 (PPPoE)")
+            self.combo_mtu.set(mtu_vals[1])
         else:
             self.f_pppoe.pack_forget()
             if "1492" in self.combo_mtu.get():
-                self.combo_mtu.set("1472 (Światłowód)")
+                self.combo_mtu.set(mtu_vals[0])
 
     # --- Krok 3: Wi-Fi ---
     def _build_step3(self):
@@ -309,16 +318,21 @@ class SetupWizardDialog(ctk.CTkToplevel):
     def _update_summary(self):
         m_txt = self.combo_wan_mode.get()
         mtu_raw = self.combo_mtu.get().split()[0]
+        is_en = (self.lang == "en")
+        on_txt = "ENABLED" if is_en else "WŁĄCZONY"
+        off_txt = "DISABLED" if is_en else "WYŁĄCZONY"
+        on_f_txt = "ENABLED" if is_en else "WŁĄCZONE"
+        off_f_txt = "DISABLED" if is_en else "WYŁĄCZONE"
         sum_txt = (
-            f"📌 Adres IP Routera: {self.e_ip.get().strip()}\n"
-            f"📌 Hasło Administratora: {'*' * len(self.e_pwd.get().strip())}\n\n"
-            f"🌐 Typ Połączenia WAN: {m_txt}\n"
-            f"🌐 Jednostka MTU WAN: {mtu_raw}\n\n"
-            f"📶 Sieć Wi-Fi SSID: {self.e_wifi_ssid.get().strip()}\n"
-            f"📶 Hasło Wi-Fi: {'*' * len(self.e_wifi_pwd.get().strip())}\n"
-            f"📶 Smart Connect: {'WŁĄCZONY' if self.sw_smart.get() == 1 else 'WYŁĄCZONY'}\n"
-            f"⚡ Wi-Fi 7 MLO: {'WŁĄCZONY' if self.sw_mlo.get() == 1 else 'WYŁĄCZONY'}\n"
-            f"🔋 TWT Oszczędzanie energii: {'WŁĄCZONE' if self.sw_twt.get() == 1 else 'WYŁĄCZONE'}"
+            f"📌 {'Router IP Address' if is_en else 'Adres IP Routera'}: {self.e_ip.get().strip()}\n"
+            f"📌 {i18n.t('wiz_step1_pwd', self.lang)}: {'*' * len(self.e_pwd.get().strip())}\n\n"
+            f"🌐 {i18n.t('wiz_step2_mode', self.lang)}: {m_txt}\n"
+            f"🌐 {'WAN MTU Unit' if is_en else 'Jednostka MTU WAN'}: {mtu_raw}\n\n"
+            f"📶 {i18n.t('wiz_step3_ssid', self.lang)}: {self.e_wifi_ssid.get().strip()}\n"
+            f"📶 {i18n.t('wiz_step3_pwd', self.lang)}: {'*' * len(self.e_wifi_pwd.get().strip())}\n"
+            f"📶 Smart Connect: {on_txt if self.sw_smart.get() == 1 else off_txt}\n"
+            f"⚡ Wi-Fi 7 MLO: {on_txt if self.sw_mlo.get() == 1 else off_txt}\n"
+            f"🔋 {'TWT Battery Saver' if is_en else 'TWT Oszczędzanie energii'}: {on_f_txt if self.sw_twt.get() == 1 else off_f_txt}"
         )
         self.lbl_sum_text.configure(text=sum_txt)
 
@@ -344,7 +358,7 @@ class SetupWizardDialog(ctk.CTkToplevel):
             # 1. Logowanie lub inicjalizacja
             ok = cli.login_with_password(admin_pwd)
             if not ok:
-                self.after(0, lambda: self.lbl_apply_status.configure(text="❌ Błąd autoryzacji z routerem. Sprawdź hasło.", text_color="#ef4444"))
+                self.after(0, lambda: self.lbl_apply_status.configure(text=i18n.t("wiz_err_auth", self.lang), text_color="#ef4444"))
                 self.after(0, lambda: self.btn_finish.configure(state="normal"))
                 self.after(0, lambda: self.btn_back.configure(state="normal"))
                 return
@@ -370,18 +384,19 @@ class SetupWizardDialog(ctk.CTkToplevel):
 
             def finish():
                 self.lbl_apply_status.configure(text="✔ " + i18n.t("wiz_success", self.lang), text_color="#22c55e")
-                messagebox.showinfo("Kreator Zakończony", i18n.t("wiz_success", self.lang), parent=self)
+                msg_title = "Wizard Finished" if self.lang == "en" else "Kreator Zakończony"
+                messagebox.showinfo(msg_title, i18n.t("wiz_success", self.lang), parent=self)
                 # Zaktualizuj główne okno aplikacji
                 self.parent.ip_entry.delete(0, "end")
                 self.parent.ip_entry.insert(0, target_ip)
-                self.parent.auth_mode.set("Hasło")
+                self.parent.auth_mode.set(i18n.t("auth_pwd", self.lang))
                 self.parent.auth_entry.delete(0, "end")
                 self.parent.auth_entry.insert(0, admin_pwd)
                 self.parent.client.ip = target_ip
                 self.parent.client.stok = cli.stok
                 self.parent.client.connected = True
-                self.parent.status_indicator.configure(text="● Połączony", text_color="#22c55e")
-                self.parent.btn_connect.configure(text="Rozłącz")
+                self.parent.status_indicator.configure(text=i18n.t("status_connected", self.lang), text_color="#22c55e")
+                self.parent.btn_connect.configure(text=i18n.t("disconnect", self.lang))
                 self.parent._fetch_data_thread()
                 self.destroy()
 

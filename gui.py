@@ -4033,17 +4033,21 @@ class MiWiFiManagerApp(ctk.CTk):
 
     def _action_sync_time(self):
         import datetime
+        lg = self.current_lang
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         def run():
             res = self.client.set_sys_time(time_str=now_str, timezone_str="CET-1CEST")
             if res.get("code") == 0:
-                self.after(0, lambda: messagebox.showinfo("Czas routera", f"Zsynchronizowano czas routera z PC ({now_str}) oraz strefę czasową (CET-1CEST)."))
+                msg = f"Synchronized router time with PC ({now_str}) and timezone (CET-1CEST)." if lg == "en" else f"Zsynchronizowano czas routera z PC ({now_str}) oraz strefę czasową (CET-1CEST)."
+                self.after(0, lambda: messagebox.showinfo(t("tools_time_label", lg) if "tools_time_label" in i18n.TRANSLATIONS[lg] else "System Time", msg))
                 self._fetch_data_thread()
             else:
-                self.after(0, lambda: messagebox.showerror("Czas routera", f"Błąd synchronizacji czasu: {res}"))
+                err_m = f"Time synchronization error: {res}" if lg == "en" else f"Błąd synchronizacji czasu: {res}"
+                self.after(0, lambda: messagebox.showerror(t("msg_error_title", lg), err_m))
         threading.Thread(target=run, daemon=True).start()
 
     def _action_check_firmware_update(self):
+        lg = self.current_lang
         def run():
             res = self.client.check_firmware_update()
             if res.get("code") == 0:
@@ -4051,21 +4055,34 @@ class MiWiFiManagerApp(ctk.CTk):
                 need = res.get("needUpdate", 0)
                 if need == 1:
                     clog = res.get("changeLog", "")
-                    msg = f"Dostępna jest nowa wersja oprogramowania!\n\nAktualna wersja: {cur_v}\nNowa wersja dostępna na serwerach Xiaomi OTA.\n\nLista zmian (Changelog):\n{clog}"
-                    self.after(0, lambda: messagebox.showinfo("Aktualizacja OTA", msg))
+                    if lg == "en":
+                        msg = f"A new firmware version is available!\n\nCurrent version: {cur_v}\nNew version available on Xiaomi OTA servers.\n\nChangelog:\n{clog}"
+                        title = "OTA Update"
+                    else:
+                        msg = f"Dostępna jest nowa wersja oprogramowania!\n\nAktualna wersja: {cur_v}\nNowa wersja dostępna na serwerach Xiaomi OTA.\n\nLista zmian (Changelog):\n{clog}"
+                        title = "Aktualizacja OTA"
+                    self.after(0, lambda: messagebox.showinfo(title, msg))
                 else:
-                    self.after(0, lambda: messagebox.showinfo("Aktualizacja OTA", f"Oprogramowanie routera jest aktualne.\nWersja zainstalowana: {cur_v}\nBrak nowszych wydań OTA."))
+                    if lg == "en":
+                        msg = f"Router firmware is up to date.\nInstalled version: {cur_v}\nNo newer OTA updates found."
+                        title = "OTA Update"
+                    else:
+                        msg = f"Oprogramowanie routera jest aktualne.\nWersja zainstalowana: {cur_v}\nBrak nowszych wydań OTA."
+                        title = "Aktualizacja OTA"
+                    self.after(0, lambda: messagebox.showinfo(title, msg))
             else:
-                self.after(0, lambda: messagebox.showerror("Błąd OTA", f"Nie udało się sprawdzić aktualizacji: {res.get('error') or res}"))
+                err_m = f"Failed to check updates: {res.get('error') or res}" if lg == "en" else f"Nie udało się sprawdzić aktualizacji: {res.get('error') or res}"
+                self.after(0, lambda: messagebox.showerror(t("msg_error_title", lg), err_m))
         threading.Thread(target=run, daemon=True).start()
 
     def _dialog_change_password(self):
+        lg = self.current_lang
         if not self.client.connected:
-            messagebox.showwarning("Brak połączenia", "Najpierw połącz się z routerem.")
+            messagebox.showwarning(t("msg_no_conn_title", lg), t("msg_no_conn_body", lg))
             return
 
         dialog = ctk.CTkToplevel(self)
-        dialog.title("Zmiana Hasła Administratora")
+        dialog.title(t("pwd_dlg_title", lg))
         dialog.geometry("480x380")
         dialog.resizable(False, False)
         dialog.grab_set()
@@ -4073,25 +4090,25 @@ class MiWiFiManagerApp(ctk.CTk):
         f = ctk.CTkFrame(dialog, corner_radius=10)
         f.pack(fill="both", expand=True, padx=15, pady=15)
 
-        ctk.CTkLabel(f, text="Zmiana Hasła Administratora", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(15, 5))
-        ctk.CTkLabel(f, text="Hasło zostanie zaszyfrowane natywnym algorytmem AES-CBC / SHA-256.", text_color="#94a3b8", font=ctk.CTkFont(size=12)).pack(pady=(0, 15))
+        ctk.CTkLabel(f, text=t("pwd_dlg_heading", lg), font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(15, 5))
+        ctk.CTkLabel(f, text=t("pwd_dlg_sub", lg), text_color="#94a3b8", font=ctk.CTkFont(size=12)).pack(pady=(0, 15))
 
         f_old = ctk.CTkFrame(f, fg_color="transparent")
         f_old.pack(fill="x", padx=15, pady=6)
-        ctk.CTkLabel(f_old, text="Dotychczasowe hasło:", width=160, anchor="w").pack(side="left")
-        e_old = ctk.CTkEntry(f_old, width=220, show="•", placeholder_text="Stare hasło...")
+        ctk.CTkLabel(f_old, text=t("pwd_dlg_old", lg), width=160, anchor="w").pack(side="left")
+        e_old = ctk.CTkEntry(f_old, width=220, show="•", placeholder_text=t("pwd_placeholder", lg))
         e_old.pack(side="right")
 
         f_new1 = ctk.CTkFrame(f, fg_color="transparent")
         f_new1.pack(fill="x", padx=15, pady=6)
-        ctk.CTkLabel(f_new1, text="Nowe hasło:", width=160, anchor="w").pack(side="left")
-        e_new1 = ctk.CTkEntry(f_new1, width=220, show="•", placeholder_text="Min. 8 znaków...")
+        ctk.CTkLabel(f_new1, text=t("pwd_dlg_new1", lg), width=160, anchor="w").pack(side="left")
+        e_new1 = ctk.CTkEntry(f_new1, width=220, show="•", placeholder_text="Min. 8...")
         e_new1.pack(side="right")
 
         f_new2 = ctk.CTkFrame(f, fg_color="transparent")
         f_new2.pack(fill="x", padx=15, pady=6)
-        ctk.CTkLabel(f_new2, text="Powtórz nowe hasło:", width=160, anchor="w").pack(side="left")
-        e_new2 = ctk.CTkEntry(f_new2, width=220, show="•", placeholder_text="Powtórz hasło...")
+        ctk.CTkLabel(f_new2, text=t("pwd_dlg_new2", lg), width=160, anchor="w").pack(side="left")
+        e_new2 = ctk.CTkEntry(f_new2, width=220, show="•", placeholder_text="Min. 8...")
         e_new2.pack(side="right")
 
         def do_change():
@@ -4100,16 +4117,20 @@ class MiWiFiManagerApp(ctk.CTk):
             new_p2 = e_new2.get().strip()
 
             if not old_p or not new_p1 or not new_p2:
-                messagebox.showerror("Błąd", "Wszystkie pola są wymagane.", parent=dialog)
+                err_m = "Please fill in all fields." if lg == "en" else "Wszystkie pola są wymagane."
+                messagebox.showerror(t("msg_error_title", lg), err_m, parent=dialog)
                 return
             if new_p1 != new_p2:
-                messagebox.showerror("Błąd", "Nowe hasła nie są identyczne.", parent=dialog)
+                err_m = "New passwords are not identical." if lg == "en" else "Nowe hasła nie są identyczne."
+                messagebox.showerror(t("msg_error_title", lg), err_m, parent=dialog)
                 return
             if len(new_p1) < 8:
-                messagebox.showerror("Błąd", "Nowe hasło powinno mieć co najmniej 8 znaków.", parent=dialog)
+                err_m = "New password must have at least 8 characters." if lg == "en" else "Nowe hasło powinno mieć co najmniej 8 znaków."
+                messagebox.showerror(t("msg_error_title", lg), err_m, parent=dialog)
                 return
             if old_p == new_p1:
-                messagebox.showerror("Błąd", "Nowe hasło musi być inne niż dotychczasowe.", parent=dialog)
+                err_m = "New password must be different from current password." if lg == "en" else "Nowe hasło musi być inne niż dotychczasowe."
+                messagebox.showerror(t("msg_error_title", lg), err_m, parent=dialog)
                 return
 
             def run():
@@ -4117,24 +4138,28 @@ class MiWiFiManagerApp(ctk.CTk):
                     res = self.client.set_router_password(old_p, new_p1)
                     if res.get("code") == 0:
                         def on_success():
-                            messagebox.showinfo("Sukces", "Hasło administratora routera zostało pomyślnie zmienione!\nZapisz nowe hasło w bezpiecznym miejscu.", parent=dialog)
+                            succ_msg = "Router administrator password successfully changed!\nPlease save your new password in a safe place." if lg == "en" else "Hasło administratora routera zostało pomyślnie zmienione!\nZapisz nowe hasło w bezpiecznym miejscu."
+                            messagebox.showinfo(t("msg_saved_title", lg), succ_msg, parent=dialog)
                             dialog.destroy()
                         self.after(0, on_success)
                     else:
-                        self.after(0, lambda: messagebox.showerror("Błąd Routera", f"Router odrzucił zmianę hasła:\n{res}", parent=dialog))
+                        err_m = f"Router rejected password change:\n{res}" if lg == "en" else f"Router odrzucił zmianę hasła:\n{res}"
+                        self.after(0, lambda: messagebox.showerror(t("msg_error_title", lg), err_m, parent=dialog))
                 except Exception as ex:
-                    self.after(0, lambda: messagebox.showerror("Błąd", f"Nie udało się zmienić hasła: {ex}", parent=dialog))
+                    err_m = f"Failed to change password: {ex}" if lg == "en" else f"Nie udało się zmienić hasła: {ex}"
+                    self.after(0, lambda: messagebox.showerror(t("msg_error_title", lg), err_m, parent=dialog))
 
             threading.Thread(target=run, daemon=True).start()
 
         btn_box = ctk.CTkFrame(f, fg_color="transparent")
         btn_box.pack(fill="x", padx=15, pady=(20, 10))
-        ctk.CTkButton(btn_box, text="Zmień Hasło", fg_color="#16a34a", hover_color="#15803d", width=140, command=do_change).pack(side="left")
-        ctk.CTkButton(btn_box, text="Anuluj", fg_color="#475569", width=100, command=dialog.destroy).pack(side="right")
+        ctk.CTkButton(btn_box, text=t("pwd_dlg_save", lg), fg_color="#16a34a", hover_color="#15803d", width=140, command=do_change).pack(side="left")
+        ctk.CTkButton(btn_box, text=t("btn_cancel", lg), fg_color="#475569", width=100, command=dialog.destroy).pack(side="right")
 
     def _action_create_json_backup(self):
+        lg = self.current_lang
         if not self.client.connected:
-            messagebox.showwarning("Brak połączenia", "Najpierw połącz się z routerem.")
+            messagebox.showwarning(t("msg_no_conn_title", lg), t("msg_no_conn_body", lg))
             return
 
         rname = self.snapshot.get("init_info", {}).get("routername") or "xiaomi"
@@ -4142,10 +4167,10 @@ class MiWiFiManagerApp(ctk.CTk):
         def_name = f"backup_miwifi_{rname}_{date_str}.json"
 
         out_path = filedialog.asksaveasfilename(
-            title="Zapisz kopię zapasową (.json)",
+            title="Save JSON Backup (.json)" if lg == "en" else "Zapisz kopię zapasową (.json)",
             initialfile=def_name,
             defaultextension=".json",
-            filetypes=[("Pliki JSON", "*.json"), ("Wszystkie pliki", "*.*")]
+            filetypes=[("JSON files", "*.json") if lg == "en" else ("Pliki JSON", "*.json"), ("All files", "*.*") if lg == "en" else ("Wszystkie pliki", "*.*")]
         )
         if not out_path:
             return
@@ -4155,20 +4180,23 @@ class MiWiFiManagerApp(ctk.CTk):
                 snap = self.client.fetch_full_snapshot()
                 with open(out_path, "w", encoding="utf-8") as f:
                     json.dump(snap, f, ensure_ascii=False, indent=2)
-                self.after(0, lambda: messagebox.showinfo("Kopia Zapasowa", f"Pełna kopia konfiguracji została pomyślnie utworzona i zapisana w:\n{out_path}"))
+                succ_msg = f"Full configuration backup was successfully created and saved to:\n{out_path}" if lg == "en" else f"Pełna kopia konfiguracji została pomyślnie utworzona i zapisana w:\n{out_path}"
+                self.after(0, lambda: messagebox.showinfo("Backup" if lg == "en" else "Kopia Zapasowa", succ_msg))
             except Exception as e:
-                self.after(0, lambda: messagebox.showerror("Błąd", f"Nie udało się utworzyć kopii zapasowej: {e}"))
+                err_m = f"Failed to create backup: {e}" if lg == "en" else f"Nie udało się utworzyć kopii zapasowej: {e}"
+                self.after(0, lambda: messagebox.showerror(t("msg_error_title", lg), err_m))
 
         threading.Thread(target=run, daemon=True).start()
 
     def _dialog_selective_restore(self):
+        lg = self.current_lang
         if not self.client.connected:
-            messagebox.showwarning("Brak połączenia", "Najpierw połącz się z routerem.")
+            messagebox.showwarning(t("msg_no_conn_title", lg), t("msg_no_conn_body", lg))
             return
 
         file_path = filedialog.askopenfilename(
-            title="Wybierz plik kopii zapasowej (.json)",
-            filetypes=[("Pliki JSON", "*.json"), ("Wszystkie pliki", "*.*")]
+            title=t("rest_dlg_title", lg),
+            filetypes=[("JSON files", "*.json") if lg == "en" else ("Pliki JSON", "*.json"), ("All files", "*.*") if lg == "en" else ("Wszystkie pliki", "*.*")]
         )
         if not file_path:
             return
@@ -4177,12 +4205,13 @@ class MiWiFiManagerApp(ctk.CTk):
             with open(file_path, "r", encoding="utf-8") as f:
                 snap = json.load(f)
         except Exception as e:
-            messagebox.showerror("Błąd Pliku", f"Nie udało się odczytać pliku JSON: {e}")
+            err_m = f"Failed to read JSON file: {e}" if lg == "en" else f"Nie udało się odczytać pliku JSON: {e}"
+            messagebox.showerror(t("msg_error_title", lg), err_m)
             return
 
-        r_name = snap.get("init_info", {}).get("routername") or "Nieznany"
+        r_name = snap.get("init_info", {}).get("routername") or ("Unknown" if lg == "en" else "Nieznany")
         r_model = snap.get("init_info", {}).get("displayName") or "Xiaomi"
-        r_date = snap.get("fetch_date") or "brak daty"
+        r_date = snap.get("fetch_date") or ("no date" if lg == "en" else "brak daty")
 
         bind_cnt = len(snap.get("mac_bind", {}).get("list", []))
         pf_single_cnt = len(snap.get("port_forward", {}).get("single", []))
@@ -4190,7 +4219,7 @@ class MiWiFiManagerApp(ctk.CTk):
         wifi_cnt = len(snap.get("wifi_detail", {}).get("info", []))
 
         dialog = ctk.CTkToplevel(self)
-        dialog.title("Selektywne Przywracanie Konfiguracji")
+        dialog.title(t("rest_dlg_title", lg))
         dialog.geometry("540x500")
         dialog.resizable(False, False)
         dialog.grab_set()
@@ -4198,36 +4227,40 @@ class MiWiFiManagerApp(ctk.CTk):
         f = ctk.CTkFrame(dialog, corner_radius=10)
         f.pack(fill="both", expand=True, padx=15, pady=15)
 
-        ctk.CTkLabel(f, text="Selektywne Przywracanie Konfiguracji", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(12, 4))
-        ctk.CTkLabel(f, text=f"Źródło: {r_model} ({r_name})  |  Data: {r_date}", font=ctk.CTkFont(size=11), text_color="#38bdf8").pack(pady=(0, 10))
+        ctk.CTkLabel(f, text=t("rest_dlg_heading", lg), font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(12, 4))
+        source_txt = t("rest_dlg_source_date", lg).format(model=r_model, name=r_name, date=r_date)
+        ctk.CTkLabel(f, text=source_txt, font=ctk.CTkFont(size=11), text_color="#38bdf8").pack(pady=(0, 10))
 
-        ctk.CTkLabel(f, text="Zaznacz moduły, które chcesz wgrać do podłączonego routera:", font=ctk.CTkFont(weight="bold")).pack(anchor="w", padx=15, pady=(5, 10))
+        ctk.CTkLabel(f, text=t("rest_dlg_prompt", lg), font=ctk.CTkFont(weight="bold")).pack(anchor="w", padx=15, pady=(5, 10))
 
-        cb_mac = ctk.CTkCheckBox(f, text=f"Statyczne rezerwacje adresów IP (DHCP mac_bind)  [{bind_cnt} reguł]")
+        cb_mac_text = t("rest_dlg_cb_mac", lg).format(cnt=bind_cnt)
+        cb_mac = ctk.CTkCheckBox(f, text=cb_mac_text)
         if bind_cnt > 0: cb_mac.select()
         else: cb_mac.deselect()
         cb_mac.pack(anchor="w", padx=20, pady=6)
 
-        cb_pf = ctk.CTkCheckBox(f, text=f"Przekierowania portów i zakresów (NAT)  [{pf_single_cnt} poj., {pf_range_cnt} zakr.]")
+        cb_pf_text = t("rest_dlg_cb_pf", lg).format(s=pf_single_cnt, r=pf_range_cnt)
+        cb_pf = ctk.CTkCheckBox(f, text=cb_pf_text)
         if (pf_single_cnt + pf_range_cnt) > 0: cb_pf.select()
         else: cb_pf.deselect()
         cb_pf.pack(anchor="w", padx=20, pady=6)
 
-        cb_wifi = ctk.CTkCheckBox(f, text=f"Konfiguracja sieci Wi-Fi (SSID, hasła, kanały)  [{wifi_cnt} pasma]")
+        cb_wifi_text = t("rest_dlg_cb_wifi", lg).format(cnt=wifi_cnt)
+        cb_wifi = ctk.CTkCheckBox(f, text=cb_wifi_text)
         cb_wifi.deselect()
         cb_wifi.pack(anchor="w", padx=20, pady=6)
 
-        cb_ps = ctk.CTkCheckBox(f, text="Usługi portów fizycznych 2.5G (Dual WAN, LAG, IPTV, Gaming)")
+        cb_ps = ctk.CTkCheckBox(f, text=t("rest_dlg_cb_ports", lg))
         cb_ps.deselect()
         cb_ps.pack(anchor="w", padx=20, pady=6)
 
-        cb_qos = ctk.CTkCheckBox(f, text="Inteligentny QoS (tryb priorytetów, limity i deklaracja pasma)")
+        cb_qos = ctk.CTkCheckBox(f, text=t("rest_dlg_cb_qos", lg))
         cb_qos.deselect()
         cb_qos.pack(anchor="w", padx=20, pady=6)
 
         lbl_warn = ctk.CTkLabel(
             f,
-            text="Wskazówka: Przywracanie rezerwacji IP i przekierowań portów nie restartuje routera i nie modyfikuje reszty sieci.",
+            text=t("rest_dlg_hint", lg),
             text_color="#94a3b8", font=ctk.CTkFont(size=11), wraplength=480, justify="left"
         )
         lbl_warn.pack(padx=15, pady=(15, 15), anchor="w")
@@ -4242,48 +4275,58 @@ class MiWiFiManagerApp(ctk.CTk):
             }
 
             if not any(sections.values()):
-                messagebox.showwarning("Wybór", "Zaznacz co najmniej jeden moduł do przywrócenia.", parent=dialog)
+                err_m = "Select at least one module to restore." if lg == "en" else "Zaznacz co najmniej jeden moduł do przywrócenia."
+                messagebox.showwarning(t("msg_warning_title", lg) if "msg_warning_title" in i18n.TRANSLATIONS[lg] else "Selection", err_m, parent=dialog)
                 return
 
-            if not messagebox.askyesno("Potwierdzenie", "Czy na pewno chcesz wgrać wybrane moduły do routera?", parent=dialog):
+            confirm_prompt = "Are you sure you want to restore the selected modules to the router?" if lg == "en" else "Czy na pewno chcesz wgrać wybrane moduły do routera?"
+            if not messagebox.askyesno(t("btn_confirm", lg) if "btn_confirm" in i18n.TRANSLATIONS[lg] else "Confirmation", confirm_prompt, parent=dialog):
                 return
 
             def run():
                 try:
                     res = self.client.restore_selective_snapshot(snap, sections)
-                    succ_txt = "\n".join(res.get("success", [])) or "Brak zmian"
+                    succ_txt = "\n".join(res.get("success", [])) or ("No changes" if lg == "en" else "Brak zmian")
                     err_txt = "\n".join(res.get("errors", []))
-                    msg = f"Podsumowanie przywracania:\n\nSUKCES:\n{succ_txt}"
-                    if err_txt:
-                        msg += f"\n\nBŁĘDY / OSTRZEŻENIA:\n{err_txt}"
+                    if lg == "en":
+                        msg = f"Restore Summary:\n\nSUCCESS:\n{succ_txt}"
+                        if err_txt:
+                            msg += f"\n\nERRORS / WARNINGS:\n{err_txt}"
+                    else:
+                        msg = f"Podsumowanie przywracania:\n\nSUKCES:\n{succ_txt}"
+                        if err_txt:
+                            msg += f"\n\nBŁĘDY / OSTRZEŻENIA:\n{err_txt}"
                     def notify():
-                        messagebox.showinfo("Przywracanie Ukończone", msg, parent=dialog)
+                        title = "Restore Completed" if lg == "en" else "Przywracanie Ukończone"
+                        messagebox.showinfo(title, msg, parent=dialog)
                         dialog.destroy()
                         self._fetch_data_thread()
                     self.after(0, notify)
                 except Exception as ex:
-                    self.after(0, lambda: messagebox.showerror("Błąd", f"Wystąpił błąd podczas wgrywania: {ex}", parent=dialog))
+                    err_m = f"Restore error: {ex}" if lg == "en" else f"Wystąpił błąd podczas wgrywania: {ex}"
+                    self.after(0, lambda: messagebox.showerror(t("msg_error_title", lg), err_m, parent=dialog))
 
             threading.Thread(target=run, daemon=True).start()
 
         btn_box = ctk.CTkFrame(f, fg_color="transparent")
         btn_box.pack(fill="x", padx=15, pady=(10, 5))
-        ctk.CTkButton(btn_box, text="Wgraj Zaznaczone", fg_color="#16a34a", hover_color="#15803d", width=160, command=do_restore).pack(side="left")
-        ctk.CTkButton(btn_box, text="Anuluj", fg_color="#475569", width=100, command=dialog.destroy).pack(side="right")
+        ctk.CTkButton(btn_box, text=t("rest_dlg_btn_restore", lg), fg_color="#16a34a", hover_color="#15803d", width=160, command=do_restore).pack(side="left")
+        ctk.CTkButton(btn_box, text=t("btn_cancel", lg), fg_color="#475569", width=100, command=dialog.destroy).pack(side="right")
 
     def _action_download_official_backup(self):
+        lg = self.current_lang
         if not self.client.connected:
-            messagebox.showwarning("Brak połączenia", "Najpierw połącz się z routerem.")
+            messagebox.showwarning(t("msg_no_conn_title", lg), t("msg_no_conn_body", lg))
             return
 
         date_str = time.strftime("%Y%m%d_%H%M%S")
         def_name = f"xiaomi_official_backup_{date_str}.tar.gz"
 
         out_path = filedialog.asksaveasfilename(
-            title="Pobierz oficjalną kopię routera (.tar.gz)",
+            title="Download Xiaomi Official Backup (.tar.gz)" if lg == "en" else "Pobierz oficjalną kopię routera (.tar.gz)",
             initialfile=def_name,
             defaultextension=".tar.gz",
-            filetypes=[("Archiwum Xiaomi", "*.tar.gz"), ("Wszystkie pliki", "*.*")]
+            filetypes=[("Xiaomi Archive", "*.tar.gz") if lg == "en" else ("Archiwum Xiaomi", "*.tar.gz"), ("All files", "*.*") if lg == "en" else ("Wszystkie pliki", "*.*")]
         )
         if not out_path:
             return
@@ -4295,16 +4338,19 @@ class MiWiFiManagerApp(ctk.CTk):
                     filename = res.get("file")
                     ok = self.client.download_official_backup(filename, out_path)
                     if ok:
-                        self.after(0, lambda: messagebox.showinfo("Kopia Zapasowa", f"Pomyślnie pobrano oficjalną kopię Xiaomi do pliku:\n{out_path}"))
+                        succ_m = f"Successfully downloaded official Xiaomi backup to:\n{out_path}" if lg == "en" else f"Pomyślnie pobrano oficjalną kopię Xiaomi do pliku:\n{out_path}"
+                        self.after(0, lambda: messagebox.showinfo("Backup" if lg == "en" else "Kopia Zapasowa", succ_m))
                     else:
-                        self.after(0, lambda: messagebox.showerror("Błąd", "Nie udało się zapisać pobranego pliku."))
+                        err_m = "Failed to save downloaded backup file." if lg == "en" else "Nie udało się zapisać pobranego pliku."
+                        self.after(0, lambda: messagebox.showerror(t("msg_error_title", lg), err_m))
                 else:
-                    self.after(0, lambda: messagebox.showerror("Błąd Routera", f"Router zgłosił błąd podczas generowania kopii: {res}"))
+                    err_m = f"Router error: {res}" if lg == "en" else f"Router zgłosił błąd: {res}"
+                    self.after(0, lambda: messagebox.showerror(t("msg_error_title", lg), err_m))
             except Exception as e:
-                self.after(0, lambda: messagebox.showerror("Błąd", f"Błąd pobierania kopii oficjalnej: {e}"))
+                err_m = f"Failed to download official backup: {e}" if lg == "en" else f"Błąd pobierania kopii oficjalnej: {e}"
+                self.after(0, lambda: messagebox.showerror(t("msg_error_title", lg), err_m))
 
         threading.Thread(target=run, daemon=True).start()
-
     # --- KREATOR KONFIGURACJI ---
     def _build_wizard_tab(self):
         lg = self.current_lang
@@ -4983,7 +5029,7 @@ class MiWiFiManagerApp(ctk.CTk):
             if st and "hour" in st:
                 t_str = f"{st.get('year')}-{safe_int(st.get('month')):02d}-{safe_int(st.get('day')):02d} {safe_int(st.get('hour')):02d}:{safe_int(st.get('min')):02d}:{safe_int(st.get('sec')):02d}"
                 tz_str = st.get('timezone', 'CST-8')
-                self.lbl_sys_time.configure(text=f"Czas routera: {t_str} ({tz_str})")
+                self.lbl_sys_time.configure(text=f"{t('tools_time_label', self.current_lang)} {t_str} ({tz_str})")
         except Exception as e:
             print("Błąd aktualizacji czasu systemowego:", e)
 
@@ -4992,9 +5038,9 @@ class MiWiFiManagerApp(ctk.CTk):
             cc = snap.get("country_code", {}).get("current", "")
             if cc:
                 if cc.upper() == "PL":
-                    self.combo_country.set("PL - Polska (Standard ETSI / UE)")
+                    self.combo_country.set(t("wifi_adv_country_pl", self.current_lang))
                 elif cc.upper() == "CN":
-                    self.combo_country.set("CN - Chiny (Pełna moc nadawania)")
+                    self.combo_country.set(t("wifi_adv_country_cn", self.current_lang))
         except Exception as e:
             print("Błąd aktualizacji kodu kraju:", e)
 
@@ -5300,18 +5346,21 @@ class MiWiFiManagerApp(ctk.CTk):
         threading.Thread(target=run, daemon=True).start()
 
     def _check_wizard_state(self):
+        lg = self.current_lang
         def run():
             try:
                 info = self.client.probe()
                 inited = info.get("inited", 1)
                 if inited == 0:
-                    self.after(0, lambda: self.lbl_wiz_status.configure(text="Router jest w stanie fabrycznym (inited=0).\nMożna rozpocząć konfigurację od zera!", text_color="#22c55e"))
+                    txt = t("wiz_s1_factory_yes", lg) if "wiz_s1_factory_yes" in i18n.TRANSLATIONS[lg] else ("Router is in factory state (inited=0).\nMożna rozpocząć konfigurację od zera!" if lg != "en" else "Router is in factory state (inited=0).\nYou can start fresh configuration!")
+                    self.after(0, lambda: self.lbl_wiz_status.configure(text=txt, text_color="#22c55e"))
                 else:
-                    self.after(0, lambda: self.lbl_wiz_status.configure(text=f"Router jest już skonfigurowany (inited={inited}).\nKreator fabryczny nie jest wymagany.", text_color="#eab308"))
+                    txt = t("wiz_s1_factory_no", lg).format(inited=inited) if "wiz_s1_factory_no" in i18n.TRANSLATIONS[lg] else (f"Router is already initialized (inited={inited}).\nSetup wizard not required." if lg == "en" else f"Router jest już skonfigurowany (inited={inited}).\nKreator fabryczny nie jest wymagany.")
+                    self.after(0, lambda: self.lbl_wiz_status.configure(text=txt, text_color="#eab308"))
             except Exception as e:
-                self.after(0, lambda: self.lbl_wiz_status.configure(text=f"Błąd sprawdzania: {e}", text_color="#ef4444"))
+                err_prefix = "Check error:" if lg == "en" else "Błąd sprawdzania:"
+                self.after(0, lambda: self.lbl_wiz_status.configure(text=f"{err_prefix} {e}", text_color="#ef4444"))
         threading.Thread(target=run, daemon=True).start()
-
 
 def main():
     app = MiWiFiManagerApp()
