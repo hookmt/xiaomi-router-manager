@@ -103,7 +103,7 @@ Lightweight, zero-dependency Python 3 scripts for rapid headless disaster recove
 ## Installation & Usage
 
 ### Option A: Standalone Executable (No Python Required)
-1. Download `Xiaomi_Router_Manager.exe` from the [Releases](releases) page.
+1. Download `Xiaomi_Router_Manager.exe` from the [Releases](https://github.com/hookmt/xiaomi-router-manager/releases) page.
 2. Launch `Xiaomi_Router_Manager.exe`.
 3. Enter your router gateway IP (`192.168.31.1` by default) and administrator password (or paste a browser URL containing `;stok=...`).
 4. Click **Connect**.
