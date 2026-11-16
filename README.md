@@ -158,6 +158,13 @@ Aplikacja całkowicie eliminuje konieczność korzystania z chińskiego panelu w
 
 ---
 
+## Acknowledgements / Podziękowania
+
+- Co-developed with **Antigravity** (Google DeepMind) as AI engineering assistant & technical partner.
+- Projekt współtworzony z cyfrowym asystentem inżynieryjnym **Antigravity** (Google DeepMind).
+
+---
+
 ## License
 
 Distributed under the MIT License. See [`LICENSE`](LICENSE) for details.
