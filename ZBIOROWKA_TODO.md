@@ -10,6 +10,24 @@
   - Statystyki błędów CRC / pakietów utraconych na portach ethernetowych.
   - Wykrywanie podłączonych klientów per port fizyczny LAN (mapowanie MAC/IP do numeru gniazda).
 
+### 2. Integracja z Home Assistant OS (HAOS / HACS)
+- **Koncepcja:**
+  - Wykorzystanie silnika `api.py` jako biblioteki bazowej dla `custom_components/xiaomi_router`.
+  - Sensory: prędkości WAN upload/download, obciążenie CPU/RAM, temperatura, stan linku portów 2.5G.
+  - Śledzenie obecności (Device Tracker) na podstawie powiązań Wi-Fi (2.4G/5G/LAN) i siły sygnału RSSI.
+  - Przełączniki i akcje: sieć dla gości on/off, diody LED nocne on/off, optymalizacja kanałów, restart routera.
+  - Korzyść poboczna: darmowy, natywny dostęp z poziomu aplikacji Home Assistant na smartfonach z Androidem i iOS!
+
+### 3. Wersja linuksowa (AppImage / Standalone binary)
+- **Koncepcja:**
+  - Standaryzacja uruchamiania `customtkinter` pod środowiskami X11 i Wayland.
+  - Przygotowanie automatycznego buildu AppImage / pojedynczego pliku binarnego dla dystrybucji Debian/Ubuntu/Fedora/Arch.
+
+### 4. Dedykowana aplikacja mobilna (Android)
+- **Koncepcja:**
+  - Opcja A (preferowana): integracja HAOS i dedykowana karta Lovelace w aplikacji mobilnej HA.
+  - Opcja B (niezależna): lekki interfejs webowy PWA (Responsive Web Dashboard) serwowany lokalnie przez router/mikroserwer.
+
 ---
 
 ## Archiwum wdrożeń
