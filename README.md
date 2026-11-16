@@ -113,7 +113,7 @@ Clone the repository and run with `uv` (recommended) or standard Python:
 
 ```bash
 # Clone repository
-git clone https://github.com/<your-username>/xiaomi-router-manager.git
+git clone https://github.com/hookmt/xiaomi-router-manager.git
 cd xiaomi-router-manager
 
 # Run using uv (installs dependencies automatically)
