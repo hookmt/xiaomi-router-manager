@@ -1,10 +1,10 @@
 # ZBIORÓWKA ZADAŃ I POPRAWEK DO WDROŻENIA
 
-Status: Zbieranie uwag i poprawek do wydania v1.1.0 (zgodnie z wytyczną użytkownika: nie poprawiać od razu, zbierać do zbiorówki na kolejną wersję).
+Status: Zbieranie uwag i poprawek do wydania patch v1.0.1 (zgodnie z wytyczną użytkownika: nie poprawiać od razu, zbierać do zbiorówki na kolejną wersję).
 
 ---
 
-## Zadania do wydania v1.1.0
+## Zadania do wydania v1.0.1 (Poprawki / Patch)
 
 ### 1. Karta Konserwacja Sprzętowa (Hardware Maintenance / System Time)
 - **Etykieta czasu routera (`lbl_sys_time`):**
