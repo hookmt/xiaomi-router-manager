@@ -2,15 +2,25 @@
 
 ---
 
-## Planowane funkcje do wydania v1.1.0 (Minor Release)
+## Planowane wydanie (Zbiorówka: Linux, Android)
 
-### 1. Rozszerzona diagnostyka i wykresy per-port LAN
+### 1. Wersja linuksowa (AppImage / Standalone binary)
+- **Koncepcja:**
+  - Standaryzacja uruchamiania `customtkinter` pod środowiskami X11 i Wayland.
+  - Przygotowanie automatycznego buildu AppImage / pojedynczego pliku binarnego dla dystrybucji Debian/Ubuntu/Fedora/Arch.
+
+### 2. Dedykowana aplikacja mobilna (Android)
+- **Koncepcja:**
+  - Opcja A (preferowana): integracja HAOS i dedykowana karta Lovelace w aplikacji mobilnej HA.
+  - Opcja B (niezależna): lekki interfejs webowy PWA (Responsive Web Dashboard) serwowany lokalnie przez router/mikroserwer.
+
+### 3. Rozszerzona diagnostyka i wykresy per-port LAN
 - **Koncepcja:**
   - Dynamiczne wykresy transferu na żywo dla każdego portu fizycznego RJ45 (wykresy MB/s w czasie rzeczywistym).
   - Statystyki błędów CRC / pakietów utraconych na portach ethernetowych.
   - Wykrywanie podłączonych klientów per port fizyczny LAN (mapowanie MAC/IP do numeru gniazda).
 
-### 2. Integracja z Home Assistant OS (HAOS / HACS)
+### 4. Integracja z Home Assistant OS (HAOS / HACS)
 - **Koncepcja:**
   - Wykorzystanie silnika `api.py` jako biblioteki bazowej dla `custom_components/xiaomi_router`.
   - Sensory: prędkości WAN upload/download, obciążenie CPU/RAM, temperatura, stan linku portów 2.5G.
@@ -18,19 +28,18 @@
   - Przełączniki i akcje: sieć dla gości on/off, diody LED nocne on/off, optymalizacja kanałów, restart routera.
   - Korzyść poboczna: darmowy, natywny dostęp z poziomu aplikacji Home Assistant na smartfonach z Androidem i iOS!
 
-### 3. Wersja linuksowa (AppImage / Standalone binary)
-- **Koncepcja:**
-  - Standaryzacja uruchamiania `customtkinter` pod środowiskami X11 i Wayland.
-  - Przygotowanie automatycznego buildu AppImage / pojedynczego pliku binarnego dla dystrybucji Debian/Ubuntu/Fedora/Arch.
-
-### 4. Dedykowana aplikacja mobilna (Android)
-- **Koncepcja:**
-  - Opcja A (preferowana): integracja HAOS i dedykowana karta Lovelace w aplikacji mobilnej HA.
-  - Opcja B (niezależna): lekki interfejs webowy PWA (Responsive Web Dashboard) serwowany lokalnie przez router/mikroserwer.
-
 ---
 
 ## Archiwum wdrożeń
+
+### v1.0.2 (Zrealizowane 2026-11-20)
+- **Szybka rezerwacja DHCP z listy urządzeń (Network Devices):**
+  - Aktywny zielony przycisk `+ Rezerwuj` / `+ Reserve` przy urządzeniach na dzierżawie dynamicznej w `Dashboard & devices -> Network Devices`.
+  - Dedykowane okno modalne z automatycznie uzupełnioną nazwą, zablokowanym do edycji adresem MAC oraz aktualnym adresem IP.
+  - Natychmiastowe związanie przez API routera (`mac_bind`), odświeżenie danych i automatyczne usunięcie przycisku po nadaniu rezerwacji.
+- **Kompilacja i wersjonowanie:**
+  - Samodzielny plik binarny `Xiaomi_Router_Manager_v1.0.2.exe` skompilowany przez PyInstaller.
+  - Uzupełniony słownik `i18n.py` (PL i EN) oraz zaktualizowany `version.py` i `file_version_info.txt`.
 
 ### v1.0.1 (Zrealizowane 2026-11-16)
 - **Wizualizacja fizycznych portów routera (Physical Ports RJ45 4x 2.5 Gbps):**

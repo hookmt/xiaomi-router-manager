@@ -2,6 +2,18 @@
 
 All notable changes to **Xiaomi Router Manager (XRM)** will be documented in this file.
 
+## [1.0.2] - 2026-11-20
+
+### Added & Improved
+- **Quick DHCP Reservation from Active Network Devices (`+ Rezerwuj` / `+ Reserve`):**
+  - Active network devices without static DHCP reservations now display a direct quick-action button in `Dashboard & devices -> Network Devices`.
+  - Automatically pre-populates Device Name, locked/readonly MAC address, and current dynamic IP address.
+  - Instantly registers the static lease via router API (`mac_bind`), refreshes network status, and removes the button once bound.
+- **Enhanced DHCP Dialog Prefill (`_dialog_add_mac_bind`):**
+  - Added support for prefilled parameters with dedicated notification header and locked hardware MAC field.
+
+---
+
 ## [1.0.1] - 2026-11-16
 
 ### Added & Improved

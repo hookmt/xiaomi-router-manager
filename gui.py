@@ -856,6 +856,20 @@ class MiWiFiManagerApp(ctk.CTk):
                 )
                 btn_wan.pack(side="right", padx=(5, 10))
 
+            # Szybka rezerwacja DHCP dla urządzeń bez stałego IP
+            is_bound = ((it.get("mac") or "").upper() in binds_by_mac)
+            if not it["is_offline"] and not is_bound and it.get("mac") and it["mac"] != "-":
+                btn_bind = ctk.CTkButton(
+                    row_f,
+                    text=t("dev_btn_quick_bind", lg),
+                    width=90,
+                    height=26,
+                    fg_color="#16a34a",
+                    hover_color="#15803d",
+                    command=lambda m=it["mac"], ip=it["ip"], n=it["name"]: self._dialog_add_mac_bind(prefill_mac=m, prefill_ip=ip, prefill_name=n)
+                )
+                btn_bind.pack(side="right", padx=(5, 5))
+
             # LEWA STRONA
             ctk.CTkLabel(row_f, text=it["name"], font=ctk.CTkFont(weight="bold"), width=180, anchor="w").pack(side="left", padx=6)
             ctk.CTkLabel(row_f, text=f"IP: {it['ip']}", width=120, anchor="w", text_color="#38bdf8" if it["is_offline"] else None).pack(side="left", padx=4)
@@ -1414,7 +1428,7 @@ class MiWiFiManagerApp(ctk.CTk):
         ctk.CTkButton(btn_box, text=t("dhcp_dlg_btn_cancel", lg), fg_color="#475569", width=120, command=dialog.destroy).pack(side="left")
         ctk.CTkButton(btn_box, text=t("dhcp_dlg_btn_save", lg), fg_color="#0284c7", hover_color="#0369a1", width=160, command=do_update).pack(side="right")
 
-    def _dialog_add_mac_bind(self):
+    def _dialog_add_mac_bind(self, prefill_mac: str = None, prefill_ip: str = None, prefill_name: str = None):
         if not self.client.connected:
             messagebox.showinfo(t("err_title", self.current_lang), t("err_not_connected", self.current_lang))
             return
@@ -1426,36 +1440,42 @@ class MiWiFiManagerApp(ctk.CTk):
         dialog.resizable(False, False)
         dialog.grab_set()
 
-        ctk.CTkLabel(dialog, text=t("dhcp_dlg_add_heading", lg), font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(15, 10))
+        heading = t("dhcp_dlg_quick_add_heading", lg) if prefill_mac else t("dhcp_dlg_add_heading", lg)
+        ctk.CTkLabel(dialog, text=heading, font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(15, 10))
 
-        # Opcja wyboru z aktualnie wykrytych urządzeń
-        online_devs = self.snapshot.get("device_list", {}).get("list", []) if self.snapshot else []
-        dev_map = {}
-        dev_options = [t("hint_manual_entry", lg)]
-        for d in online_devs:
-            d_n = d.get("name") or d.get("oname") or ("Unknown" if lg == "en" else "Nieznane")
-            d_m = d.get("mac", "")
-            d_i = d.get("ip", [{}])[0].get("ip") if isinstance(d.get("ip"), list) and d.get("ip") else str(d.get("ip", ""))
-            opt_label = f"{d_n} ({d_i} / {d_m})"
-            dev_options.append(opt_label)
-            dev_map[opt_label] = (d_n, d_m, d_i)
+        if not prefill_mac:
+            # Opcja wyboru z aktualnie wykrytych urządzeń
+            online_devs = self.snapshot.get("device_list", {}).get("list", []) if self.snapshot else []
+            dev_map = {}
+            dev_options = [t("hint_manual_entry", lg)]
+            for d in online_devs:
+                d_n = d.get("name") or d.get("oname") or ("Unknown" if lg == "en" else "Nieznane")
+                d_m = d.get("mac", "")
+                d_i = d.get("ip", [{}])[0].get("ip") if isinstance(d.get("ip"), list) and d.get("ip") else str(d.get("ip", ""))
+                opt_label = f"{d_n} ({d_i} / {d_m})"
+                dev_options.append(opt_label)
+                dev_map[opt_label] = (d_n, d_m, d_i)
 
-        f_select = ctk.CTkFrame(dialog, fg_color="transparent")
-        f_select.pack(fill="x", padx=25, pady=5)
-        ctk.CTkLabel(f_select, text=t("dhcp_dlg_select_active", lg)).pack(anchor="w")
+            f_select = ctk.CTkFrame(dialog, fg_color="transparent")
+            f_select.pack(fill="x", padx=25, pady=5)
+            ctk.CTkLabel(f_select, text=t("dhcp_dlg_select_active", lg)).pack(anchor="w")
 
-        def on_device_select(choice):
-            if choice in dev_map:
-                n, m, i = dev_map[choice]
-                ent_name.delete(0, "end")
-                ent_name.insert(0, n)
-                ent_mac.delete(0, "end")
-                ent_mac.insert(0, m)
-                ent_ip.delete(0, "end")
-                ent_ip.insert(0, i)
+            def on_device_select(choice):
+                if choice in dev_map:
+                    n, m, i = dev_map[choice]
+                    ent_name.delete(0, "end")
+                    ent_name.insert(0, n)
+                    ent_mac.delete(0, "end")
+                    ent_mac.insert(0, m)
+                    ent_ip.delete(0, "end")
+                    ent_ip.insert(0, i)
 
-        combo_dev = ctk.CTkComboBox(f_select, values=dev_options, width=420, command=on_device_select)
-        combo_dev.pack(fill="x", pady=(2, 8))
+            combo_dev = ctk.CTkComboBox(f_select, values=dev_options, width=420, command=on_device_select)
+            combo_dev.pack(fill="x", pady=(2, 8))
+        else:
+            f_info = ctk.CTkFrame(dialog, fg_color="transparent")
+            f_info.pack(fill="x", padx=25, pady=5)
+            ctk.CTkLabel(f_info, text=t("dhcp_dlg_quick_info", lg).format(mac=prefill_mac), text_color="#10b981", font=ctk.CTkFont(weight="bold")).pack(anchor="w", pady=(2, 8))
 
         f_form = ctk.CTkFrame(dialog, fg_color="transparent")
         f_form.pack(fill="x", padx=25, pady=5)
@@ -1463,18 +1483,25 @@ class MiWiFiManagerApp(ctk.CTk):
         ctk.CTkLabel(f_form, text=t("dhcp_dlg_dev_name", lg)).pack(anchor="w")
         ent_name = ctk.CTkEntry(f_form, placeholder_text=t("dhcp_dlg_ph_dev_name", lg))
         ent_name.pack(fill="x", pady=(2, 8))
+        if prefill_name:
+            ent_name.insert(0, prefill_name)
 
         ctk.CTkLabel(f_form, text=t("dhcp_dlg_mac_hint", lg)).pack(anchor="w")
         ent_mac = ctk.CTkEntry(f_form, placeholder_text=t("dhcp_dlg_ph_mac", lg))
         ent_mac.pack(fill="x", pady=(2, 8))
+        if prefill_mac:
+            ent_mac.insert(0, prefill_mac)
+            ent_mac.configure(state="disabled")
 
         ctk.CTkLabel(f_form, text=t("dhcp_dlg_static_ip", lg)).pack(anchor="w")
         ent_ip = ctk.CTkEntry(f_form, placeholder_text=t("dhcp_dlg_ph_ip", lg))
         ent_ip.pack(fill="x", pady=(2, 15))
+        if prefill_ip and prefill_ip != "-":
+            ent_ip.insert(0, prefill_ip)
 
         def do_save():
             name = ent_name.get().strip()
-            mac = ent_mac.get().strip()
+            mac = prefill_mac if prefill_mac else ent_mac.get().strip()
             ip = ent_ip.get().strip()
             if not name or not mac or not ip:
                 messagebox.showerror(t("err_title", lg), t("dhcp_dlg_err_fields", lg), parent=dialog)
