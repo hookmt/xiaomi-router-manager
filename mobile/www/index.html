@@ -435,11 +435,11 @@
             <!-- Selektor typu połączenia -->
             <div class="form-group">
               <label class="form-label">Wybierz typ połączenia WAN:</label>
-              <div class="seg-btn full-width" id="wan-type-selector">
-                <button data-type="dhcp" class="active">DHCP</button>
-                <button data-type="pppoe">PPPoE</button>
-                <button data-type="static">Statyczny IP</button>
-              </div>
+              <select id="wan-type-select" class="form-select">
+                <option value="dhcp">DHCP (Automatyczny IP od modemu)</option>
+                <option value="pppoe">PPPoE (Login i hasło światłowodu / Neostrady)</option>
+                <option value="static">Statyczny IP (Stała adresacja ręczna)</option>
+              </select>
             </div>
 
             <!-- Sekcja PPPoE (widoczna tylko dla PPPoE) -->
@@ -602,94 +602,315 @@
             <h2 class="view-title">Sieć Bezprzewodowa (Wi-Fi)</h2>
             <p class="view-desc">Konfiguracja pasm 2.4 GHz oraz 5 GHz (Wi-Fi 7 / 6), mocy nadawania i optymalizacja kanałów.</p>
           </div>
-          <button class="btn-secondary" id="btn-wifi-opt">✨ Optymalizuj kanały Wi-Fi</button>
+          <div class="header-actions">
+            <label class="toggle-switch-label">
+              <input type="checkbox" id="wifi-switch-smartconnect">
+              <span class="toggle-slider"></span>
+              <span class="switch-txt">Smart Connect (Wspólne SSID)</span>
+            </label>
+            <button class="btn-warn" id="btn-wifi-opt">✨ Optymalizuj kanały Wi-Fi</button>
+            <button class="btn-secondary" id="btn-wifi-card">🎫 Karta Dostępowa Wi-Fi</button>
+          </div>
+        </div>
+
+        <!-- Baner informacyjny Smart Connect (Wi-Fi 双频合一) -->
+        <div id="wifi-bsd-banner" class="wifi-banner-info">
+          ★ Smart Connect (Wi-Fi 双频合一) jest WŁĄCZONY - Pasma 2.4 GHz i 5 GHz współdzielą jedno SSID i hasło. Router automatycznie dobiera pasmo.
         </div>
 
         <div class="grid-2-col">
-          <!-- Pasmo 2.4 GHz -->
+          <!-- Karta Lewa: Pasmo 2.4 GHz (lub Wspólna Sieć) -->
           <div class="card">
             <div class="card-head">
-              <span class="card-icon">📶</span>
-              <h3>Pasmo 2.4 GHz</h3>
+              <div class="head-title-row">
+                <span class="card-icon">📶</span>
+                <h3 id="wifi-2g-card-title">Wspólna Sieć Wi-Fi i Pasmo 2.4 GHz (Smart Connect)</h3>
+              </div>
+              <label class="toggle-switch-label sm">
+                <input type="checkbox" id="wifi-2g-enable" checked>
+                <span class="toggle-slider"></span>
+                <span id="wifi-2g-enable-txt" class="status-lbl">Włączone</span>
+              </label>
             </div>
+            
             <div class="form-group">
-              <label class="form-label">Nazwa sieci (SSID 2.4G):</label>
+              <label class="form-label" id="wifi-2g-ssid-lbl">Wspólna nazwa (SSID):</label>
               <input type="text" id="wifi-2g-ssid" class="form-input">
             </div>
+
             <div class="form-group">
-              <label class="form-label">Hasło Wi-Fi 2.4G:</label>
-              <input type="password" id="wifi-2g-pwd" class="form-input">
+              <label class="form-label" id="wifi-2g-enc-lbl">Wspólne szyfrowanie:</label>
+              <select id="wifi-2g-enc" class="form-select">
+                <option value="sae-mixed">WPA2/WPA3 Personal (sae-mixed)</option>
+                <option value="psk2">WPA2 Personal (psk2)</option>
+                <option value="sae">WPA3 Personal (sae)</option>
+                <option value="none">Brak zabezpieczeń (Otwarte)</option>
+              </select>
             </div>
+
             <div class="form-group">
-              <label class="form-label">Moc nadawania:</label>
+              <label class="form-label" id="wifi-2g-pwd-lbl">Wspólne hasło Wi-Fi:</label>
+              <div class="input-password-wrapper">
+                <input type="password" id="wifi-2g-pwd" class="form-input">
+                <button type="button" class="btn-toggle-pwd" id="btn-toggle-2g-pwd">👁️</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-inline">
+                <input type="checkbox" id="wifi-2g-show-pwd">
+                <span>Pokaż hasło w polu</span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Moc nadawania (TX Power):</label>
               <select id="wifi-2g-tx" class="form-select">
                 <option value="max">Maksymalna (Wzmocniona)</option>
                 <option value="mid">Średnia (Standardowa)</option>
                 <option value="min">Niska (Oszczędna)</option>
               </select>
             </div>
+
             <div class="form-row-2">
               <div class="form-group">
-                <label class="form-label">Kanał:</label>
+                <label class="form-label">Kanał Wi-Fi (Channel):</label>
                 <select id="wifi-2g-channel" class="form-select">
                   <option value="0">Auto</option>
-                  <option value="1">1</option><option value="6">6</option><option value="11">11</option>
+                  <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                  <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                  <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                  <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                  <option value="13">13</option>
                 </select>
               </div>
               <div class="form-group">
-                <label class="form-label">Szerokość:</label>
+                <label class="form-label">Szerokość pasma (Bandwidth):</label>
                 <select id="wifi-2g-bw" class="form-select">
                   <option value="0">40 / 20 MHz</option>
                   <option value="20">20 MHz</option>
                 </select>
               </div>
             </div>
+
+            <div class="form-group">
+              <label class="toggle-switch-label sm">
+                <input type="checkbox" id="wifi-2g-hidden">
+                <span class="toggle-slider"></span>
+                <span class="switch-txt">Ukryj sieć (Brak rozgłaszania SSID)</span>
+              </label>
+            </div>
+
+            <div class="wifi-summary-box" id="wifi-2g-summary">
+              Kanał: 11 | Szerokość: do 40 MHz | Status: Włączone
+            </div>
           </div>
 
-          <!-- Pasmo 5 GHz / Wi-Fi 7 -->
+          <!-- Karta Prawa: Pasmo 5 GHz / Wi-Fi 7 -->
           <div class="card">
             <div class="card-head">
-              <span class="card-icon">🚀</span>
-              <h3>Pasmo 5 GHz / Wi-Fi 7 MLO</h3>
+              <div class="head-title-row">
+                <span class="card-icon">🚀</span>
+                <h3 id="wifi-5g-card-title">Parametry Radiowe 5 GHz (Smart Connect)</h3>
+              </div>
+              <label class="toggle-switch-label sm">
+                <input type="checkbox" id="wifi-5g-enable" checked>
+                <span class="toggle-slider"></span>
+                <span id="wifi-5g-enable-txt" class="status-lbl">Włączone</span>
+              </label>
             </div>
-            <div class="form-group">
-              <label class="form-label">Nazwa sieci (SSID 5G):</label>
-              <input type="text" id="wifi-5g-ssid" class="form-input">
+
+            <!-- Baner synchronizacji z 2.4 GHz przy Smart Connect -->
+            <div id="wifi-5g-sync-banner" class="wifi-sync-info">
+              ★ Smart Connect włączony: Pasmo 5 GHz współdzieli wspólną nazwę SSID, hasło i szyfrowanie z panelem po lewej.
             </div>
-            <div class="form-group">
-              <label class="form-label">Hasło Wi-Fi 5G:</label>
-              <input type="password" id="wifi-5g-pwd" class="form-input">
+
+            <!-- Pola 5G (widoczne tylko gdy Smart Connect jest wyłączony) -->
+            <div id="wifi-5g-credentials-box" class="hidden">
+              <div class="form-group">
+                <label class="form-label">Nazwa sieci (SSID 5G):</label>
+                <input type="text" id="wifi-5g-ssid" class="form-input">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Szyfrowanie 5G:</label>
+                <select id="wifi-5g-enc" class="form-select">
+                  <option value="sae-mixed">WPA2/WPA3 Personal (sae-mixed)</option>
+                  <option value="psk2">WPA2 Personal (psk2)</option>
+                  <option value="sae">WPA3 Personal (sae)</option>
+                  <option value="none">Brak zabezpieczeń (Otwarte)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Hasło Wi-Fi 5G:</label>
+                <div class="input-password-wrapper">
+                  <input type="password" id="wifi-5g-pwd" class="form-input">
+                  <button type="button" class="btn-toggle-pwd" id="btn-toggle-5g-pwd">👁️</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="checkbox-inline">
+                  <input type="checkbox" id="wifi-5g-show-pwd">
+                  <span>Pokaż hasło w polu</span>
+                </label>
+              </div>
             </div>
+
             <div class="form-group">
-              <label class="form-label">Moc nadawania:</label>
+              <label class="form-label">Moc nadawania (TX Power):</label>
               <select id="wifi-5g-tx" class="form-select">
                 <option value="max">Maksymalna (Wzmocniona)</option>
                 <option value="mid">Średnia (Standardowa)</option>
                 <option value="min">Niska (Oszczędna)</option>
               </select>
             </div>
+
             <div class="form-row-2">
               <div class="form-group">
-                <label class="form-label">Kanał:</label>
+                <label class="form-label">Kanał Wi-Fi (Channel):</label>
                 <select id="wifi-5g-channel" class="form-select">
                   <option value="0">Auto</option>
-                  <option value="36">36</option><option value="44">44</option><option value="149">149</option>
+                  <option value="36">36</option><option value="40">40</option><option value="44">44</option>
+                  <option value="48">48</option><option value="52">52</option><option value="56">56</option>
+                  <option value="60">60</option><option value="64">64</option><option value="149">149</option>
+                  <option value="153">153</option><option value="157">157</option><option value="161">161</option>
+                  <option value="165">165</option>
                 </select>
               </div>
               <div class="form-group">
-                <label class="form-label">Szerokość:</label>
+                <label class="form-label">Szerokość pasma (Bandwidth):</label>
                 <select id="wifi-5g-bw" class="form-select">
                   <option value="0">160 / 80 / 40 / 20 MHz (Wi-Fi 7)</option>
                   <option value="80">80 / 40 / 20 MHz</option>
                   <option value="40">40 MHz</option>
+                  <option value="20">20 MHz</option>
                 </select>
               </div>
+            </div>
+
+            <div class="form-group">
+              <label class="toggle-switch-label sm">
+                <input type="checkbox" id="wifi-5g-hidden">
+                <span class="toggle-slider"></span>
+                <span class="switch-txt">Ukryj sieć (Brak rozgłaszania SSID)</span>
+              </label>
+            </div>
+
+            <div class="wifi-summary-box" id="wifi-5g-summary">
+              Kanał: 36 | Szerokość: do 160 MHz (Wi-Fi 6/7) | Status: Włączone
             </div>
           </div>
         </div>
 
         <div class="card-footer-box">
-          <button class="btn-primary" id="btn-save-wifi">💾 Zastosuj Ustawienia Wi-Fi</button>
+          <button class="btn-success full-width" id="btn-save-wifi">★ Zastosuj i Zsynchronizuj Ustawienia Wi-Fi (Zapis obu pasm / Smart Connect)</button>
+        </div>
+
+        <!-- Karta: Zaawansowane Ustawienia Wi-Fi (Funkcje Systemowe i Roaming) -->
+        <div class="card mt-16">
+          <div class="card-head">
+            <span class="card-icon">⚡</span>
+            <h3>Zaawansowane Ustawienia Wi-Fi (Funkcje Systemowe i Roaming)</h3>
+          </div>
+
+          <div class="adv-wifi-list">
+            <!-- 1. Wi-Fi 5 Kompatybilność -->
+            <div class="adv-item">
+              <div class="adv-info">
+                <div class="adv-title">Tryb zgodności z Wi-Fi 5 (Legacy Wi-Fi 5)</div>
+                <div class="adv-desc">Dla starszych urządzeń mających problem z Wi-Fi 6/7. Włączenie wyłącza OFDMA, TWT, BSS Coloring.</div>
+              </div>
+              <label class="toggle-switch-label">
+                <input type="checkbox" id="wifi-adv-w5">
+                <span class="toggle-slider"></span>
+                <span id="wifi-adv-w5-lbl" class="status-lbl">Wyłączone</span>
+              </label>
+            </div>
+
+            <!-- 2. TWT -->
+            <div class="adv-item">
+              <div class="adv-info">
+                <div class="adv-title">Tryb oszczędzania energii TWT (Target Wake Time)</div>
+                <div class="adv-desc">Target Wake Time: redukuje zużycie baterii urządzeń Wi-Fi 6/7. Starsze urządzenia mogą wymagać wyłączenia tej funkcji.</div>
+              </div>
+              <label class="toggle-switch-label">
+                <input type="checkbox" id="wifi-adv-twt">
+                <span class="toggle-slider"></span>
+                <span id="wifi-adv-twt-lbl" class="status-lbl">Wyłączone</span>
+              </label>
+            </div>
+
+            <!-- 3. MU-MIMO -->
+            <div class="adv-item">
+              <div class="adv-info">
+                <div class="adv-title">MU-MIMO i Kształtowanie Wiązki (Beamforming)</div>
+                <div class="adv-desc">Jednoczesna komunikacja z wieloma klientami oraz kierunkowe formowanie wiązki sygnału.</div>
+              </div>
+              <label class="toggle-switch-label">
+                <input type="checkbox" id="wifi-adv-mimo" checked>
+                <span class="toggle-slider"></span>
+                <span id="wifi-adv-mimo-lbl" class="status-lbl">Włączone</span>
+              </label>
+            </div>
+
+            <!-- 4. Mi Connect -->
+            <div class="adv-item">
+              <div class="adv-info">
+                <div class="adv-title">Szybkie parowanie Xiaomi (Mi Connect)</div>
+                <div class="adv-desc">Automatyczne wykrywanie nowych urządzeń Xiaomi IoT w Mi Home i automatyczna synchronizacja hasła Wi-Fi.</div>
+              </div>
+              <label class="toggle-switch-label">
+                <input type="checkbox" id="wifi-adv-miotrelay">
+                <span class="toggle-slider"></span>
+                <span id="wifi-adv-miotrelay-lbl" class="status-lbl">Wyłączone</span>
+              </label>
+            </div>
+
+            <!-- 5. Tryb cichy -->
+            <div class="adv-item">
+              <div class="adv-info">
+                <div class="adv-title">Tryb cichy Wi-Fi (Tymczasowe wyłączenie)</div>
+                <div class="adv-desc text-danger">Wyłącza wszystkie radia Wi-Fi do restartu routera. Po restarcie Wi-Fi włącza się ponownie automatycznie.</div>
+              </div>
+              <label class="toggle-switch-label">
+                <input type="checkbox" id="wifi-adv-silence">
+                <span class="toggle-slider"></span>
+                <span id="wifi-adv-silence-lbl" class="status-lbl">Wyłączone</span>
+              </label>
+            </div>
+
+            <!-- 6. Roaming Mesh 802.11k/v -->
+            <div class="adv-item-col">
+              <div class="adv-item no-border">
+                <div class="adv-info">
+                  <div class="adv-title">Ręczne parametry roamingu Mesh (802.11k/v)</div>
+                  <div class="adv-desc">Wymusza przełączenie terminala (802.11k/v) do silniejszego węzła Mesh, gdy RSSI spadnie poniżej progu.</div>
+                </div>
+                <label class="toggle-switch-label">
+                  <input type="checkbox" id="wifi-adv-roam">
+                  <span class="toggle-slider"></span>
+                  <span id="wifi-adv-roam-lbl" class="status-lbl">Domyślne</span>
+                </label>
+              </div>
+
+              <!-- Paski progów roamingu -->
+              <div id="wifi-roam-box" class="roam-box hidden">
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label class="form-label">Próg 2.4 GHz (dBm):</label>
+                    <input type="number" id="wifi-roam-2g" class="form-input" value="-65">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Próg 5 GHz (dBm):</label>
+                    <input type="number" id="wifi-roam-5g" class="form-input" value="-70">
+                  </div>
+                </div>
+                <button class="btn-primary" id="btn-save-roam">Zapisz Progi Roamingu</button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1201,6 +1422,47 @@
         <div class="modal-footer">
           <button class="btn-secondary" id="btn-reserve-cancel">Anuluj</button>
           <button class="btn-primary" id="btn-reserve-save">Zapisz Rezerwację</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. MODAL KARTY DOSTĘPOWEJ WI-FI -->
+    <div id="modal-wcard" class="modal-backdrop">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title-box">
+            <span class="modal-icon">🎫</span>
+            <h3>Karta Dostępowa Sieci Wi-Fi</h3>
+          </div>
+          <button class="btn-icon" id="btn-wcard-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="wcard-box">
+            <div class="wcard-badge" id="wcard-type-badge">★ Domowa Sieć Wi-Fi (Smart Connect)</div>
+            <div class="wcard-field">
+              <span class="wcard-lbl">Nazwa sieci (SSID):</span>
+              <span class="wcard-val bold" id="wcard-ssid-val">hook_mt</span>
+            </div>
+            <div class="wcard-field">
+              <span class="wcard-lbl">Szyfrowanie:</span>
+              <span class="wcard-val" id="wcard-enc-val">WPA2/WPA3 Personal</span>
+            </div>
+            <div class="wcard-field">
+              <span class="wcard-lbl">Hasło dostępu:</span>
+              <div class="wcard-pwd-row">
+                <span class="wcard-pwd mono" id="wcard-pwd-val">••••••••</span>
+                <button type="button" class="btn-sm btn-secondary" id="btn-wcard-copy-pwd">📋 Kopiuj</button>
+              </div>
+            </div>
+            <div class="wcard-qr-container" id="wcard-qr-box">
+              <div class="wcard-qr-hint">Zeskanuj telefonem, aby połączyć się z Wi-Fi:</div>
+              <div id="wcard-qr-code" class="qr-placeholder"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="btn-wcard-cancel">Zamknij</button>
+          <button class="btn-primary" id="btn-wcard-copy-all">📋 Kopiuj dane do schowka</button>
         </div>
       </div>
     </div>

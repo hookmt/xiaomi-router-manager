@@ -1327,3 +1327,239 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   9. NOWE ELEMENTY WI-FI, KARTA DOSTĘPOWA, ROAMING I BADGE URZĄDZEŃ
+   ========================================================================== */
+.wifi-banner-info {
+  background-color: #1e293b;
+  border: 1px solid #0284c7;
+  border-left: 4px solid #38bdf8;
+  color: #38bdf8;
+  font-weight: 600;
+  font-size: 12.5px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+}
+
+.wifi-sync-info {
+  background-color: rgba(56, 189, 248, 0.1);
+  border-left: 3px solid #38bdf8;
+  color: #38bdf8;
+  padding: 8px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.wifi-summary-box {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toggle-switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  user-select: none;
+}
+
+.toggle-switch-label.sm {
+  font-size: 11.5px;
+}
+
+.toggle-switch-label input {
+  display: none;
+}
+
+.toggle-switch-label .toggle-slider {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background-color: #334155;
+  border-radius: 20px;
+  transition: 0.2s;
+  display: inline-block;
+}
+
+.toggle-switch-label .toggle-slider::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.toggle-switch-label input:checked + .toggle-slider {
+  background-color: var(--primary);
+}
+
+.toggle-switch-label input:checked + .toggle-slider::after {
+  transform: translateX(16px);
+}
+
+.toggle-switch-label .status-lbl {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.toggle-switch-label input:checked ~ .status-lbl {
+  color: #38bdf8;
+}
+
+.adv-wifi-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.adv-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+}
+
+.adv-item.no-border {
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+
+.adv-item-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+}
+
+.adv-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.adv-desc {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.roam-box {
+  background-color: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 6px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+/* Nowe badge urządzeń */
+.badge-mesh { background-color: #06b6d4; color: #fff; }
+.badge-wifi-game { background-color: #f59e0b; color: #fff; }
+.badge-wifi-iot { background-color: #14b8a6; color: #fff; }
+.badge-bound { background-color: #16a34a; color: #fff; }
+.badge-admin { background-color: #38bdf8; color: #0f172a; font-weight: bold; }
+
+/* Karta dostępowa Wi-Fi modal */
+.wcard-box {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 1px solid #38bdf8;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wcard-badge {
+  color: #38bdf8;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.wcard-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wcard-lbl {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.wcard-val {
+  font-size: 15px;
+  color: var(--text-main);
+}
+
+.wcard-pwd-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgba(15, 23, 42, 0.7);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px dashed #334155;
+}
+
+.wcard-pwd {
+  font-size: 16px;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 1px;
+}
+
+.wcard-qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(51, 65, 85, 0.4);
+}
+
+.wcard-qr-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.qr-placeholder {
+  width: 140px;
+  height: 140px;
+  background-color: #fff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
