@@ -1,0 +1,74 @@
+name: Build and Release XRM
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.5'
+
+      - name: Build Android Release APK
+        run: |
+          cd mobile/android
+          gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Prepare APK Asset
+        run: |
+          find mobile/android/app/build/outputs/apk/ -name "*.apk" -not -name "*androidTest*" | head -n 1 | xargs -I {} cp {} Xiaomi_Router_Manager_v1.0.2.apk
+          ls -lh Xiaomi_Router_Manager_v1.0.2.apk
+
+      - name: Upload Android APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Xiaomi_Router_Manager_v1.0.2.apk
+          path: Xiaomi_Router_Manager_v1.0.2.apk
+          retention-days: 14
+
+  release:
+    name: Create GitHub Release
+    needs: build-android
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: Xiaomi_Router_Manager_v1.0.2.apk
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            Xiaomi_Router_Manager_v1.0.2.exe
+            Xiaomi_Router_Manager_v1.0.2.apk
+          body_path: release_notes_v1.0.2.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
