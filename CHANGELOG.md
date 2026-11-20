@@ -2,7 +2,33 @@
 
 All notable changes to **Xiaomi Router Manager (XRM)** will be documented in this file.
 
-## [1.0.2] - 2026-11-20
+## [1.0.5] - 2026-11-20
+
+### Added & Improved
+- **Native Android App & Tablet-Optimized Client (`mobile/`):**
+  - Built-in Android project with Gradle wrapper, hardware-accelerated WebView, and Android Keystore secure token storage.
+  - Responsive, fluent interface designed specifically for tablets (OPPO Pad 3 Pro) and smartphones, featuring accordion drawer navigation and full offline UI test suite.
+- **Modernized Dropdown Selection Menus (`CTkOptionMenu` on Windows & Android):**
+  - Replaced horizontal segmented buttons with dropdown selectors for WAN connection modes (`PPPoE`, `DHCP`, `Static IP`) with dynamic form layout.
+  - Replaced segmented switches in 2.5 Gbps hardware port features with intuitive dropdown: `Dual WAN`, `Link Aggregation (LAG LACP)`, `IPTV Bridge VLAN`, and `Gaming Port VIP QoS`.
+  - Replaced segmented switches in QoS / DDNS / VPN modules with unified dropdown switcher.
+- **Adaptive Wi-Fi & Smart Connect Layout:**
+  - When Smart Connect is enabled: common full-width card manages unified SSID, password, and encryption, while band cards focus purely on RF parameters (TX power, channel, bandwidth, hidden SSID).
+  - When Smart Connect is disabled: top card gracefully hides, presenting independent, full-fledged cards for 2.4 GHz and 5 GHz with separate save actions.
+- **Bidirectional Sorting & Direct Reservation Badges:**
+  - Network devices and static DHCP leases now support bidirectional sorting: numeric IPv4 octets (Ascending / Descending), Alphabetical (A-Z / Z-A), and Active First.
+  - Real-time reservation status directly on device rows: green `● Reserved` badge and `Edit` button for bound devices, `+ Reserve IP` button for unbound devices, and `Edit`/`Delete` for offline leases.
+- **Serwer DHCP DNS Configuration:**
+  - Dedicated `DNS 1` and `DNS 2` configuration fields in LAN / DHCP settings.
+
+### Fixed & Hardened
+- **RAM Memory Gauge & Unit Calculation:**
+  - Fixed RAM calculation on dashboard by properly parsing router string format (e.g. `"1024MB"`) to bytes, resolving the `440.32 B / 1 KB` display bug.
+- **Router Time Display:**
+  - Fixed `[object Object]` bug in system tools by parsing nested router time dictionary `{year, month, day, hour, min, sec, timezone}` into standard formatted timestamp.
+- **Security & Repository Hygiene:**
+  - Removed hardcoded fallback MAC identifier from `miwifi_core.py` and `app.js` in favor of dynamic discovery.
+  - Removed development HTTP proxy scripts (`mobile/run_preview.py` and `mobile/run_preview.bat`) from Git tracking.
 
 ### Added & Improved
 - **Quick DHCP Reservation from Active Network Devices (`+ Rezerwuj` / `+ Reserve`):**

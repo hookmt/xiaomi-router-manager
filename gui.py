@@ -38,6 +38,30 @@ def safe_float(val, default=0.0):
         return default
 
 
+def parse_mem_total_bytes(val) -> float:
+    """Parsuje ciągi rozmiaru pamięci (np. '1024MB', '512MB', surowe bajty) do bajtów."""
+    if isinstance(val, (int, float)):
+        v = float(val)
+        return v * 1024 * 1024 if 0 < v < 65536 else v
+    s = str(val or "").strip()
+    m = re.match(r"^([\d\.]+)\s*([a-zA-Z]*)$", s)
+    if not m:
+        return 0.0
+    num = float(m.group(1))
+    unit = m.group(2).upper()
+    if "TB" in unit:
+        return num * (1024 ** 4)
+    if "GB" in unit:
+        return num * (1024 ** 3)
+    if "MB" in unit or unit == "M":
+        return num * (1024 ** 2)
+    if "KB" in unit or unit == "K":
+        return num * 1024
+    if 0 < num < 65536:
+        return num * (1024 ** 2)
+    return num
+
+
 def parse_ip_key(ip_str: str):
     """Zwraca krotkę liczb do numerycznego sortowania IPv4."""
     try:
@@ -614,13 +638,30 @@ class MiWiFiManagerApp(ctk.CTk):
         self.entry_filter_devices.bind("<KeyRelease>", lambda e: self._render_devices_list())
 
         # Sortowanie
-        self.combo_dev_sort = ctk.CTkComboBox(
+        dev_sort_vals = [
+            "Sortuj: Domyślnie",
+            "Adres IP (rosnąco)",
+            "Adres IP (malejąco)",
+            "Nazwa (A-Z)",
+            "Nazwa (Z-A)",
+            "Aktywne najpierw",
+            "Czas połączenia"
+        ] if self.current_lang == "pl" else [
+            "Sort: Default",
+            "IP Address (Ascending)",
+            "IP Address (Descending)",
+            "Name (A-Z)",
+            "Name (Z-A)",
+            "Active First",
+            "Connection Time"
+        ]
+        self.combo_dev_sort = ctk.CTkOptionMenu(
             dev_top,
-            values=["Sortuj: Domyślnie", "Alfabetycznie (A-Z)", "Adres IP", "Rodzaj połączenia", "Czas połączenia"],
-            width=170,
+            values=dev_sort_vals,
+            width=180,
             command=lambda v: self._render_devices_list()
         )
-        self.combo_dev_sort.set("Sortuj: Domyślnie")
+        self.combo_dev_sort.set(dev_sort_vals[0])
         self.combo_dev_sort.pack(side="left", padx=5)
 
         # Przełącznik urządzeń offline
@@ -803,16 +844,23 @@ class MiWiFiManagerApp(ctk.CTk):
             ]
 
         # 4. Sortowanie
-        sort_mode = self.combo_dev_sort.get() if hasattr(self, "combo_dev_sort") else "Sortuj: Domyślnie"
-        if sort_mode in ("Alfabetycznie (A-Z)", "Alphabetical (A-Z)"):
-            items.sort(key=lambda x: x["name"].lower())
-        elif sort_mode in ("Adres IP", "IP Address"):
+        sort_mode = self.combo_dev_sort.get().lower() if hasattr(self, "combo_dev_sort") else ""
+        if "rosn" in sort_mode or "asc" in sort_mode:
             items.sort(key=lambda x: parse_ip_key(x["ip"]))
-        elif sort_mode in ("Rodzaj połączenia", "Connection Type"):
-            type_order = {0: 0, 2: 1, 1: 2, 3: 3, 99: 4}
-            items.sort(key=lambda x: (type_order.get(x["type_code"], 5), parse_ip_key(x["ip"])))
-        elif sort_mode in ("Czas połączenia", "Connection Time"):
+        elif "mal" in sort_mode or "desc" in sort_mode:
+            items.sort(key=lambda x: parse_ip_key(x["ip"]), reverse=True)
+        elif "a-z" in sort_mode:
+            items.sort(key=lambda x: x["name"].lower())
+        elif "z-a" in sort_mode:
+            items.sort(key=lambda x: x["name"].lower(), reverse=True)
+        elif "aktyw" in sort_mode or "active" in sort_mode:
+            items.sort(key=lambda x: (1 if x["is_offline"] else 0, parse_ip_key(x["ip"])))
+        elif "czas" in sort_mode or "time" in sort_mode:
             items.sort(key=lambda x: (-1 if x["is_offline"] else x["online_sec"]), reverse=True)
+        elif "alfabet" in sort_mode:
+            items.sort(key=lambda x: x["name"].lower())
+        elif "ip" in sort_mode:
+            items.sort(key=lambda x: parse_ip_key(x["ip"]))
 
         # 5. Aktualizacja licznika
         active_count = len(active_macs)
@@ -833,8 +881,32 @@ class MiWiFiManagerApp(ctk.CTk):
             row_f.pack(fill="x", padx=5, pady=3)
 
             # PRAWA STRONA NAJPIERW (gwarancja braku obcinania na węższych oknach)
+            is_bound = ((it.get("mac") or "").upper() in binds_by_mac)
+
             if it["is_offline"]:
-                lbl_off = ctk.CTkLabel(row_f, text="Offline", text_color="#94a3b8", font=ctk.CTkFont(size=12, weight="bold"), width=95, anchor="e")
+                if is_bound:
+                    btn_del_bind = ctk.CTkButton(
+                        row_f,
+                        text=("Delete" if lg == "en" else "Usuń"),
+                        width=60,
+                        height=26,
+                        fg_color="#dc2626",
+                        hover_color="#991b1b",
+                        command=lambda m=it["mac"], n=it["name"]: self._action_delete_mac_bind(m, n)
+                    )
+                    btn_del_bind.pack(side="right", padx=(3, 8))
+
+                    btn_edit_bind = ctk.CTkButton(
+                        row_f,
+                        text=("Edit" if lg == "en" else "Edytuj"),
+                        width=60,
+                        height=26,
+                        fg_color="#0284c7",
+                        hover_color="#0369a1",
+                        command=lambda m=it["mac"], n=it["name"], i=it["ip"]: self._dialog_edit_mac_bind(m, n, i)
+                    )
+                    btn_edit_bind.pack(side="right", padx=(3, 3))
+                lbl_off = ctk.CTkLabel(row_f, text="Offline", text_color="#94a3b8", font=ctk.CTkFont(size=12, weight="bold"), width=75, anchor="e")
                 lbl_off.pack(side="right", padx=(5, 10))
             elif it["is_admin"]:
                 lbl_adm = ctk.CTkLabel(row_f, text="[Admin PC / AP]" if lg == "en" else "[Stacja Admina / AP]", text_color="#38bdf8", font=ctk.CTkFont(size=11, weight="bold"), width=130, anchor="e")
@@ -848,7 +920,7 @@ class MiWiFiManagerApp(ctk.CTk):
                 btn_wan = ctk.CTkButton(
                     row_f,
                     text=btn_txt,
-                    width=95,
+                    width=90,
                     height=26,
                     fg_color=btn_color,
                     hover_color="#334155" if it["wan_allowed"] else "#991b1b",
@@ -856,19 +928,40 @@ class MiWiFiManagerApp(ctk.CTk):
                 )
                 btn_wan.pack(side="right", padx=(5, 10))
 
-            # Szybka rezerwacja DHCP dla urządzeń bez stałego IP
-            is_bound = ((it.get("mac") or "").upper() in binds_by_mac)
-            if not it["is_offline"] and not is_bound and it.get("mac") and it["mac"] != "-":
-                btn_bind = ctk.CTkButton(
-                    row_f,
-                    text=t("dev_btn_quick_bind", lg),
-                    width=90,
-                    height=26,
-                    fg_color="#16a34a",
-                    hover_color="#15803d",
-                    command=lambda m=it["mac"], ip=it["ip"], n=it["name"]: self._dialog_add_mac_bind(prefill_mac=m, prefill_ip=ip, prefill_name=n)
-                )
-                btn_bind.pack(side="right", padx=(5, 5))
+            # Wskaźnik i akcja rezerwacji DHCP dla urządzeń online
+            if not it["is_offline"] and it.get("mac") and it["mac"] != "-":
+                if is_bound:
+                    btn_edit_bind = ctk.CTkButton(
+                        row_f,
+                        text=("Edit" if lg == "en" else "Edytuj"),
+                        width=60,
+                        height=26,
+                        fg_color="#0284c7",
+                        hover_color="#0369a1",
+                        command=lambda m=it["mac"], n=it["name"], i=it["ip"]: self._dialog_edit_mac_bind(m, n, i)
+                    )
+                    btn_edit_bind.pack(side="right", padx=(3, 5))
+
+                    lbl_bound = ctk.CTkLabel(
+                        row_f,
+                        text=("● Reserved" if lg == "en" else "● Zarezerwowany"),
+                        text_color="#22c55e",
+                        font=ctk.CTkFont(size=11, weight="bold"),
+                        width=100,
+                        anchor="e"
+                    )
+                    lbl_bound.pack(side="right", padx=(3, 5))
+                else:
+                    btn_bind = ctk.CTkButton(
+                        row_f,
+                        text=t("dev_btn_quick_bind", lg),
+                        width=95,
+                        height=26,
+                        fg_color="#16a34a",
+                        hover_color="#15803d",
+                        command=lambda m=it["mac"], ip=it["ip"], n=it["name"]: self._dialog_add_mac_bind(prefill_mac=m, prefill_ip=ip, prefill_name=n)
+                    )
+                    btn_bind.pack(side="right", padx=(3, 5))
 
             # LEWA STRONA
             ctk.CTkLabel(row_f, text=it["name"], font=ctk.CTkFont(weight="bold"), width=180, anchor="w").pack(side="left", padx=6)
@@ -1091,11 +1184,17 @@ class MiWiFiManagerApp(ctk.CTk):
         card_cfg.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
         ctk.CTkLabel(card_cfg, text=t("wan_cfg_title", lg), font=ctk.CTkFont(size=16, weight="bold")).pack(anchor="w", padx=10, pady=(10, 10))
 
-        ctk.CTkLabel(card_cfg, text=t("wan_lbl_select_type", lg)).pack(anchor="w", padx=10, pady=(5, 2))
-        wan_modes = [t("wan_mode_pppoe", lg), t("wan_mode_dhcp", lg), t("wan_mode_static", lg)]
-        self.seg_wan_mode = ctk.CTkSegmentedButton(card_cfg, values=wan_modes, command=self._on_wan_mode_change)
+        f_mode_row = ctk.CTkFrame(card_cfg, fg_color="transparent")
+        f_mode_row.pack(fill="x", padx=10, pady=(5, 10))
+        ctk.CTkLabel(f_mode_row, text=t("wan_lbl_select_type", lg), font=ctk.CTkFont(weight="bold")).pack(side="left", padx=(0, 10))
+        wan_modes = [
+            ("PPPoE (Login i hasło światłowodu / Neostrady)" if lg == "pl" else "PPPoE (Fiber / Broadband Login)"),
+            ("DHCP (Automatyczny IP od modemu / dostawcy)" if lg == "pl" else "DHCP (Automatic IP from Modem)"),
+            ("Statyczny IP (Stała adresacja ręczna)" if lg == "pl" else "Static IP (Manual Addressing)")
+        ]
+        self.seg_wan_mode = ctk.CTkOptionMenu(f_mode_row, values=wan_modes, command=self._on_wan_mode_change)
         self.seg_wan_mode.set(wan_modes[0])
-        self.seg_wan_mode.pack(fill="x", padx=10, pady=(0, 10))
+        self.seg_wan_mode.pack(side="left", fill="x", expand=True)
 
         # Sekcja PPPoE
         self.frame_wan_pppoe = ctk.CTkFrame(card_cfg, fg_color="transparent")
@@ -1126,6 +1225,7 @@ class MiWiFiManagerApp(ctk.CTk):
         # Sekcja Wspólna: MTU i DNS
         f_common = ctk.CTkFrame(card_cfg, fg_color="transparent")
         f_common.pack(fill="x", padx=5, pady=2)
+        self.f_common_wan = f_common
 
         ctk.CTkLabel(f_common, text=t("wan_lbl_mtu_desc", lg), font=ctk.CTkFont(weight="bold")).pack(anchor="w", padx=5, pady=(4, 1))
         ctk.CTkLabel(
@@ -1179,15 +1279,15 @@ class MiWiFiManagerApp(ctk.CTk):
         btn_save_wan.pack(fill="x", padx=10, pady=(10, 15))
 
     def _on_wan_mode_change(self, mode):
-        m_low = mode.lower()
+        m_low = str(mode).lower()
         if "pppoe" in m_low:
-            self.frame_wan_pppoe.pack(fill="x", padx=5, pady=2)
+            self.frame_wan_pppoe.pack(fill="x", padx=5, pady=2, before=self.f_common_wan)
             self.frame_wan_static.pack_forget()
             if not self.entry_wan_mtu.get().strip():
                 self.entry_wan_mtu.insert(0, "1472")
         elif "stat" in m_low:
             self.frame_wan_pppoe.pack_forget()
-            self.frame_wan_static.pack(fill="x", padx=5, pady=2)
+            self.frame_wan_static.pack(fill="x", padx=5, pady=2, before=self.f_common_wan)
             if not self.entry_wan_mtu.get().strip():
                 self.entry_wan_mtu.insert(0, "1500")
         else:  # DHCP
@@ -1289,11 +1389,23 @@ class MiWiFiManagerApp(ctk.CTk):
         self.entry_filter_bind.pack(side="right", padx=(5, 10))
         self.entry_filter_bind.bind("<KeyRelease>", lambda e: self._filter_mac_bind_list())
 
-        bind_sort_vals = ["By Name (A-Z)", "By IP Address", "Default"] if lg == "en" else ["Po nazwie (A-Z)", "Po adresie IP", "Domyślnie"]
-        self.combo_bind_sort = ctk.CTkComboBox(
+        bind_sort_vals = [
+            "Kolejność routera (domyślnie)",
+            "Adres IP (rosnąco)",
+            "Adres IP (malejąco)",
+            "Nazwa (A-Z)",
+            "Nazwa (Z-A)"
+        ] if lg == "pl" else [
+            "Router Default",
+            "IP Address (Ascending)",
+            "IP Address (Descending)",
+            "Name (A-Z)",
+            "Name (Z-A)"
+        ]
+        self.combo_bind_sort = ctk.CTkOptionMenu(
             bar_binds,
             values=bind_sort_vals,
-            width=150,
+            width=200,
             command=lambda v: self._filter_mac_bind_list()
         )
         self.combo_bind_sort.set(bind_sort_vals[0])
@@ -1316,11 +1428,15 @@ class MiWiFiManagerApp(ctk.CTk):
         if filter_text:
             binds = [b for b in binds if filter_text in (b.get("name") or "").lower() or filter_text in (b.get("ip") or "").lower() or filter_text in (b.get("mac") or "").lower()]
 
-        sort_mode = self.combo_bind_sort.get() if hasattr(self, "combo_bind_sort") else ("By Name (A-Z)" if lg == "en" else "Po nazwie (A-Z)")
-        if "nazw" in sort_mode.lower() or "name" in sort_mode.lower():
-            binds.sort(key=lambda b: (b.get("name") or b.get("origin_name") or "").lower())
-        elif "ip" in sort_mode.lower():
+        sort_mode = self.combo_bind_sort.get().lower() if hasattr(self, "combo_bind_sort") else ""
+        if "rosn" in sort_mode or "asc" in sort_mode:
             binds.sort(key=lambda b: parse_ip_key(b.get("ip", "")))
+        elif "mal" in sort_mode or "desc" in sort_mode:
+            binds.sort(key=lambda b: parse_ip_key(b.get("ip", "")), reverse=True)
+        elif "a-z" in sort_mode:
+            binds.sort(key=lambda b: (b.get("name") or b.get("origin_name") or "").lower())
+        elif "z-a" in sort_mode:
+            binds.sort(key=lambda b: (b.get("name") or b.get("origin_name") or "").lower(), reverse=True)
 
         total_binds = len(getattr(self, "raw_binds", []))
         lbl_head = ("Static DHCP Leases (Total: {count})" if lg == "en" else "Statyczne Rezerwacje IP (Łącznie: {count})").format(count=total_binds)
@@ -1574,9 +1690,56 @@ class MiWiFiManagerApp(ctk.CTk):
         )
         self.lbl_bsd_banner.pack(padx=10, pady=8)
 
+        # KARTA WSPÓLNA: Smart Connect Wi-Fi (Pełna szerokość)
+        self.card_wifi_combined = ctk.CTkFrame(self.scroll_wifi, corner_radius=10)
+        self.card_wifi_combined.grid(row=1, column=0, columnspan=2, padx=5, pady=(0, 10), sticky="ew")
+
+        top_comb = ctk.CTkFrame(self.card_wifi_combined, fg_color="transparent")
+        top_comb.pack(fill="x", padx=15, pady=(12, 6))
+        ctk.CTkLabel(top_comb, text=("Wspólna sieć Wi-Fi (Smart Connect)" if lg == "pl" else "Combined Wi-Fi Network (Smart Connect)"), font=ctk.CTkFont(size=15, weight="bold")).pack(side="left")
+
+        self.f_ssid_common = ctk.CTkFrame(self.card_wifi_combined, fg_color="transparent")
+        self.f_ssid_common.pack(fill="x", padx=15, pady=4)
+        ctk.CTkLabel(self.f_ssid_common, text=("Wspólna nazwa (SSID):" if lg == "pl" else "Combined Network Name (SSID):"), font=ctk.CTkFont(weight="bold")).pack(side="left")
+        self.entry_wifi_ssid_common = ctk.CTkEntry(self.f_ssid_common, width=280)
+        self.entry_wifi_ssid_common.pack(side="right")
+
+        self.f_enc_common = ctk.CTkFrame(self.card_wifi_combined, fg_color="transparent")
+        self.f_enc_common.pack(fill="x", padx=15, pady=4)
+        ctk.CTkLabel(self.f_enc_common, text=("Wspólne szyfrowanie:" if lg == "pl" else "Combined Security:"), font=ctk.CTkFont(weight="bold")).pack(side="left")
+        self.combo_wifi_enc_common = ctk.CTkComboBox(self.f_enc_common, values=get_wifi_enc_options(lg), width=280)
+        self.combo_wifi_enc_common.set(code_to_enc("sae-mixed", lg))
+        self.combo_wifi_enc_common.pack(side="right")
+
+        self.f_pwd_common = ctk.CTkFrame(self.card_wifi_combined, fg_color="transparent")
+        self.f_pwd_common.pack(fill="x", padx=15, pady=4)
+        ctk.CTkLabel(self.f_pwd_common, text=("Wspólne hasło Wi-Fi:" if lg == "pl" else "Combined Wi-Fi Password:"), font=ctk.CTkFont(weight="bold")).pack(side="left")
+        self.entry_wifi_pwd_common = ctk.CTkEntry(self.f_pwd_common, width=280, show="•")
+        self.entry_wifi_pwd_common.pack(side="right")
+
+        self.f_show_common = ctk.CTkFrame(self.card_wifi_combined, fg_color="transparent")
+        self.f_show_common.pack(fill="x", padx=15, pady=2)
+        self.switch_show_pwd_common = ctk.CTkCheckBox(
+            self.f_show_common,
+            text=t("wifi_show_pwd", lg),
+            command=lambda: self.entry_wifi_pwd_common.configure(show="" if self.switch_show_pwd_common.get() == 1 else "•")
+        )
+        self.switch_show_pwd_common.pack(side="right")
+
+        btn_save_comb = ctk.CTkButton(
+            self.card_wifi_combined,
+            text=("Zapisz Wspólną Konfigurację Wi-Fi" if lg == "pl" else "Save Combined Wi-Fi Setup"),
+            fg_color="#16a34a",
+            hover_color="#15803d",
+            height=34,
+            font=ctk.CTkFont(weight="bold"),
+            command=self._action_save_all_wifi
+        )
+        btn_save_comb.pack(fill="x", padx=15, pady=(8, 12))
+
         # KARTA LEWA: Pasmo 2.4 GHz
         self.card_2g = ctk.CTkFrame(self.scroll_wifi)
-        self.card_2g.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
+        self.card_2g.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
         self.lbl_title_2g = ctk.CTkLabel(self.card_2g, text=t("wifi_2g_title", lg), font=ctk.CTkFont(size=15, weight="bold"))
         self.lbl_title_2g.pack(anchor="w", padx=15, pady=(15, 8))
@@ -1588,37 +1751,37 @@ class MiWiFiManagerApp(ctk.CTk):
         self.switch_wifi_on_2g.select()
         self.switch_wifi_on_2g.pack(side="right")
 
-        f_ssid_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
-        f_ssid_2g.pack(fill="x", padx=15, pady=4)
-        self.lbl_ssid_2g = ctk.CTkLabel(f_ssid_2g, text=t("wifi_ssid", lg))
+        self.f_ssid_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
+        self.f_ssid_2g.pack(fill="x", padx=15, pady=4)
+        self.lbl_ssid_2g = ctk.CTkLabel(self.f_ssid_2g, text=t("wifi_ssid", lg))
         self.lbl_ssid_2g.pack(side="left")
-        self.entry_wifi_ssid_2g = ctk.CTkEntry(f_ssid_2g, width=200)
+        self.entry_wifi_ssid_2g = ctk.CTkEntry(self.f_ssid_2g, width=200)
         self.entry_wifi_ssid_2g.pack(side="right")
 
-        f_enc_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
-        f_enc_2g.pack(fill="x", padx=15, pady=4)
-        self.lbl_enc_2g = ctk.CTkLabel(f_enc_2g, text=t("wifi_enc", lg))
+        self.f_enc_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
+        self.f_enc_2g.pack(fill="x", padx=15, pady=4)
+        self.lbl_enc_2g = ctk.CTkLabel(self.f_enc_2g, text=t("wifi_enc", lg))
         self.lbl_enc_2g.pack(side="left")
-        self.combo_wifi_enc_2g = ctk.CTkComboBox(f_enc_2g, values=get_wifi_enc_options(lg), width=220)
+        self.combo_wifi_enc_2g = ctk.CTkComboBox(self.f_enc_2g, values=get_wifi_enc_options(lg), width=220)
         self.combo_wifi_enc_2g.set(code_to_enc("sae-mixed", lg))
         self.combo_wifi_enc_2g.pack(side="right")
 
-        f_pwd_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
-        f_pwd_2g.pack(fill="x", padx=15, pady=4)
-        self.lbl_pwd_2g = ctk.CTkLabel(f_pwd_2g, text=t("wifi_pwd", lg))
+        self.f_pwd_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
+        self.f_pwd_2g.pack(fill="x", padx=15, pady=4)
+        self.lbl_pwd_2g = ctk.CTkLabel(self.f_pwd_2g, text=t("wifi_pwd", lg))
         self.lbl_pwd_2g.pack(side="left")
-        self.entry_wifi_pwd_2g = ctk.CTkEntry(f_pwd_2g, width=200, show="•")
+        self.entry_wifi_pwd_2g = ctk.CTkEntry(self.f_pwd_2g, width=200, show="•")
         self.entry_wifi_pwd_2g.pack(side="right")
 
-        f_show_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
-        f_show_2g.pack(fill="x", padx=15, pady=2)
-        self.switch_show_pwd_2g = ctk.CTkCheckBox(f_show_2g, text=t("wifi_show_pwd", lg), command=lambda: self._toggle_show_pwd(2))
+        self.f_show_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
+        self.f_show_2g.pack(fill="x", padx=15, pady=2)
+        self.switch_show_pwd_2g = ctk.CTkCheckBox(self.f_show_2g, text=t("wifi_show_pwd", lg), command=lambda: self._toggle_show_pwd(2))
         self.switch_show_pwd_2g.pack(side="right")
 
-        f_tx_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
-        f_tx_2g.pack(fill="x", padx=15, pady=4)
-        ctk.CTkLabel(f_tx_2g, text=t("wifi_txpwr", lg)).pack(side="left")
-        self.combo_wifi_tx_2g = ctk.CTkComboBox(f_tx_2g, values=get_wifi_tx_options(lg), width=200)
+        self.f_tx_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
+        self.f_tx_2g.pack(fill="x", padx=15, pady=4)
+        ctk.CTkLabel(self.f_tx_2g, text=t("wifi_txpwr", lg)).pack(side="left")
+        self.combo_wifi_tx_2g = ctk.CTkComboBox(self.f_tx_2g, values=get_wifi_tx_options(lg), width=200)
         self.combo_wifi_tx_2g.set(code_to_tx("max", lg))
         self.combo_wifi_tx_2g.pack(side="right")
 
@@ -1651,7 +1814,7 @@ class MiWiFiManagerApp(ctk.CTk):
 
         # KARTA PRAWA: Pasmo 5 GHz
         self.card_5g = ctk.CTkFrame(self.scroll_wifi)
-        self.card_5g.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
+        self.card_5g.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 
         self.lbl_title_5g = ctk.CTkLabel(self.card_5g, text=t("wifi_5g_title", lg), font=ctk.CTkFont(size=15, weight="bold"))
         self.lbl_title_5g.pack(anchor="w", padx=15, pady=(15, 8))
@@ -1747,7 +1910,7 @@ class MiWiFiManagerApp(ctk.CTk):
 
         # 3. KARTA ZAAWANSOWANYCH USTAWIEŃ WI-FI (Funkcje LuCI / Firmware Xiaomi)
         self.card_adv_wifi = ctk.CTkFrame(self.scroll_wifi, corner_radius=10)
-        self.card_adv_wifi.grid(row=3, column=0, columnspan=2, padx=5, pady=(10, 15), sticky="ew")
+        self.card_adv_wifi.grid(row=4, column=0, columnspan=2, padx=5, pady=(10, 15), sticky="ew")
 
         ctk.CTkLabel(
             self.card_adv_wifi,
@@ -1928,43 +2091,56 @@ class MiWiFiManagerApp(ctk.CTk):
     def _update_smartconnect_layout(self, is_on: bool):
         lg = self.current_lang
         if is_on:
-            self.lbl_bsd_banner.configure(
-                text=t("wifi_bsd_banner_on", lg)
-            )
-            self.lbl_title_2g.configure(text=t("wifi_bsd_title_2g", lg))
-            self.lbl_title_5g.configure(text=t("wifi_bsd_title_5g", lg))
-            self.lbl_ssid_2g.configure(text=t("wifi_ssid_combined", lg))
-            self.lbl_pwd_2g.configure(text=t("wifi_pwd_combined", lg))
-            self.lbl_enc_2g.configure(text=t("wifi_enc_combined", lg))
-            if hasattr(self, "lbl_5g_sync_info"):
-                self.lbl_5g_sync_info.configure(text=t("wifi_bsd_info", lg))
+            self.lbl_bsd_banner.configure(text=t("wifi_bsd_banner_on", lg))
+            if hasattr(self, "card_wifi_combined"):
+                self.card_wifi_combined.grid(row=1, column=0, columnspan=2, padx=5, pady=(0, 10), sticky="ew")
 
-            self.f_ssid_5g.pack_forget()
-            self.f_enc_5g.pack_forget()
-            self.f_pwd_5g.pack_forget()
-            self.f_show_5g.pack_forget()
-            self.btn_save_5g.pack_forget()
-            self.btn_save_2g.pack_forget()
-            self.frame_5g_sync.pack(fill="x", padx=15, pady=(5, 10), before=self.f_tx_5g)
-            self.frame_save_bsd.grid(row=2, column=0, columnspan=2, padx=10, pady=(10, 10), sticky="ew")
+            self.lbl_title_2g.configure(text=("📊 Parametry radiowe 2.4 GHz" if lg == "pl" else "📊 2.4 GHz Radio Parameters"))
+            self.lbl_title_5g.configure(text=("🚀 Parametry radiowe 5 GHz" if lg == "pl" else "🚀 5 GHz Radio Parameters"))
+
+            if hasattr(self, "f_ssid_2g"):
+                self.f_ssid_2g.pack_forget()
+                self.f_enc_2g.pack_forget()
+                self.f_pwd_2g.pack_forget()
+                self.f_show_2g.pack_forget()
+                self.btn_save_2g.pack_forget()
+
+            if hasattr(self, "f_ssid_5g"):
+                self.f_ssid_5g.pack_forget()
+                self.f_enc_5g.pack_forget()
+                self.f_pwd_5g.pack_forget()
+                self.f_show_5g.pack_forget()
+                self.btn_save_5g.pack_forget()
+
+            if hasattr(self, "frame_5g_sync") and hasattr(self, "f_tx_5g"):
+                self.frame_5g_sync.pack(fill="x", padx=15, pady=(5, 10), before=self.f_tx_5g)
+            if hasattr(self, "frame_save_bsd"):
+                self.frame_save_bsd.grid_forget()
         else:
-            self.lbl_bsd_banner.configure(
-                text=t("wifi_bsd_banner_off", lg)
-            )
+            self.lbl_bsd_banner.configure(text=t("wifi_bsd_banner_off", lg))
+            if hasattr(self, "card_wifi_combined"):
+                self.card_wifi_combined.grid_remove()
+
             self.lbl_title_2g.configure(text=t("wifi_2g_title", lg))
             self.lbl_title_5g.configure(text=t("wifi_5g_title", lg))
-            self.lbl_ssid_2g.configure(text=t("wifi_ssid", lg))
-            self.lbl_pwd_2g.configure(text=t("wifi_pwd", lg))
-            self.lbl_enc_2g.configure(text=t("wifi_enc", lg))
 
-            self.frame_5g_sync.pack_forget()
-            self.f_ssid_5g.pack(fill="x", padx=15, pady=4, before=self.f_tx_5g)
-            self.f_enc_5g.pack(fill="x", padx=15, pady=4, before=self.f_tx_5g)
-            self.f_pwd_5g.pack(fill="x", padx=15, pady=4, before=self.f_tx_5g)
-            self.f_show_5g.pack(fill="x", padx=15, pady=2, before=self.f_tx_5g)
-            self.btn_save_5g.pack(fill="x", padx=15, pady=(5, 15))
-            self.btn_save_2g.pack(fill="x", padx=15, pady=(5, 15))
-            self.frame_save_bsd.grid_forget()
+            if hasattr(self, "f_ssid_2g") and hasattr(self, "f_tx_2g"):
+                self.f_ssid_2g.pack(fill="x", padx=15, pady=4, before=self.f_tx_2g)
+                self.f_enc_2g.pack(fill="x", padx=15, pady=4, before=self.f_tx_2g)
+                self.f_pwd_2g.pack(fill="x", padx=15, pady=4, before=self.f_tx_2g)
+                self.f_show_2g.pack(fill="x", padx=15, pady=2, before=self.f_tx_2g)
+                self.btn_save_2g.pack(fill="x", padx=15, pady=(5, 15))
+
+            if hasattr(self, "frame_5g_sync"):
+                self.frame_5g_sync.pack_forget()
+            if hasattr(self, "f_ssid_5g") and hasattr(self, "f_tx_5g"):
+                self.f_ssid_5g.pack(fill="x", padx=15, pady=4, before=self.f_tx_5g)
+                self.f_enc_5g.pack(fill="x", padx=15, pady=4, before=self.f_tx_5g)
+                self.f_pwd_5g.pack(fill="x", padx=15, pady=4, before=self.f_tx_5g)
+                self.f_show_5g.pack(fill="x", padx=15, pady=2, before=self.f_tx_5g)
+                self.btn_save_5g.pack(fill="x", padx=15, pady=(5, 15))
+            if hasattr(self, "frame_save_bsd"):
+                self.frame_save_bsd.grid_forget()
 
     def _on_toggle_bsd(self):
         is_on = self.switch_bsd.get() == 1
@@ -1973,13 +2149,16 @@ class MiWiFiManagerApp(ctk.CTk):
             ssid_2g = self.entry_wifi_ssid_2g.get().strip()
             pwd_2g = self.entry_wifi_pwd_2g.get().strip()
             enc_2g = self.combo_wifi_enc_2g.get()
-            if ssid_2g:
-                self.entry_wifi_ssid_5g.delete(0, "end")
-                self.entry_wifi_ssid_5g.insert(0, ssid_2g)
-            if pwd_2g:
-                self.entry_wifi_pwd_5g.delete(0, "end")
-                self.entry_wifi_pwd_5g.insert(0, pwd_2g)
-            self.combo_wifi_enc_5g.set(enc_2g)
+            if hasattr(self, "entry_wifi_ssid_common"):
+                if not self.entry_wifi_ssid_common.get().strip() and ssid_2g:
+                    self.entry_wifi_ssid_common.delete(0, "end")
+                    self.entry_wifi_ssid_common.insert(0, ssid_2g)
+            if hasattr(self, "entry_wifi_pwd_common"):
+                if not self.entry_wifi_pwd_common.get().strip() and pwd_2g:
+                    self.entry_wifi_pwd_common.delete(0, "end")
+                    self.entry_wifi_pwd_common.insert(0, pwd_2g)
+            if hasattr(self, "combo_wifi_enc_common") and enc_2g:
+                self.combo_wifi_enc_common.set(enc_2g)
 
     def _action_save_single_wifi(self, wifi_idx: int):
         if not self.client.connected:
@@ -2077,12 +2256,23 @@ class MiWiFiManagerApp(ctk.CTk):
         bw_5g = bandwidth_to_code(self.combo_wifi_bw_5g.get())
 
         if bsd == 1:
-            ssid_5g = ssid_2g
-            pwd_5g = pwd_2g
-            enc_5g = enc_2g
-            tx_5g = tx_2g
-            hid_5g = hid_2g
-            on_5g = 1
+            if hasattr(self, "entry_wifi_ssid_common") and self.entry_wifi_ssid_common.get().strip():
+                ssid_common = self.entry_wifi_ssid_common.get().strip()
+                pwd_common = self.entry_wifi_pwd_common.get().strip()
+                enc_common = enc_to_code(self.combo_wifi_enc_common.get())
+            else:
+                ssid_common = ssid_2g
+                pwd_common = pwd_2g
+                enc_common = enc_2g
+            ssid_2g = ssid_common
+            pwd_2g = pwd_common
+            enc_2g = enc_common
+            ssid_5g = ssid_common
+            pwd_5g = pwd_common
+            enc_5g = enc_common
+            tx_5g = WIFI_TX_MAP_CODE.get(self.combo_wifi_tx_5g.get(), "max")
+            hid_5g = 1 if self.switch_wifi_hidden_5g.get() == 1 else 0
+            on_5g = 1 if self.switch_wifi_on_5g.get() == 1 else 0
         else:
             ssid_5g = self.entry_wifi_ssid_5g.get().strip()
             pwd_5g = self.entry_wifi_pwd_5g.get().strip()
@@ -2987,9 +3177,13 @@ class MiWiFiManagerApp(ctk.CTk):
         top_bar = ctk.CTkFrame(tab, fg_color="transparent")
         top_bar.grid(row=0, column=0, padx=15, pady=(15, 10), sticky="ew")
 
-        ctk.CTkLabel(top_bar, text=t("qos_module_label", lg), font=ctk.CTkFont(weight="bold")).pack(side="left", padx=(0, 10))
-        vals = [t("qos_tab_qos", lg), t("qos_tab_ddns", lg), t("qos_tab_vpn", lg)]
-        self.seg_qos_vpn = ctk.CTkSegmentedButton(
+        ctk.CTkLabel(top_bar, text=("Wybierz moduł:" if lg == "pl" else "Select Module:"), font=ctk.CTkFont(weight="bold")).pack(side="left", padx=(0, 10))
+        vals = [
+            ("Inteligentny QoS i Kontrola Pasma" if lg == "pl" else "Smart QoS & Bandwidth"),
+            ("Dynamiczny DNS (DDNS)" if lg == "pl" else "Dynamic DNS (DDNS)"),
+            ("Klient VPN i Smart VPN" if lg == "pl" else "VPN Client & Smart VPN")
+        ]
+        self.seg_qos_vpn = ctk.CTkOptionMenu(
             top_bar,
             values=vals,
             command=self._on_qos_vpn_tab_change
@@ -3625,9 +3819,15 @@ class MiWiFiManagerApp(ctk.CTk):
         top_bar = ctk.CTkFrame(tab, fg_color="transparent")
         top_bar.grid(row=1, column=0, padx=15, pady=(5, 10), sticky="ew")
 
-        ctk.CTkLabel(top_bar, text=t("ports_func_label", lg), font=ctk.CTkFont(weight="bold")).pack(side="left", padx=(0, 10))
-        ports_tabs = [t("ports_tab_dualwan", lg), t("ports_tab_lag", lg), t("ports_tab_iptv", lg), t("ports_tab_game", lg)]
-        self.seg_ports = ctk.CTkSegmentedButton(
+        ctk.CTkLabel(top_bar, text=("⚡ Konfiguracja Zaawansowanej Roli Portów" if lg == "pl" else "⚡ Hardware Port Role Setup"), font=ctk.CTkFont(size=14, weight="bold")).pack(side="left", padx=(0, 15))
+        ctk.CTkLabel(top_bar, text=("Wybierz funkcję:" if lg == "pl" else "Select Feature:"), font=ctk.CTkFont(weight="bold")).pack(side="left", padx=(0, 8))
+        ports_tabs = [
+            ("Dual WAN (Drugi dostawca Internetu)" if lg == "pl" else "Dual WAN (Secondary ISP)"),
+            ("Agregacja LAN (LAG - łączenie portów)" if lg == "pl" else "LAN Aggregation (LAG 802.3ad)"),
+            ("Telewizja IP (IPTV Bridge VLAN)" if lg == "pl" else "IP Television (IPTV Bridge)"),
+            ("Port Sieciowy Gry (Gaming QoS VIP)" if lg == "pl" else "Gaming Port (VIP QoS)")
+        ]
+        self.seg_ports = ctk.CTkOptionMenu(
             top_bar,
             values=ports_tabs,
             command=self._on_ports_tab_change
@@ -4820,7 +5020,7 @@ class MiWiFiManagerApp(ctk.CTk):
 
             mem = status.get("mem", {})
             mem_usage = safe_float(mem.get("usage"))
-            mem_total = safe_float(mem.get("total"))
+            mem_total = parse_mem_total_bytes(mem.get("total"))
             if mem_total > 0:
                 if mem_usage > 1.0:
                     m_percent = mem_usage / 100.0
@@ -4869,6 +5069,19 @@ class MiWiFiManagerApp(ctk.CTk):
                 self.lbl_wan_mac_val.configure(text=f"{('WAN MAC address:' if lg == 'en' else 'Adres MAC WAN:')} {w_mac}")
                 w_mtu = str(det.get("mtu") or wan_details.get("mtu") or "-")
                 self.lbl_wan_mtu_val.configure(text=f"{('MTU size:' if lg == 'en' else 'Rozmiar MTU:')} {w_mtu}")
+
+                if hasattr(self, "seg_wan_mode"):
+                    vals = self.seg_wan_mode.cget("values")
+                    target_val = None
+                    if "DHCP" in w_type:
+                        target_val = next((v for v in vals if "dhcp" in v.lower()), None)
+                    elif "STAT" in w_type:
+                        target_val = next((v for v in vals if "stat" in v.lower()), None)
+                    elif "PPPOE" in w_type:
+                        target_val = next((v for v in vals if "pppoe" in v.lower()), None)
+                    if target_val and target_val != self.seg_wan_mode.get():
+                        self.seg_wan_mode.set(target_val)
+                        self._on_wan_mode_change(target_val)
 
                 ipv6_info = wan_details.get("ipv6_info", {})
                 ipv6_mode = ipv6_info.get("ipv6_mode") or ipv6_info.get("wanType") or ("Disabled" if lg == "en" else "Wyłączony")
@@ -5004,6 +5217,17 @@ class MiWiFiManagerApp(ctk.CTk):
                         self.entry_wifi_pwd_2g.insert(0, pwd)
                     self.combo_wifi_enc_2g.set(code_to_enc(enc, self.current_lang))
                     self.combo_wifi_tx_2g.set(code_to_tx(tx, self.current_lang))
+
+                    if hasattr(self, "entry_wifi_ssid_common"):
+                        if not self.entry_wifi_ssid_common.get() or self.entry_wifi_ssid_common.get() == "hook_mt":
+                            self.entry_wifi_ssid_common.delete(0, "end")
+                            self.entry_wifi_ssid_common.insert(0, ssid)
+                    if hasattr(self, "entry_wifi_pwd_common"):
+                        if not self.entry_wifi_pwd_common.get() or pwd:
+                            self.entry_wifi_pwd_common.delete(0, "end")
+                            self.entry_wifi_pwd_common.insert(0, pwd)
+                    if hasattr(self, "combo_wifi_enc_common"):
+                        self.combo_wifi_enc_common.set(code_to_enc(enc, self.current_lang))
                     
                     ch_code = w.get("channel", "0")
                     bw_code = w.get("bandwidth", "0")
@@ -5346,8 +5570,8 @@ class MiWiFiManagerApp(ctk.CTk):
         if not self.client.connected:
             return
 
-        mode = self.seg_wan_mode.get()
-        wan_type = "pppoe" if mode == "PPPoE" else ("dhcp" if mode == "DHCP" else "static")
+        mode = str(self.seg_wan_mode.get()).lower()
+        wan_type = "pppoe" if "pppoe" in mode else ("static" if "stat" in mode else "dhcp")
         mtu_str = self.entry_wan_mtu.get().strip()
         if not mtu_str:
             mtu_str = "1472"

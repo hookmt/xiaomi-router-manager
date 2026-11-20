@@ -108,7 +108,7 @@ class MiWiFiClient:
                 pass
 
         if not device_mac:
-            device_mac = "84:47:09:89:c0:ae"  # fallback
+            device_mac = "00:00:00:00:00:00"  # fallback neutralny
 
         # Generowanie nonce: 0_MAC_TIMESTAMP_RANDOM
         ts = int(time.time())
@@ -545,8 +545,8 @@ class MiWiFiClient:
         if not HAVE_CRYPTO:
             return {"code": -2, "error": "Brak biblioteki cryptography w środowisku Python"}
 
-        # deviceId (klient MAC lub fallback)
-        device_mac = "84:47:09:89:c0:ae"
+        # deviceId (klient MAC lub fallback neutralny)
+        device_mac = self.device_id or "00:00:00:00:00:00"
         nonce = f"0_{device_mac}_{int(time.time())}_{random.randint(1000, 9999)}"
         key_str = self.PUBLIC_KEY
         iv_bytes = bytes.fromhex("64175472480004614961023454661220")

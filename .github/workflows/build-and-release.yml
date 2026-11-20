@@ -37,19 +37,52 @@ jobs:
 
       - name: Prepare APK Asset
         run: |
-          find mobile/android/app/build/outputs/apk/ -name "*.apk" -not -name "*androidTest*" | head -n 1 | xargs -I {} cp {} Xiaomi_Router_Manager_v1.0.2.apk
-          ls -lh Xiaomi_Router_Manager_v1.0.2.apk
+          find mobile/android/app/build/outputs/apk/ -name "*.apk" -not -name "*androidTest*" | head -n 1 | xargs -I {} cp {} Xiaomi_Router_Manager_v1.0.5.apk
+          ls -lh Xiaomi_Router_Manager_v1.0.5.apk
 
       - name: Upload Android APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Xiaomi_Router_Manager_v1.0.2.apk
-          path: Xiaomi_Router_Manager_v1.0.2.apk
+          name: Xiaomi_Router_Manager_v1.0.5.apk
+          path: Xiaomi_Router_Manager_v1.0.5.apk
+          retention-days: 14
+
+  build-windows:
+    name: Build Windows Executable
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install customtkinter requests pyinstaller
+
+      - name: Build Windows Executable with PyInstaller
+        run: |
+          pyinstaller Xiaomi_Router_Manager_v1.0.5.spec
+
+      - name: Prepare EXE Asset
+        run: |
+          Copy-Item "dist\Xiaomi_Router_Manager_v1.0.5.exe" -Destination "Xiaomi_Router_Manager_v1.0.5.exe"
+          Get-Item "Xiaomi_Router_Manager_v1.0.5.exe" | Format-List Length, Name
+
+      - name: Upload Windows EXE Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Xiaomi_Router_Manager_v1.0.5.exe
+          path: Xiaomi_Router_Manager_v1.0.5.exe
           retention-days: 14
 
   release:
     name: Create GitHub Release
-    needs: build-android
+    needs: [build-android, build-windows]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     steps:
@@ -59,15 +92,20 @@ jobs:
       - name: Download Android APK
         uses: actions/download-artifact@v4
         with:
-          name: Xiaomi_Router_Manager_v1.0.2.apk
+          name: Xiaomi_Router_Manager_v1.0.5.apk
+
+      - name: Download Windows EXE
+        uses: actions/download-artifact@v4
+        with:
+          name: Xiaomi_Router_Manager_v1.0.5.exe
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            Xiaomi_Router_Manager_v1.0.2.exe
-            Xiaomi_Router_Manager_v1.0.2.apk
-          body_path: release_notes_v1.0.2.md
+            Xiaomi_Router_Manager_v1.0.5.exe
+            Xiaomi_Router_Manager_v1.0.5.apk
+          body_path: release_notes_v1.0.5.md
           draft: false
           prerelease: false
         env:

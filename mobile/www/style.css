@@ -750,19 +750,6 @@ body {
   align-items: center;
   text-align: center;
   gap: 6px;
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.port-card:hover {
-  border-color: var(--primary);
-  background-color: var(--bg-card-hover);
-}
-
-.port-card.active-card {
-  border-color: #38bdf8;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
-  background-color: #16233b;
 }
 
 .port-number {
@@ -1562,4 +1549,81 @@ body {
   align-items: center;
   justify-content: center;
   padding: 8px;
+}
+
+/* Compact header keeps login and controls reachable on narrow phones. */
+@media (max-width: 700px) {
+  #app-root, #main-content, .content-view, .card { min-width: 0; }
+  #main-header { height: auto; min-height: 60px; flex-wrap: wrap; padding: 8px 12px; gap: 8px; }
+  .header-left { flex: 1 1 auto; min-width: 0; }
+  .header-center { flex: 0 0 auto; }
+  .header-right { flex: 1 1 100%; flex-wrap: wrap; justify-content: space-between; min-width: 0; }
+  .logo-title { max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+  .grid-2-col { grid-template-columns: minmax(0, 1fr); }
+  .summary-sep { display: none; }
+  .dash-grid-3 > *, .grid-2-col > * { min-width: 0; }
+}
+@media (max-width: 380px) {
+  .logo-title { max-width: 130px; }
+  #main-header { padding: 8px; }
+  #main-content { padding: 10px; }
+}
+
+/* Device cards and Mesh nodes use the same spacing as the desktop application. */
+.device-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+.device-card.offline { opacity: .7; }
+.dev-main { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; }
+.dev-info-left { flex: 1 1 240px; min-width: 0; }
+.dev-name-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dev-meta-row { flex-wrap: wrap; overflow-wrap: anywhere; }
+.dev-actions { flex-wrap: wrap; }
+.btn-success {
+  border: 1px solid var(--success);
+  border-radius: var(--radius-sm);
+  background: #047857;
+  color: #fff;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.mesh-node-card { background: #1e293b; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 14px; }
+.mesh-node-card.master { border-color: var(--primary); }
+.mesh-satellites { display: grid; gap: 10px; margin-top: 12px; }
+.mesh-node-card .node-meta { color: var(--text-muted); font-size: 12px; display: flex; gap: 12px; flex-wrap: wrap; overflow-wrap: anywhere; }
+.header-center { gap: 8px; }
+.btn-connect { background: #dc2626; color: #fff; }
+.btn-connect:hover { background: #b91c1c; }
+.btn-connect.connected, .btn-connect.connected:hover { background: #059669; color: #fff; border-color: #10b981; }
+.port-card.port-inactive { background:#27303d; border-color:#64748b; }
+.port-card.port-role-wan, .port-card.port-role-wan2 { background:#123765; border-color:#3b82f6; }
+.port-card.port-role-lan { background:#123d33; border-color:#10b981; }
+.port-card.port-role-lag { background:#50331a; border-color:#f59e0b; }
+.port-card.port-role-iptv { background:#43305d; border-color:#a855f7; }
+.port-card.port-role-game { background:#502732; border-color:#f43f5e; }
+.port-card.port-unknown { border-color:#64748b; }
+.port-card .port-badge { background:transparent; }
+.nat-rule { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px; margin-top:8px; background:#1e293b; border-radius:6px; }
+.nat-rule-info { flex:1 1 250px; overflow-wrap:anywhere; }
+.nat-dialog { width:min(92vw, 460px); max-height:90vh; margin:auto; border:1px solid var(--border-light); border-radius:10px; background:var(--bg-card); color:var(--text-main); padding:20px; }
+.nat-dialog::backdrop { background:rgba(0,0,0,.7); }
+.nat-dialog form, .nat-dialog label { display:flex; flex-direction:column; gap:8px; }
+.nat-dialog form { gap:12px; }
+.nat-dialog input, .nat-dialog select { padding:9px; background:#0f172a; border:1px solid var(--border-light); color:var(--text-main); border-radius:5px; }
+.nat-dialog label.restore-option { flex-direction:row; align-items:center; flex-wrap:wrap; gap:8px; }
+.nat-dialog label.restore-option input { flex:0 0 auto; }
+.nat-dialog-actions { display:flex; gap:8px; justify-content:flex-end; }
+.system-overview .card { display:flex; flex-direction:column; gap:10px; }
+.system-overview .backup-actions-bar { flex-direction:column; align-items:stretch; }
+@media (max-width:700px) {
+  #main-header .header-left { flex:1 1 45%; }
+  #main-header .header-center { margin-left:auto; }
+}
+@media (max-width:700px) {
+  .header-left .logo-box, .header-left .logo-text { min-width:0; overflow:hidden; }
+  .header-left .logo-title { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; }
 }

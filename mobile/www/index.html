@@ -29,6 +29,9 @@
           <span class="status-dot disconnected" id="status-dot"></span>
           <span class="status-text" id="status-text">Rozłączony</span>
         </div>
+        <button id="btn-connect" class="btn-head btn-connect">
+          Połącz
+        </button>
       </div>
 
       <div class="header-right">
@@ -59,9 +62,7 @@
         </div>
 
         <!-- Przycisk Połącz / Rozłącz -->
-        <button id="btn-connect" class="btn-head btn-connect">
-          Połącz
-        </button>
+
       </div>
     </header>
 
@@ -90,7 +91,7 @@
           <div class="nav-group-items">
             <button class="nav-item active" data-view="dashboard">
               <span class="item-icon">💻</span>
-              <span class="item-title">Kokpit na żywo (Dashboard)</span>
+              <span class="item-title">Stan routera</span>
             </button>
             <button class="nav-item" data-view="devices">
               <span class="item-icon">📱</span>
@@ -144,10 +145,8 @@
               <span class="item-icon">🔀</span>
               <span class="item-title">Przekierowania Portów (NAT/DMZ)</span>
             </button>
-            <button class="nav-item" data-view="qos">
-              <span class="item-icon">🚀</span>
-              <span class="item-title">QoS i Kontrola Pasma</span>
-            </button>
+            <button class="nav-item" data-view="qos"><span class="item-icon">🚀</span><span class="item-title">QoS i Kontrola Pasma</span></button>
+            <button class="nav-item" data-view="services"><span class="item-icon">🌐</span><span class="item-title">DDNS i VPN</span></button>
           </div>
         </div>
 
@@ -159,21 +158,9 @@
             <span class="group-arrow">▾</span>
           </div>
           <div class="nav-group-items">
-            <button class="nav-item" data-view="tools">
-              <span class="item-icon">💡</span>
-              <span class="item-title">Narzędzia i Diody LED</span>
-            </button>
-            <button class="nav-item" data-view="backup">
-              <span class="item-icon">💾</span>
-              <span class="item-title">Kopia i Przywracanie JSON</span>
-            </button>
-            <button class="nav-item" data-view="diag">
-              <span class="item-icon">🩺</span>
-              <span class="item-title">Diagnostyka sieci (Ping/Trace)</span>
-            </button>
             <button class="nav-item" data-view="reboot">
               <span class="item-icon">🔄</span>
-              <span class="item-title">Restart i Zasilanie</span>
+              <span class="item-title">System i konserwacja</span>
             </button>
           </div>
         </div>
@@ -197,12 +184,10 @@
       <section id="view-dashboard" class="content-view active">
         <div class="view-header">
           <div>
-            <h2 class="view-title" id="dash-router-title">Router: Xiaomi BE7000 (192.168.31.1)</h2>
+            <h2 class="view-title" id="dash-router-title">Router: brak połączenia</h2>
             <p class="view-desc" id="dash-router-desc">Bieżący podgląd pracy procesora, transferu WAN i stanu urządzeń.</p>
           </div>
-          <button class="btn-secondary" id="btn-export-md">
-            <span>📝</span> Eksport do .md
-          </button>
+
         </div>
 
         <!-- 3 RÓWNE KOLUMNY KAFELKÓW (ZGODNIE Z WERSJĄ WINDOWS) -->
@@ -216,11 +201,11 @@
             <div class="info-list">
               <div class="info-row">
                 <span class="lbl">Model:</span>
-                <span class="val bold" id="dash-model">Xiaomi BE7000 (RC06)</span>
+                <span class="val bold" id="dash-model">--</span>
               </div>
               <div class="info-row">
                 <span class="lbl">Oprogramowanie:</span>
-                <span class="val" id="dash-fw">1.1.38 (CN)</span>
+                <span class="val" id="dash-fw">--</span>
               </div>
               <div class="info-row">
                 <span class="lbl">Czas pracy (uptime):</span>
@@ -242,7 +227,7 @@
             <div class="gauge-box">
               <div class="gauge-header">
                 <span>Obciążenie CPU:</span>
-                <span class="val bold" id="dash-cpu-val">0.0%</span>
+                <span class="val bold" id="dash-cpu-val">--</span>
               </div>
               <div class="progress-bar">
                 <div class="progress-fill fill-cpu" id="dash-cpu-bar" style="width: 0%;"></div>
@@ -251,7 +236,7 @@
             <div class="gauge-box">
               <div class="gauge-header">
                 <span>Pamięć RAM:</span>
-                <span class="val bold" id="dash-ram-val">0%</span>
+                <span class="val bold" id="dash-ram-val">--</span>
               </div>
               <div class="progress-bar">
                 <div class="progress-fill fill-ram" id="dash-ram-bar" style="width: 0%;"></div>
@@ -270,14 +255,14 @@
                 <span class="speed-arrow">↓</span>
                 <div>
                   <div class="speed-label">Pobieranie</div>
-                  <div class="speed-value" id="dash-down-speed">0.0 KB/s</div>
+                  <div class="speed-value" id="dash-down-speed">--</div>
                 </div>
               </div>
               <div class="speed-metric up">
                 <span class="speed-arrow">↑</span>
                 <div>
                   <div class="speed-label">Wysyłanie</div>
-                  <div class="speed-value" id="dash-up-speed">0.0 KB/s</div>
+                  <div class="speed-value" id="dash-up-speed">--</div>
                 </div>
               </div>
             </div>
@@ -299,17 +284,17 @@
           <div class="summary-line">
             <span class="summary-item">
               <strong>Wykryte aktywne urządzenia:</strong>
-              <span class="badge badge-blue" id="dash-dev-count">0</span>
+              <span class="badge badge-blue" id="dash-dev-count">--</span>
             </span>
             <span class="summary-sep">|</span>
             <span class="summary-item">
               <strong>Diody LED:</strong>
-              <span class="badge badge-green" id="dash-led-status">Włączone</span>
+              <span class="badge badge-green" id="dash-led-status">--</span>
             </span>
             <span class="summary-sep">|</span>
             <span class="summary-item">
               <strong>Tryb sieci:</strong>
-              <span class="badge badge-purple" id="dash-net-mode">Router Główny</span>
+              <span class="badge badge-purple" id="dash-net-mode">--</span>
             </span>
           </div>
         </div>
@@ -326,6 +311,7 @@
           </div>
           <div class="header-actions">
             <input type="text" id="dev-search-input" class="input-search" placeholder="Szukaj (nazwa, IP, MAC)...">
+            <select id="dev-sort-select" class="form-select sort-select" aria-label="Sortowanie urządzeń"><option value="original">Kolejność routera</option><option value="ip-asc">IP rosnąco</option><option value="ip-desc">IP malejąco</option><option value="name-asc">Nazwa A-Z</option><option value="name-desc">Nazwa Z-A</option></select>
             <label class="checkbox-inline">
               <input type="checkbox" id="dev-show-offline" checked>
               <span>Pokaż offline</span>
@@ -351,15 +337,15 @@
         <div class="card" id="mesh-container">
           <div class="mesh-node-card master">
             <div class="node-badge">Router Główny (Master)</div>
-            <h3 id="mesh-master-name">Xiaomi BE7000</h3>
+            <h3 id="mesh-master-name">--</h3>
             <div class="node-meta">
-              <span>IP: <strong id="mesh-master-ip">192.168.31.1</strong></span>
+              <span>IP: <strong id="mesh-master-ip">--</strong></span>
               <span>MAC: <strong id="mesh-master-mac">--</strong></span>
-              <span>Klienci: <strong id="mesh-master-clients">0</strong></span>
+              <span>Klienci: <strong id="mesh-master-clients">--</strong></span>
             </div>
           </div>
           <div class="mesh-satellites" id="mesh-satellites-list">
-            <div class="empty-state">Brak dodatkowych węzłów satelitarnych Mesh w sieci (tryb pojedynczego routera).</div>
+            <div class="empty-state">Brak danych o topologii.</div>
           </div>
         </div>
       </section>
@@ -385,7 +371,7 @@
             <div class="info-list">
               <div class="info-row">
                 <span class="lbl">Stan łącza:</span>
-                <span class="val bold" id="wan-stat-link">● Połączony (Link UP)</span>
+                <span class="val bold" id="wan-stat-link">--</span>
               </div>
               <div class="info-row">
                 <span class="lbl">Czas połączenia:</span>
@@ -520,7 +506,6 @@
           </div>
           <div class="header-actions">
             <button class="btn-primary" id="btn-add-reserve-manual">+ Nowa rezerwacja</button>
-            <button class="btn-secondary" id="btn-json-backup">📋 Kopia / Przywróć JSON</button>
           </div>
         </div>
 
@@ -562,6 +547,10 @@
               <label class="form-label">Czas dzierżawy (minuty):</label>
               <input type="number" id="dhcp-lease-input" class="form-input" value="720">
             </div>
+            <div class="form-row-2">
+              <div class="form-group"><label class="form-label" for="dhcp-dns1-input">DNS 1</label><input type="text" id="dhcp-dns1-input" class="form-input" placeholder="Adres IPv4 DNS 1"></div>
+              <div class="form-group"><label class="form-label" for="dhcp-dns2-input">DNS 2</label><input type="text" id="dhcp-dns2-input" class="form-input" placeholder="Adres IPv4 DNS 2"></div>
+            </div>
             <button class="btn-primary" id="btn-save-dhcp">Zapisz Serwer DHCP</button>
           </div>
         </div>
@@ -574,6 +563,7 @@
               <h3>Statyczne Rezerwacje Adresów IP (Static DHCP)</h3>
             </div>
             <input type="text" id="dhcp-search-input" class="input-search compact" placeholder="Filtruj rezerwacje...">
+            <select id="bind-sort-select" class="form-select sort-select" aria-label="Sortowanie rezerwacji"><option value="original">Kolejność routera</option><option value="ip-asc">IP rosnąco</option><option value="ip-desc">IP malejąco</option><option value="name-asc">Nazwa A-Z</option><option value="name-desc">Nazwa Z-A</option></select>
           </div>
           <div class="table-responsive">
             <table class="data-table" id="table-dhcp-binds">
@@ -618,21 +608,8 @@
           ★ Smart Connect (Wi-Fi 双频合一) jest WŁĄCZONY - Pasma 2.4 GHz i 5 GHz współdzielą jedno SSID i hasło. Router automatycznie dobiera pasmo.
         </div>
 
-        <div class="grid-2-col">
-          <!-- Karta Lewa: Pasmo 2.4 GHz (lub Wspólna Sieć) -->
-          <div class="card">
-            <div class="card-head">
-              <div class="head-title-row">
-                <span class="card-icon">📶</span>
-                <h3 id="wifi-2g-card-title">Wspólna Sieć Wi-Fi i Pasmo 2.4 GHz (Smart Connect)</h3>
-              </div>
-              <label class="toggle-switch-label sm">
-                <input type="checkbox" id="wifi-2g-enable" checked>
-                <span class="toggle-slider"></span>
-                <span id="wifi-2g-enable-txt" class="status-lbl">Włączone</span>
-              </label>
-            </div>
-            
+        <div class="card" id="wifi-common-credentials"><h3 id="wifi-common-heading">Wspólna sieć Wi-Fi</h3>
+          <div id="wifi-2g-credentials-fields">
             <div class="form-group">
               <label class="form-label" id="wifi-2g-ssid-lbl">Wspólna nazwa (SSID):</label>
               <input type="text" id="wifi-2g-ssid" class="form-input">
@@ -663,6 +640,21 @@
               </label>
             </div>
 
+          </div>
+        </div>
+
+        <div class="grid-2-col">
+          <!-- Karta Lewa: Pasmo 2.4 GHz (lub Wspólna Sieć) -->
+          <div class="card">
+            <div class="card-head">
+              <div class="head-title-row">
+                <span class="card-icon">📶</span>
+                <h3 id="wifi-2g-card-title">Wspólna Sieć Wi-Fi i Pasmo 2.4 GHz (Smart Connect)</h3>
+              </div>
+              <input type="checkbox" id="wifi-2g-enable" checked hidden><span id="wifi-2g-enable-txt" class="status-lbl" hidden></span>
+            </div>
+            <div id="wifi-2g-credentials-slot"></div>
+            
             <div class="form-group">
               <label class="form-label">Moc nadawania (TX Power):</label>
               <select id="wifi-2g-tx" class="form-select">
@@ -702,7 +694,7 @@
             </div>
 
             <div class="wifi-summary-box" id="wifi-2g-summary">
-              Kanał: 11 | Szerokość: do 40 MHz | Status: Włączone
+              --
             </div>
           </div>
 
@@ -713,16 +705,12 @@
                 <span class="card-icon">🚀</span>
                 <h3 id="wifi-5g-card-title">Parametry Radiowe 5 GHz (Smart Connect)</h3>
               </div>
-              <label class="toggle-switch-label sm">
-                <input type="checkbox" id="wifi-5g-enable" checked>
-                <span class="toggle-slider"></span>
-                <span id="wifi-5g-enable-txt" class="status-lbl">Włączone</span>
-              </label>
+              <input type="checkbox" id="wifi-5g-enable" checked hidden><span id="wifi-5g-enable-txt" class="status-lbl" hidden></span>
             </div>
 
             <!-- Baner synchronizacji z 2.4 GHz przy Smart Connect -->
             <div id="wifi-5g-sync-banner" class="wifi-sync-info">
-              ★ Smart Connect włączony: Pasmo 5 GHz współdzieli wspólną nazwę SSID, hasło i szyfrowanie z panelem po lewej.
+              ★ Smart Connect włączony: Pasmo 5 GHz korzysta ze wspólnych danych podanych powyżej.
             </div>
 
             <!-- Pola 5G (widoczne tylko gdy Smart Connect jest wyłączony) -->
@@ -799,7 +787,7 @@
             </div>
 
             <div class="wifi-summary-box" id="wifi-5g-summary">
-              Kanał: 36 | Szerokość: do 160 MHz (Wi-Fi 6/7) | Status: Włączone
+              --
             </div>
           </div>
         </div>
@@ -925,31 +913,32 @@
           </div>
         </div>
 
-        <!-- 4 INTERAKTYWNE KAFELKI PORTÓW FIZYCZNYCH -->
+        <p id="ports-read-status" class="text-warning" role="status"></p>
+        <!-- Stan portów fizycznych -->
         <div class="ports-grid-4" id="ports-hardware-grid">
-          <div class="port-card active-card" data-port="1">
+          <div class="port-card" data-port="1">
             <div class="port-number">Port 1 (2.5G)</div>
             <div class="port-spec">2.5G RJ45</div>
-            <div class="port-badge badge-wan1">Główny Internet (WAN1)</div>
-            <div class="port-status status-up">● Połączony (2.5G)</div>
+            <div class="port-badge badge-down">Rola nieznana</div>
+            <div class="port-status status-down">Brak danych</div>
           </div>
           <div class="port-card" data-port="2">
             <div class="port-number">Port 2 (2.5G)</div>
             <div class="port-spec">2.5G RJ45</div>
-            <div class="port-badge badge-lan">Lokalna Sieć (LAN)</div>
-            <div class="port-status status-up">● Połączony (2.5G)</div>
+            <div class="port-badge badge-down">Rola nieznana</div>
+            <div class="port-status status-down">Brak danych</div>
           </div>
           <div class="port-card" data-port="3">
             <div class="port-number">Port 3 (2.5G)</div>
             <div class="port-spec">2.5G RJ45</div>
-            <div class="port-badge badge-down">Rozłączony / Wolny</div>
-            <div class="port-status status-down">○ Gotowy (Auto MDI-X)</div>
+            <div class="port-badge badge-down">Rola nieznana</div>
+            <div class="port-status status-down">Brak danych</div>
           </div>
           <div class="port-card" data-port="4">
             <div class="port-number">Port 4 (2.5G)</div>
             <div class="port-spec">2.5G RJ45</div>
-            <div class="port-badge badge-lan">Lokalna Sieć (LAN)</div>
-            <div class="port-status status-up">● Połączony (2.5G)</div>
+            <div class="port-badge badge-down">Rola nieznana</div>
+            <div class="port-status status-down">Brak danych</div>
           </div>
         </div>
 
@@ -999,7 +988,7 @@
                 </select>
               </div>
             </div>
-            <button class="btn-primary" id="btn-save-lag">Zapisz Konfigurację LAG</button>
+            <button class="btn-primary" id="btn-save-lag" disabled>Zapisz Konfigurację LAG</button>
           </div>
 
           <!-- Karta 2: Dual WAN -->
@@ -1031,7 +1020,7 @@
                 </select>
               </div>
             </div>
-            <button class="btn-primary" id="btn-save-dualwan">Zapisz Konfigurację Dual WAN</button>
+            <button class="btn-primary" id="btn-save-dualwan" disabled>Zapisz Konfigurację Dual WAN</button>
           </div>
 
           <!-- Karta 3: IPTV -->
@@ -1060,7 +1049,7 @@
                 <input type="number" id="iptv-vid-input" class="form-input" placeholder="np. 100 lub puste">
               </div>
             </div>
-            <button class="btn-primary" id="btn-save-iptv">Zapisz Konfigurację IPTV</button>
+            <button class="btn-primary" id="btn-save-iptv" disabled>Zapisz Konfigurację IPTV</button>
           </div>
 
           <!-- Karta 4: Gaming Port -->
@@ -1083,7 +1072,7 @@
                 <option value="3">Port 3 (2.5G)</option>
               </select>
             </div>
-            <button class="btn-primary" id="btn-save-game">Zapisz Konfigurację Portu Gry</button>
+            <button class="btn-primary" id="btn-save-game" disabled>Zapisz Konfigurację Portu Gry</button>
           </div>
         </div>
       </section>
@@ -1099,6 +1088,10 @@
           </div>
         </div>
 
+        <p id="nat-read-status" class="text-warning" role="status"></p>
+        <div class="card"><h3>Przekierowania pojedynczych portów</h3><div id="nat-single-list" class="nat-list">Brak danych</div></div>
+        <div class="card"><h3>Przekierowania zakresów portów</h3><div id="nat-range-list" class="nat-list">Brak danych</div><button class="btn-secondary" id="btn-add-range" disabled>Dodaj zakres portów</button></div>
+        <div class="card"><h3>Automatyczne mapowanie portów (UPnP)</h3><label class="checkbox-inline"><input type="checkbox" id="upnp-switch" disabled><span id="upnp-state-text">Stan UPnP nieodczytany</span></label><div id="upnp-list" class="nat-list">Brak danych</div></div>
         <div class="grid-2-col">
           <!-- DMZ -->
           <div class="card">
@@ -1109,7 +1102,7 @@
             <p class="card-desc">Przekazuje cały ruch przychodzący bez reguł na jeden konkretny adres IP w sieci domowej.</p>
             <div class="form-group">
               <label class="checkbox-inline">
-                <input type="checkbox" id="dmz-enabled-chk">
+                <input type="checkbox" id="dmz-enabled-chk" disabled>
                 <span>Włącz strefę DMZ</span>
               </label>
             </div>
@@ -1117,7 +1110,7 @@
               <label class="form-label">Adres IP hosta DMZ:</label>
               <input type="text" id="dmz-ip-input" class="form-input" placeholder="np. 192.168.31.50">
             </div>
-            <button class="btn-primary" id="btn-save-dmz">Zapisz Ustawienia DMZ</button>
+            <button class="btn-primary" id="btn-save-dmz" disabled>Zapisz Ustawienia DMZ</button>
           </div>
 
           <!-- Nowe przekierowanie -->
@@ -1154,7 +1147,7 @@
                 <input type="text" id="nat-target-ip" class="form-input" placeholder="192.168.31.10">
               </div>
             </div>
-            <button class="btn-primary" id="btn-add-nat-rule">+ Dodaj Regułę Portu</button>
+            <button class="btn-primary" id="btn-add-nat-rule" disabled>+ Dodaj Regułę Portu</button>
           </div>
         </div>
       </section>
@@ -1189,97 +1182,31 @@
               <button data-mode="video">Wideo / Streaming</button>
             </div>
           </div>
+          <div class="form-row-2"><div class="form-group"><label class="form-label">Pobieranie (Mbps)</label><input class="form-input" type="number" min="1" id="qos-download"></div><div class="form-group"><label class="form-label">Wysyłanie (Mbps)</label><input class="form-input" type="number" min="1" id="qos-upload"></div></div><button class="btn-primary" id="btn-save-qos-band">Zapisz prędkość łącza</button>
           <button class="btn-primary" id="btn-save-qos">Zapisz Ustawienia QoS</button>
         </div>
+      </section>
+
+      <section id="view-services" class="content-view">
+        <div class="view-header"><div><h2 class="view-title">DDNS i VPN</h2><p class="view-desc">Usługi dynamicznego DNS i profile klienta VPN.</p></div></div>
+        <div class="grid-2-col">
+          <div class="card"><h3>Dynamiczny DNS (DDNS)</h3><div id="ddns-list" class="nat-list">Brak danych</div>
+            <h4>Dodaj usługę DDNS</h4><div class="form-group"><label class="form-label">Dostawca</label><select id="ddns-provider" class="form-select"><option>no-ip.com</option><option>oray.com</option><option>pubyun.com</option><option>3322.org</option><option>dyndns.com</option></select></div>
+            <div class="form-group"><label class="form-label">Domena</label><input id="ddns-domain" class="form-input"></div><div class="form-group"><label class="form-label">Nazwa użytkownika</label><input id="ddns-user" class="form-input"></div><div class="form-group"><label class="form-label">Hasło</label><input id="ddns-password" class="form-input" type="password"></div><button id="ddns-add" class="btn-primary">Dodaj DDNS</button></div>
+          <div class="card"><h3>Klient VPN</h3><p id="vpn-status">Brak danych</p><div id="vpn-list" class="nat-list">Brak danych</div><button id="vpn-disconnect" class="btn-secondary">Rozłącz VPN</button><h4>Dodaj profil VPN</h4>
+            <div class="form-group"><label class="form-label">Protokół</label><select id="vpn-proto" class="form-select"><option>l2tp</option><option>pptp</option></select></div><div class="form-group"><label class="form-label">Serwer</label><input id="vpn-server" class="form-input"></div><div class="form-group"><label class="form-label">Nazwa użytkownika</label><input id="vpn-user" class="form-input"></div><div class="form-group"><label class="form-label">Hasło</label><input id="vpn-password" class="form-input" type="password"></div><label class="checkbox-inline"><input type="checkbox" id="vpn-auto"><span>Automatyczne łączenie</span></label><button id="vpn-add" class="btn-primary">Dodaj VPN</button>
+          </div>
+        </div>
+        <div class="card"><h3>Smart VPN</h3><p>Dzielenie ruchu VPN według domen lub urządzeń.</p><label class="checkbox-inline"><input type="checkbox" id="smartvpn-enabled" disabled><span>Włącz Smart VPN</span></label><select id="smartvpn-mode" class="form-select" disabled><option value="1">Domeny</option><option value="2">Urządzenia</option></select><button id="smartvpn-save" class="btn-primary" disabled>Zapisz Smart VPN</button></div>
       </section>
 
       <!-- ============================================================ -->
       <!-- WIDOK 10: SYSTEM, NARZĘDZIA I DIODY LED                      -->
       <!-- ============================================================ -->
-      <section id="view-tools" class="content-view">
-        <div class="view-header">
-          <div>
-            <h2 class="view-title">Narzędzia Systemowe i Diody LED</h2>
-            <p class="view-desc">Sterowanie podświetleniem obudowy, zmiana hasła administratora i parametry routera.</p>
-          </div>
-        </div>
-
-        <div class="grid-2-col">
-          <!-- Diody LED -->
-          <div class="card">
-            <div class="card-head">
-              <span class="card-icon">💡</span>
-              <h3>Diody LED Obudowy</h3>
-            </div>
-            <p class="card-desc">Wyłącz diody sygnalizacyjne na obudowie BE7000 (np. na noc w sypialni).</p>
-            <div class="form-group">
-              <label class="toggle-switch">
-                <input type="checkbox" id="led-switch" checked>
-                <span class="toggle-slider"></span>
-              </label>
-              <span id="led-status-lbl" class="bold">Włączone</span>
-            </div>
-            <button class="btn-primary" id="btn-save-led">Zapisz Stan Diod</button>
-          </div>
-
-          <!-- Zmiana Hasła -->
-          <div class="card">
-            <div class="card-head">
-              <span class="card-icon">🔑</span>
-              <h3>Zmiana Hasła Administratora</h3>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Nowe hasło routera:</label>
-              <input type="password" id="new-admin-pwd" class="form-input" placeholder="Wpisz nowe bezpieczne hasło">
-            </div>
-            <button class="btn-warn" id="btn-change-admin-pwd">Zmień Hasło Routera</button>
-          </div>
-        </div>
-      </section>
 
       <!-- ============================================================ -->
       <!-- WIDOK 11: KOPIA I PRZYWRACANIE JSON                          -->
       <!-- ============================================================ -->
-      <section id="view-backup" class="content-view">
-        <div class="view-header">
-          <div>
-            <h2 class="view-title">Kopia i Przywracanie Konfiguracji JSON</h2>
-            <p class="view-desc">Bezpieczny eksport rezerwacji DHCP i ustawień routera do schowka lub pliku JSON.</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-head">
-            <span class="card-icon">📋</span>
-            <h3>Edytor JSON Schowka</h3>
-          </div>
-          <div class="backup-actions-bar">
-            <button class="btn-primary" id="btn-gen-json">📥 Pobierz rezerwacje do JSON</button>
-            <button class="btn-secondary" id="btn-copy-json">📋 Kopiuj do schowka</button>
-            <button class="btn-secondary" id="btn-paste-json">📋 Wklej ze schowka</button>
-            <button class="btn-warn" id="btn-apply-json">⚡ Przywróć rezerwacje z JSON</button>
-          </div>
-          <textarea id="json-editor-area" class="code-area" placeholder="Tutaj pojawi się zawartość JSON..."></textarea>
-        </div>
-      </section>
-
-      <!-- ============================================================ -->
-      <!-- WIDOK 12: DIAGNOSTYKA SIECI (PING / TRACEROUTE)               -->
-      <!-- ============================================================ -->
-      <section id="view-diag" class="content-view">
-        <div class="view-header">
-          <div>
-            <h2 class="view-title">Diagnostyka Sieci (Ping i Traceroute)</h2>
-            <p class="view-desc">Sprawdzanie opóźnień do węzłów w sieci domowej i w Internecie bezpośrednio z procesora BE7000.</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="diag-form-row">
-            <input type="text" id="diag-host-input" class="form-input" value="8.8.8.8" placeholder="Adres IP lub domena (np. 1.1.1.1)">
-            <button class="btn-primary" id="btn-run-ping">🚀 Uruchom Ping</button>
-          </div>
-          <pre id="diag-console" class="diag-terminal">Gotowy do wykonania testu diagnostycznego...</pre>
-        </div>
-      </section>
 
       <!-- ============================================================ -->
       <!-- WIDOK 13: RESTART ROUTERA                                     -->
@@ -1287,9 +1214,16 @@
       <section id="view-reboot" class="content-view">
         <div class="view-header">
           <div>
-            <h2 class="view-title">Restart i Zasilanie Routera</h2>
-            <p class="view-desc">Bezpieczny restart systemu Xiaomi OpenWrt bez utraty zapisanych parametrów.</p>
+            <h2 class="view-title">System i konserwacja</h2>
+            <p class="view-desc">Bezpieczeństwo, ustawienia sprzętowe, raporty i konserwacja routera.</p>
           </div>
+        </div>
+        <div class="grid-2-col system-overview">
+          <div class="card"><h3>Strefa bezpieczeństwa i hasła</h3><p class="card-desc">Zmiana hasła administratora routera.</p><button class="btn-primary" id="system-change-password">Zmień hasło administratora</button></div>
+          <div class="card"><h3>Kopia i przywracanie</h3><p>Kopia JSON obejmuje dostępne dane routera i może zawierać hasła. Przywracanie obsługuje tylko dostępne sekcje wskazane w kolejnym oknie.</p><div class="backup-actions-bar"><button class="btn-primary" id="btn-save-snapshot">Utwórz kopię zapasową (.json)</button><label class="btn-secondary">Wczytaj kopię JSON <input type="file" id="backup-file-input" accept="application/json,.json" hidden></label><button class="btn-warn" id="btn-apply-json" disabled>Wybierz sekcje do przywrócenia</button><button class="btn-secondary" id="btn-official-backup">Pobierz oficjalną kopię Xiaomi (.tar.gz)</button></div><p id="backup-file-status" role="status">Nie wczytano kopii JSON.</p><p>Oficjalna kopia Xiaomi jest osobnym plikiem. Jej zakres i przywracanie nie zostały potwierdzone.</p></div>
+          <div class="card"><h3>Raporty i dokumentacja sieci</h3><p class="card-desc">Raport stanu routera i urządzeń.</p><button class="btn-primary" id="btn-export-md">Eksportuj raport do Markdown (.md)</button></div>
+          <div class="card"><h3>Diody LED routera</h3><div class="form-group"><label class="toggle-switch"><input type="checkbox" id="led-switch" disabled><span class="toggle-slider"></span></label><span id="led-status-lbl" class="bold">Brak danych</span></div><button class="btn-primary" id="btn-save-led" disabled>Zapisz stan diod</button></div>
+          <div class="card"><h3>Konserwacja i system</h3><p id="system-router-time">Czas routera: --</p><button class="btn-secondary" id="btn-nfc-enable">Włącz NFC</button><button class="btn-secondary" id="btn-nfc-disable">Wyłącz NFC</button><button class="btn-secondary" id="btn-sync-time">Synchronizuj czas</button><button class="btn-secondary" id="btn-check-firmware">Sprawdź aktualizacje firmware</button></div>
         </div>
         <div class="card danger-card">
           <div class="card-head">
@@ -1298,6 +1232,8 @@
           </div>
           <p class="card-desc">Restart spowoduje chwilowe przerwanie połączenia z Internetem i sieciami Wi-Fi na około 60-90 sekund.</p>
           <button class="btn-danger" id="btn-reboot-router">🔄 Zrestartuj Xiaomi BE7000 Teraz</button>
+          <p class="card-desc">Przywrócenie ustawień fabrycznych usuwa konfigurację routera i wymaga ponownego skonfigurowania sieci.</p>
+          <button class="btn-danger" id="btn-factory-reset">Przywróć ustawienia fabryczne</button>
         </div>
       </section>
 
@@ -1380,7 +1316,7 @@
           </div>
           <div class="form-group">
             <label class="checkbox-inline">
-              <input type="checkbox" id="login-remember-pwd" checked>
+              <input type="checkbox" id="login-remember-pwd">
               <span>Zapamiętaj logowanie na tym urządzeniu</span>
             </label>
           </div>
@@ -1469,6 +1405,7 @@
 
   </div>
 
+  <script src="translations.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

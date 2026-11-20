@@ -10,21 +10,24 @@ android {
         applicationId "com.hookmt.xrm"
         minSdk 24
         targetSdk 34
-        versionCode 102
-        versionName "1.0.2"
+        versionCode 105
+        versionName "1.0.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures { buildConfig true }
     buildTypes {
         release {
+            buildConfigField 'boolean', 'PREVIEW_READ_ONLY', 'false' 
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
         }
         debug {
+            buildConfigField 'boolean', 'PREVIEW_READ_ONLY', 'false'
             applicationIdSuffix ".debug"
-            debuggable true
+            debuggable false
         }
     }
 
