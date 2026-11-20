@@ -1,11 +1,15 @@
 package com.hookmt.xrm;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.JsResult;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -16,7 +20,10 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "XRM_Main";
+    private static final int FILECHOOSER_RESULTCODE = 1001;
+
     private WebView webView;
+    private ValueCallback<Uri[]> mUploadMessage;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -47,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // Pozostaw nawigację wewnątrz widoku WebView
                 return false;
             }
         });
@@ -94,6 +100,22 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                if (mUploadMessage != null) {
+                    mUploadMessage.onReceiveValue(null);
+                }
+                mUploadMessage = filePathCallback;
+                Intent intent = fileChooserParams.createIntent();
+                try {
+                    startActivityForResult(intent, FILECHOOSER_RESULTCODE);
+                } catch (ActivityNotFoundException e) {
+                    mUploadMessage = null;
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
                 Log.d(TAG, consoleMessage.message() + " -- From line "
                         + consoleMessage.lineNumber() + " of "
@@ -104,6 +126,24 @@ public class MainActivity extends AppCompatActivity {
 
         // Ładowanie spakowanego zasobu aplikacji WWW
         webView.loadUrl("file:///android_asset/index.html");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FILECHOOSER_RESULTCODE) {
+            if (mUploadMessage != null) {
+                Uri[] results = null;
+                if (resultCode == RESULT_OK && data != null) {
+                    String dataString = data.getDataString();
+                    if (dataString != null) {
+                        results = new Uri[]{Uri.parse(dataString)};
+                    }
+                }
+                mUploadMessage.onReceiveValue(results);
+                mUploadMessage = null;
+            }
+        }
     }
 
     @Override
