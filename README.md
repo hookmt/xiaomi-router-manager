@@ -104,7 +104,11 @@ Located in `mobile/`, this client provides a unified experience across smartphon
 - **100% Offline Capability:** Works immediately with unconfigured or factory-reset routers (`192.168.31.1`) over open `Xiaomi_XXXX` Wi-Fi without internet or external dependencies.
 - **Quick DHCP Reservation:** Includes the green `+ Reserve` / `+ Rezerwuj` button for one-tap IP binding with hardware MAC lock.
 - **Setup Wizard:** 3-step offline initial router configuration (admin password, Wi-Fi SSID/PSK, WAN connection type).
-- **Available as:** Standalone `Xiaomi_Router_Manager_v1.0.2.apk` package and local web preview via `python mobile/run_preview.py`.
+- **Available as:** Standalone `Xiaomi_Router_Manager_v1.0.5.apk` package in [Releases](https://github.com/hookmt/xiaomi-router-manager/releases).
+
+<p align="center">
+  <img src="screenshots/13_android_tablet_dashboard.png" alt="Xiaomi Router Manager Android Tablet Dashboard" width="850">
+</p>
 
 
 ---
@@ -185,13 +189,25 @@ Located in `mobile/`, this client provides a unified experience across smartphon
 <img src="screenshots/10_system_tools.png" alt="System Tools" width="850">
 </details>
 
+<details>
+<summary><b>12. Android Tablet Client - 4x 2.5 Gbps Port Management & LACP LAG</b></summary>
+<br>
+<img src="screenshots/14_android_tablet_ports_2.5g.png" alt="Android Tablet Physical Ports 2.5G" width="850">
+</details>
+
+<details>
+<summary><b>13. Android Tablet Client - Wi-Fi Settings & Smart Connect Architecture</b></summary>
+<br>
+<img src="screenshots/15_android_tablet_wifi_smartconnect.png" alt="Android Tablet Wi-Fi Smart Connect" width="850">
+</details>
+
 ---
 
 ## Installation & Usage
 
 ### Option A: Standalone Executable (No Python Required)
-1. Download `Xiaomi_Router_Manager_v1.0.2.exe` from the [Releases](https://github.com/hookmt/xiaomi-router-manager/releases) page.
-2. Launch `Xiaomi_Router_Manager_v1.0.2.exe`.
+1. Download `Xiaomi_Router_Manager_v1.0.5.exe` from the [Releases](https://github.com/hookmt/xiaomi-router-manager/releases) page.
+2. Launch `Xiaomi_Router_Manager_v1.0.5.exe`.
 3. Enter your router gateway IP (`192.168.31.1` by default) and administrator password (or paste a browser URL containing `;stok=...`).
 4. Click **Connect**.
 
