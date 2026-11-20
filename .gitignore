@@ -28,3 +28,13 @@ test_*.py
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Android build artifacts
+.gradle/
+mobile/android/.gradle/
+mobile/android/build/
+mobile/android/app/build/
+local.properties
+*.apk
+*.aab
+

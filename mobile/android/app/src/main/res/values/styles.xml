@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.XiaomiRouterManager" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@color/status_bar</item>
+        <item name="android:navigationBarColor">@color/status_bar</item>
+        <item name="android:windowBackground">@color/background</item>
+    </style>
+</resources>

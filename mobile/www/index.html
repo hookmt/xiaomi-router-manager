@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Xiaomi Router Manager Mobile</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#13161c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="mode-auto">
+  <div id="app" class="app-container">
+    
+    <!-- GÓRNY PASEK APLIKACJI -->
+    <header class="top-bar">
+      <div class="top-left">
+        <div class="app-logo">📶</div>
+        <div class="app-titles">
+          <h1 class="app-title">Xiaomi Router Manager</h1>
+          <span class="app-subtitle" id="lbl-device-info">BE7000 / BE6500 / AX3600</span>
+        </div>
+      </div>
+      <div class="top-center">
+        <div class="conn-pill" id="conn-pill">
+          <span class="status-dot disconnected" id="status-dot"></span>
+          <span class="status-text" id="status-text">Rozłączony</span>
+        </div>
+      </div>
+      <div class="top-right">
+        <!-- Przełącznik układu (Telefon / Tablet / Auto) -->
+        <div class="layout-toggle" title="Układ interfejsu">
+          <button class="btn-icon active" id="btn-layout-auto" title="Auto (wg ekranu)">📱/💻</button>
+          <button class="btn-icon" id="btn-layout-phone" title="Wymuś Telefon (pion)">📱</button>
+          <button class="btn-icon" id="btn-layout-tablet" title="Wymuś Tablet (poziom)">💻</button>
+        </div>
+        <!-- Język -->
+        <button class="btn-lang" id="btn-lang-toggle">PL / EN</button>
+        <!-- Przycisk połączenia -->
+        <button class="btn-connect" id="btn-connect">Połącz</button>
+      </div>
+    </header>
+
+    <!-- GŁÓWNA STRUKTURA: BOCZNY PASEK (DLA TABLETU) + OBSZAR ROBOCZY -->
+    <div class="main-body">
+      
+      <!-- BOCZNY PASEK NAWIGACJI (TABLET / LANDSCAPE) -->
+      <aside class="sidebar" id="sidebar">
+        <div class="nav-section-title" data-i18n="nav_views">Widoki robocze</div>
+        <nav class="nav-links">
+          <button class="nav-item active" data-tab="dashboard">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text" data-i18n="tab_dashboard">Pulpit</span>
+          </button>
+          <button class="nav-item" data-tab="devices">
+            <span class="nav-icon">💻</span>
+            <span class="nav-text" data-i18n="tab_devices">Urządzenia</span>
+            <span class="nav-badge" id="badge-dev-count">0</span>
+          </button>
+          <button class="nav-item" data-tab="dhcp">
+            <span class="nav-icon">🏷️</span>
+            <span class="nav-text" data-i18n="tab_dhcp">Rezerwacje DHCP</span>
+          </button>
+          <button class="nav-item" data-tab="ports">
+            <span class="nav-icon">🔌</span>
+            <span class="nav-text" data-i18n="tab_ports">Porty 2.5G</span>
+          </button>
+          <button class="nav-item" data-tab="wifi">
+            <span class="nav-icon">📶</span>
+            <span class="nav-text" data-i18n="tab_wifi">Wi-Fi</span>
+          </button>
+          <button class="nav-item" data-tab="wizard">
+            <span class="nav-icon">✨</span>
+            <span class="nav-text" data-i18n="tab_wizard">Kreator Setup</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="router-quick-stats">
+            <div class="stat-row">
+              <span class="stat-label">Brama IP:</span>
+              <span class="stat-val" id="sb-ip">192.168.31.1</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Model:</span>
+              <span class="stat-val" id="sb-model">BE7000</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- OBSZAR TREŚCI -->
+      <main class="content-area" id="content-area">
+        
+        <!-- ZAKŁADKA 1: PULPIT (DASHBOARD) -->
+        <section class="tab-pane active" id="pane-dashboard">
+          <div class="dash-grid">
+            
+            <!-- Karta transferu WAN -->
+            <div class="card card-speeds">
+              <div class="card-header">
+                <span class="card-icon">🌐</span>
+                <span class="card-title" data-i18n="card_wan_speed">Prędkość WAN (Internet)</span>
+              </div>
+              <div class="speeds-box">
+                <div class="speed-item down">
+                  <span class="speed-arrow">↓</span>
+                  <span class="speed-val" id="val-downspeed">0.0 KB/s</span>
+                  <span class="speed-label" data-i18n="speed_download">Pobieranie</span>
+                </div>
+                <div class="speed-item up">
+                  <span class="speed-arrow">↑</span>
+                  <span class="speed-val" id="val-upspeed">0.0 KB/s</span>
+                  <span class="speed-label" data-i18n="speed_upload">Wysyłanie</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Karta zasobów CPU i RAM -->
+            <div class="card card-system">
+              <div class="card-header">
+                <span class="card-icon">⚡</span>
+                <span class="card-title" data-i18n="card_resources">Zasoby sprzętowe</span>
+              </div>
+              <div class="res-box">
+                <div class="res-item">
+                  <div class="res-labels">
+                    <span>CPU</span>
+                    <span id="lbl-cpu-val">0%</span>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill" id="fill-cpu" style="width: 0%"></div></div>
+                </div>
+                <div class="res-item">
+                  <div class="res-labels">
+                    <span>Pamięć RAM</span>
+                    <span id="lbl-mem-val">0%</span>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill mem" id="fill-mem" style="width: 0%"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Karta fizycznych portów 2.5G -->
+            <div class="card card-ports-preview">
+              <div class="card-header">
+                <span class="card-icon">🔌</span>
+                <span class="card-title" data-i18n="card_phys_ports">Porty fizyczne RJ45 (4x 2.5 Gbps)</span>
+              </div>
+              <div class="ports-flex" id="ports-container">
+                <!-- Dynamicznie generowane porty 1-4 -->
+              </div>
+            </div>
+
+            <!-- Karta podsumowania sieci -->
+            <div class="card card-summary">
+              <div class="card-header">
+                <span class="card-icon">ℹ️</span>
+                <span class="card-title" data-i18n="card_net_info">Informacje o systemie</span>
+              </div>
+              <div class="summary-list">
+                <div class="sum-row"><span class="sum-k" data-i18n="lbl_firmware">Oprogramowanie:</span><span class="sum-v" id="val-fw">-</span></div>
+                <div class="sum-row"><span class="sum-k" data-i18n="lbl_uptime">Czas pracy:</span><span class="sum-v" id="val-uptime">-</span></div>
+                <div class="sum-row"><span class="sum-k" data-i18n="lbl_clients">Podłączone urządzenia:</span><span class="sum-v" id="val-client-count">0</span></div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ZAKŁADKA 2: URZĄDZENIA W SIECI (NETWORK DEVICES) -->
+        <section class="tab-pane" id="pane-devices">
+          <div class="pane-header">
+            <div class="search-box">
+              <input type="text" id="input-dev-search" placeholder="Szukaj (nazwa, IP, MAC)..." data-i18n-ph="ph_search_dev">
+            </div>
+            <div class="pane-actions">
+              <label class="toggle-switch">
+                <input type="checkbox" id="chk-show-offline" checked>
+                <span class="slider"></span>
+                <span class="toggle-text" data-i18n="lbl_show_offline">Pokaż offline</span>
+              </label>
+              <button class="btn-action" id="btn-refresh-devs">🔄 Odśwież</button>
+            </div>
+          </div>
+          
+          <div class="devices-list" id="devices-list">
+            <!-- Wiersze urządzeń generowane dynamicznie -->
+          </div>
+        </section>
+
+        <!-- ZAKŁADKA 3: REZERWACJE DHCP (STATIC DHCP LEASES) -->
+        <section class="tab-pane" id="pane-dhcp">
+          <div class="pane-header">
+            <div class="search-box">
+              <input type="text" id="input-dhcp-search" placeholder="Szukaj rezerwacji..." data-i18n-ph="ph_search_dhcp">
+            </div>
+            <div class="pane-actions">
+              <button class="btn-action btn-add" id="btn-manual-add-dhcp">+ Nowa rezerwacja</button>
+              <button class="btn-action btn-secondary" id="btn-export-dhcp">💾 Kopia JSON</button>
+              <label class="btn-action btn-secondary btn-file-label">
+                📂 Przywróć
+                <input type="file" id="file-import-dhcp" accept=".json" style="display: none;">
+              </label>
+            </div>
+          </div>
+
+          <div class="dhcp-table-container">
+            <div class="dhcp-list" id="dhcp-list">
+              <!-- Rezerwacje DHCP generowane dynamicznie -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ZAKŁADKA 4: FIZYCZNE PORTY 2.5G -->
+        <section class="tab-pane" id="pane-ports">
+          <div class="ports-full-view">
+            <h2 data-i18n="ports_full_title">Zarządzanie Portami 4x 2.5 Gbps (Xiaomi BE7000)</h2>
+            <p class="subtitle" data-i18n="ports_full_desc">Podgląd statusu łącza, agregacji LAN (LAG LACP) oraz konfiguracji Dual WAN.</p>
+            <div class="ports-grid-large" id="ports-large-container"></div>
+          </div>
+        </section>
+
+        <!-- ZAKŁADKA 5: WI-FI -->
+        <section class="tab-pane" id="pane-wifi">
+          <div class="wifi-cards-container">
+            <div class="card wifi-card">
+              <div class="card-header">
+                <span class="card-title">📶 Wi-Fi 2.4 GHz</span>
+              </div>
+              <div class="wifi-fields">
+                <div class="sum-row"><span class="sum-k">SSID:</span><span class="sum-v font-bold" id="wifi-2g-ssid">-</span></div>
+                <div class="sum-row"><span class="sum-k">Szyfrowanie:</span><span class="sum-v" id="wifi-2g-enc">WPA2/WPA3 Personal</span></div>
+                <div class="sum-row"><span class="sum-k">Kanał:</span><span class="sum-v" id="wifi-2g-channel">-</span></div>
+              </div>
+            </div>
+
+            <div class="card wifi-card">
+              <div class="card-header">
+                <span class="card-title">🚀 Wi-Fi 5 GHz (Wi-Fi 7 MLO)</span>
+              </div>
+              <div class="wifi-fields">
+                <div class="sum-row"><span class="sum-k">SSID:</span><span class="sum-v font-bold" id="wifi-5g-ssid">-</span></div>
+                <div class="sum-row"><span class="sum-k">Szyfrowanie:</span><span class="sum-v" id="wifi-5g-enc">WPA2/WPA3 Personal</span></div>
+                <div class="sum-row"><span class="sum-k">Kanał:</span><span class="sum-v" id="wifi-5g-channel">-</span></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="wifi-opt-box">
+            <button class="btn-action btn-opt" id="btn-opt-channels">⚡ Optymalizuj kanały Wi-Fi</button>
+            <div class="opt-progress" id="opt-progress" style="display: none;">
+              <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+              <span class="opt-text">Skanowanie zakłóceń otoczenia w toku...</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ZAKŁADKA 6: KREATOR PIERWSZEJ KONFIGURACJI (SETUP WIZARD) -->
+        <section class="tab-pane" id="pane-wizard">
+          <div class="wizard-box">
+            <h2 data-i18n="wiz_title">Kreator Pierwszej Konfiguracji (Quick Setup)</h2>
+            <p class="subtitle" data-i18n="wiz_desc">Pozwala skonfigurować nowy lub zresetowany do fabryki router Xiaomi w 3 prostych krokach bez otwierania przeglądarki.</p>
+            
+            <div class="wizard-steps">
+              <div class="step-card">
+                <h3>1. Hasło administratora</h3>
+                <input type="password" id="wiz-pwd" placeholder="Wpisz nowe bezpieczne hasło admina">
+              </div>
+              <div class="step-card">
+                <h3>2. Sieć bezprzewodowa Wi-Fi</h3>
+                <input type="text" id="wiz-ssid" placeholder="Nazwa sieci Wi-Fi (SSID)">
+                <input type="password" id="wiz-wifi-pwd" placeholder="Hasło Wi-Fi (min. 8 znaków)">
+              </div>
+              <div class="step-card">
+                <h3>3. Typ połączenia z Internetem (WAN)</h3>
+                <select id="wiz-wan-type">
+                  <option value="dhcp">Automatyczne IP (DHCP - najczęstsze)</option>
+                  <option value="pppoe">PPPoE (Login i hasło od dostawcy)</option>
+                  <option value="static">Statyczny adres IP</option>
+                </select>
+              </div>
+              <button class="btn-action btn-wizard-apply" id="btn-wizard-submit">Zastosuj i zrestartuj sieć routera</button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- DOLNY PASEK NAWIGACJI (TELEFON / PORTRAIT) -->
+    <nav class="bottom-nav" id="bottom-nav">
+      <button class="b-nav-item active" data-tab="dashboard">
+        <span class="b-nav-icon">📊</span>
+        <span class="b-nav-text" data-i18n="tab_dashboard">Pulpit</span>
+      </button>
+      <button class="b-nav-item" data-tab="devices">
+        <span class="b-nav-icon">💻</span>
+        <span class="b-nav-text" data-i18n="tab_devices">Urządzenia</span>
+      </button>
+      <button class="b-nav-item" data-tab="dhcp">
+        <span class="b-nav-icon">🏷️</span>
+        <span class="b-nav-text" data-i18n="tab_dhcp">DHCP</span>
+      </button>
+      <button class="b-nav-item" data-tab="ports">
+        <span class="b-nav-icon">🔌</span>
+        <span class="b-nav-text" data-i18n="tab_ports">Porty</span>
+      </button>
+      <button class="b-nav-item" data-tab="wizard">
+        <span class="b-nav-icon">✨</span>
+        <span class="b-nav-text" data-i18n="tab_wizard">Kreator</span>
+      </button>
+    </nav>
+
+    <!-- MODAL POŁĄCZENIA / LOGOWANIA -->
+    <div class="modal-overlay" id="modal-login">
+      <div class="modal-card">
+        <h2 data-i18n="login_title">Połącz z routerem Xiaomi</h2>
+        <div class="form-group">
+          <label data-i18n="lbl_gateway_ip">Adres IP bramy (Router IP):</label>
+          <input type="text" id="login-ip" value="192.168.31.1">
+        </div>
+        <div class="form-group">
+          <label data-i18n="lbl_password">Hasło administratora:</label>
+          <input type="password" id="login-pwd" placeholder="Hasło routera...">
+        </div>
+        <div class="form-divider"><span>LUB</span></div>
+        <div class="form-group">
+          <label data-i18n="lbl_stok">Token / Link stok (z przeglądarki):</label>
+          <input type="text" id="login-stok" placeholder="Wklej link ze ;stok=...">
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-secondary" id="btn-login-cancel" data-i18n="btn_cancel">Anuluj</button>
+          <button class="btn-primary" id="btn-login-submit" data-i18n="btn_connect">Zaloguj i Połącz</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: SZYBKA REZERWACJA DHCP (+ REZERWUJ) -->
+    <div class="modal-overlay" id="modal-reserve">
+      <div class="modal-card">
+        <h2 data-i18n="dlg_quick_reserve_title">Szybka Rezerwacja DHCP</h2>
+        <div class="modal-alert-green">
+          <span class="icon">✅</span>
+          <span id="res-alert-mac">Urządzenie: 00:00:00:00:00:00</span>
+        </div>
+        <div class="form-group">
+          <label data-i18n="lbl_dev_name">Nazwa / Opis Urządzenia:</label>
+          <input type="text" id="res-name">
+        </div>
+        <div class="form-group">
+          <label data-i18n="lbl_mac_locked">Adres MAC (zablokowany):</label>
+          <input type="text" id="res-mac" readonly class="input-readonly">
+        </div>
+        <div class="form-group">
+          <label data-i18n="lbl_assigned_ip">Przypisany Stały Adres IP:</label>
+          <input type="text" id="res-ip">
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-secondary" id="btn-res-cancel" data-i18n="btn_cancel">Anuluj</button>
+          <button class="btn-primary btn-green" id="btn-res-save" data-i18n="btn_save_reserve">Zapisz Rezerwację</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

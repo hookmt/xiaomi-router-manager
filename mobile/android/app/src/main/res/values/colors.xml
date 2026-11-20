@@ -1,0 +1,5 @@
+<resources>
+    <color name="primary">#0284c7</color>
+    <color name="background">#12151c</color>
+    <color name="status_bar">#151821</color>
+</resources>

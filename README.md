@@ -2,6 +2,7 @@
 
 [![Version](https://img.shields.io/badge/version-v1.0.2-blue.svg)](version.py)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-blue.svg)](https://microsoft.com/windows)
+[![Android](https://img.shields.io/badge/Android-APK%20%7C%20Adaptive%20Tablet%20%26%20Phone-green.svg)](#9-adaptive-mobile--tablet-app-android-apk--offline-web-client)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![UI](https://img.shields.io/badge/UI-CustomTkinter%20Fluent%20Design-darkgreen.svg)](https://github.com/TomSchimansky/CustomTkinter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -93,6 +94,18 @@ Lightweight, zero-dependency Python 3 scripts for rapid headless disaster recove
 - `CLI/restore_router_config.py`: Primary emergency script injecting DHCP reservations and NAT rules in 3 seconds via session token.
 - `CLI/apply_dhcp.py`: Automated Excel/CSV parser and DHCP reservation injector.
 - `CLI/apply_portforward.py`: Automated port forwarding rule injector.
+
+### 9. Adaptive Mobile & Tablet App (Android APK & Offline Web Client)
+Located in `mobile/`, this client provides a unified experience across smartphones and tablets:
+- **Smart Adaptive Layout:**
+  - **Phone Mode (Portrait):** Bottom navigation, single-column thumb-friendly cards for quick triage.
+  - **Tablet Mode (Landscape):** Left navigation sidebar, multi-column dashboard mirroring desktop UX without black bars.
+  - **Manual Layout Switcher:** Instant top-bar toggle between `[Auto]`, `[Phone]`, and `[Tablet]` modes.
+- **100% Offline Capability:** Works immediately with unconfigured or factory-reset routers (`192.168.31.1`) over open `Xiaomi_XXXX` Wi-Fi without internet or external dependencies.
+- **Quick DHCP Reservation:** Includes the green `+ Reserve` / `+ Rezerwuj` button for one-tap IP binding with hardware MAC lock.
+- **Setup Wizard:** 3-step offline initial router configuration (admin password, Wi-Fi SSID/PSK, WAN connection type).
+- **Available as:** Standalone `Xiaomi_Router_Manager_v1.0.2.apk` package and local web preview via `python mobile/run_preview.py`.
+
 
 ---
 
