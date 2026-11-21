@@ -28,6 +28,13 @@
   - Przełączniki i akcje: sieć dla gości on/off, diody LED nocne on/off, optymalizacja kanałów, restart routera.
   - Korzyść poboczna: darmowy, natywny dostęp z poziomu aplikacji Home Assistant na smartfonach z Androidem i iOS!
 
+### 5. Wybór strefy czasowej i regionu w aplikacji mobilnej (Android / PWA)
+- **Koncepcja i cel:**
+  - Wdrożenie selektora strefy czasowej (Timezone) oraz kodu regionu w ustawieniach systemowych klienta mobilnego (oraz w kreatorze pierwszej konfiguracji).
+  - **Kluczowe znaczenie operacyjne:**
+    1. **Moc nadawania radia Wi-Fi (Tx Power / RegDomain):** prawidłowy region determinuje dozwoloną moc sygnału RF i profile pasm 2.4/5 GHz (np. regulacje CE dla Europy vs FCC dla USA/Chiny).
+    2. **Wpięcie urządzenia do chmury Xiaomi Cloud / Mi Home:** zgodność strefy czasowej i regionu routera z kontem użytkownika Xiaomi jest kluczowa dla bezbłędnego parowania i synchronizacji harmonogramów.
+
 ---
 
 ## Archiwum wdrożeń
