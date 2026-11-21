@@ -7,7 +7,7 @@
 [![UI](https://img.shields.io/badge/UI-CustomTkinter%20Fluent%20Design-darkgreen.svg)](https://github.com/TomSchimansky/CustomTkinter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Xiaomi Router Manager (XRM)** is a native, modern Windows desktop application and diagnostic toolkit designed for managing, configuring, and recovering Xiaomi & Redmi Wi-Fi routers running official MiWiFi / OpenWrt LuCI firmware. 
+**Xiaomi Router Manager (XRM)** is a native, modern Windows desktop application, Android mobile & tablet client (APK), and diagnostic toolkit designed for managing, configuring, and recovering Xiaomi & Redmi Wi-Fi routers running official MiWiFi / OpenWrt LuCI firmware. 
 
 Originally built and optimized for the flagship **Xiaomi Router BE7000 (4x 2.5 Gbps)**, it also provides full compatibility with **BE6500 Pro, AX3600, AX6000, AX9000**, and related models.
 
