@@ -31,6 +31,17 @@
 ### 5. Wybór strefy czasowej i regionu w aplikacji mobilnej oraz kreatorze (Zrealizowane w v1.0.6)
 - **Status:** Zrealizowane 2026-11-22 w v1.0.6 (mobile PWA / Android APK oraz kreator Windows setup_wizard.py).
 
+### 6. Poprawa komunikatu zapisu regionu Wi-Fi (set_country_code) [Plan na v1.0.7]
+- **Problem:** API routera przy zapisie regionu zwraca specyficzną odpowiedź (chińskie znaki), co aplikacja interpretuje jako błąd, mimo że region w rzeczywistości zapisuje się poprawnie (potwierdzone odczytem, po rozłączeniu i wyczyszczeniu pamięci).
+- **Plan działania:** przechwycenie specyficznego kodu/odpowiedzi z routera i wyświetlenie czytelnego komunikatu sukcesu w PL/EN (np. "Region zapisany pomyślnie. Zmiana może wymagać restartu routera").
+
+### 7. Prezentacja minimalnego obciążenia CPU [Plan na v1.0.7]
+- **Problem:** Wskazanie "0%" obciążenia procesora w stanie bezczynności wygląda niewiarygodnie i sprawia wrażenie "zaciętego wskaźnika".
+- **Plan działania:** formatowanie zerowego obciążenia jako `< 1%` lub `0,1%` w telemetrii desktopowej i mobilnej.
+
+### 8. Selektor strefy i regionu w głównym oknie Windows Desktop [Plan na v1.0.7]
+- **Koncepcja:** Dodanie rozwijanej listy wyboru strefy czasowej i kodu kraju bezpośrednio do zakładki Narzędzia i diagnostyka w `gui.py` (obok przycisku synchronizacji czasu z PC).
+
 ---
 
 ## Archiwum wdrożeń
