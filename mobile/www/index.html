@@ -1223,7 +1223,9 @@
           <div class="card"><h3>Kopia i przywracanie</h3><p>Kopia JSON obejmuje dostępne dane routera i może zawierać hasła. Przywracanie obsługuje tylko dostępne sekcje wskazane w kolejnym oknie.</p><div class="backup-actions-bar"><button class="btn-primary" id="btn-save-snapshot">Utwórz kopię zapasową (.json)</button><label class="btn-secondary">Wczytaj kopię JSON <input type="file" id="backup-file-input" accept="application/json,.json" hidden></label><button class="btn-warn" id="btn-apply-json" disabled>Wybierz sekcje do przywrócenia</button><button class="btn-secondary" id="btn-official-backup">Pobierz oficjalną kopię Xiaomi (.tar.gz)</button></div><p id="backup-file-status" role="status">Nie wczytano kopii JSON.</p><p>Oficjalna kopia Xiaomi jest osobnym plikiem. Jej zakres i przywracanie nie zostały potwierdzone.</p></div>
           <div class="card"><h3>Raporty i dokumentacja sieci</h3><p class="card-desc">Raport stanu routera i urządzeń.</p><button class="btn-primary" id="btn-export-md">Eksportuj raport do Markdown (.md)</button></div>
           <div class="card"><h3>Diody LED routera</h3><div class="form-group"><label class="toggle-switch"><input type="checkbox" id="led-switch" disabled><span class="toggle-slider"></span></label><span id="led-status-lbl" class="bold">Brak danych</span></div><button class="btn-primary" id="btn-save-led" disabled>Zapisz stan diod</button></div>
-          <div class="card"><h3>Konserwacja i system</h3><p id="system-router-time">Czas routera: --</p><button class="btn-secondary" id="btn-nfc-enable">Włącz NFC</button><button class="btn-secondary" id="btn-nfc-disable">Wyłącz NFC</button><button class="btn-secondary" id="btn-sync-time">Synchronizuj czas</button><button class="btn-secondary" id="btn-check-firmware">Sprawdź aktualizacje firmware</button></div>
+          <div class="card"><h3>Konserwacja i system</h3><p id="system-router-time">Czas routera: --</p><button class="btn-secondary" id="btn-nfc-enable">Włącz NFC</button><button class="btn-secondary" id="btn-nfc-disable">Wyłącz NFC</button><button class="btn-secondary" id="btn-sync-time">Synchronizuj czas z urządzeniem</button><button class="btn-secondary" id="btn-check-firmware">Sprawdź aktualizacje firmware</button></div>
+          <div class="card"><h3>Strefa czasowa routera</h3><p class="card-desc">Ustaw strefę czasową routera niezależnie od synchronizacji czasu. Wpływa na harmonogramy, logi i chmurę Xiaomi Cloud.</p><div class="form-group"><label class="form-label">Strefa czasowa (Timezone):</label><select id="system-tz-select" class="form-select"><option value="">-- ładowanie... --</option></select></div><button class="btn-primary" id="btn-save-tz">Zapisz strefę czasową</button></div>
+          <div class="card"><h3>Region regulacyjny Wi-Fi (RegDomain)</h3><p class="card-desc">Kod kraju determinuje dozwoloną moc nadawania radia Wi-Fi (Tx Power, CE vs FCC) oraz poprawne parowanie z Xiaomi Cloud / Mi Home.</p><div class="form-group"><label class="form-label">Kod regionu (Country Code):</label><select id="system-region-select" class="form-select"><option value="">-- ładowanie... --</option></select></div><div class="backup-actions-bar"><button class="btn-secondary" id="btn-read-region">Odczytaj z routera</button><button class="btn-primary" id="btn-save-region">Zapisz region</button></div><p class="card-desc" style="color:#f59e0b">⚠️ Zmiana regionu może wymagać restartu routera i wpływa na dostępne kanały oraz moc radia Wi-Fi.</p></div>
         </div>
         <div class="card danger-card">
           <div class="card-head">
@@ -1274,6 +1276,16 @@
               <input type="checkbox" id="wiz-same-pwd" checked>
               <span>Użyj tego samego hasła dla panelu administratora routera</span>
             </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">🌍 Strefa czasowa routera (Timezone):</label>
+            <select id="wiz-tz-select" class="form-select"><option value="">-- ładowanie... --</option></select>
+            <p class="card-desc" style="margin-top:4px">Wymagane do poprawnych harmonogramów i synchronizacji z Xiaomi Cloud.</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">📡 Region regulacyjny Wi-Fi (Country Code / RegDomain):</label>
+            <select id="wiz-region-select" class="form-select"><option value="">-- ładowanie... --</option></select>
+            <p class="card-desc" style="margin-top:4px;color:#f59e0b">Determinuje dopuszczalną moc nadawania radia Wi-Fi (CE dla Europy, FCC dla USA/CN dla Chin).</p>
           </div>
           <button class="btn-primary" id="btn-wizard-apply">🚀 Zastosuj i Uruchom Router</button>
         </div>

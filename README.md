@@ -1,6 +1,6 @@
 # Xiaomi Router Manager (XRM)
 
-[![Version](https://img.shields.io/badge/version-v1.0.5-blue.svg)](version.py)
+[![Version](https://img.shields.io/badge/version-v1.0.6-blue.svg)](version.py)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-blue.svg)](https://microsoft.com/windows)
 [![Android](https://img.shields.io/badge/Android-APK%20%7C%20Adaptive%20Tablet%20%26%20Phone-green.svg)](#9-adaptive-mobile--tablet-app-android-apk--offline-web-client)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)

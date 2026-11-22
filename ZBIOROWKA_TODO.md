@@ -28,16 +28,24 @@
   - Przełączniki i akcje: sieć dla gości on/off, diody LED nocne on/off, optymalizacja kanałów, restart routera.
   - Korzyść poboczna: darmowy, natywny dostęp z poziomu aplikacji Home Assistant na smartfonach z Androidem i iOS!
 
-### 5. Wybór strefy czasowej i regionu w aplikacji mobilnej (Android / PWA)
-- **Koncepcja i cel:**
-  - Wdrożenie selektora strefy czasowej (Timezone) oraz kodu regionu w ustawieniach systemowych klienta mobilnego (oraz w kreatorze pierwszej konfiguracji).
-  - **Kluczowe znaczenie operacyjne:**
-    1. **Moc nadawania radia Wi-Fi (Tx Power / RegDomain):** prawidłowy region determinuje dozwoloną moc sygnału RF i profile pasm 2.4/5 GHz (np. regulacje CE dla Europy vs FCC dla USA/Chiny).
-    2. **Wpięcie urządzenia do chmury Xiaomi Cloud / Mi Home:** zgodność strefy czasowej i regionu routera z kontem użytkownika Xiaomi jest kluczowa dla bezbłędnego parowania i synchronizacji harmonogramów.
+### 5. Wybór strefy czasowej i regionu w aplikacji mobilnej oraz kreatorze (Zrealizowane w v1.0.6)
+- **Status:** Zrealizowane 2026-11-22 w v1.0.6 (mobile PWA / Android APK oraz kreator Windows setup_wizard.py).
 
 ---
 
 ## Archiwum wdrożeń
+
+### v1.0.6 (Zrealizowane 2026-11-22)
+- **Selektor strefy czasowej i kodu regionu (Mobile & Windows):**
+  - Mobile (app.js / index.html): nowa karta strefy czasowej (44 strefy IANA mapowane do POSIX), nowa karta regionu Wi-Fi (CE/FCC/CN) z odczytem i zapisem, integracja z kreatorem mobilnym oraz dynamiczna strefa przy synchronizacji czasu.
+  - Windows (setup_wizard.py): rozszerzenie kreatora do 5 krokow, dedykowany krok 4 wyboru strefy i regionu, automatyczny zapis do routera w watku wykonawczym (`_apply_all`).
+  - Podbicie wersji do v1.0.6 we wszystkich komponentach (Python, Gradle, Windows PE, PWA).
+
+### v1.0.5 (Zrealizowane 2026-11-20)
+- **Natywny klient Android i optymalizacja tabletowa (mobile/):**
+  - Pelny projekt Android z Gradle, WebView i Android Keystore.
+  - Płynny interfejs dla smartfonow i tabletow (OPPO Pad 3 Pro), drawer nawigacyjny.
+  - Rozwijane menu CTkOptionMenu na Windowsie, dynamiczny ukad Smart Connect, dwukierunkowe sortowanie urzadzen i rezerwacji DHCP, konfiguracja DNS w DHCP.
 
 ### v1.0.2 (Zrealizowane 2026-11-20)
 - **Szybka rezerwacja DHCP z listy urządzeń (Network Devices):**

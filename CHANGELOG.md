@@ -2,6 +2,19 @@
 
 All notable changes to **Xiaomi Router Manager (XRM)** will be documented in this file.
 
+## [1.0.6] - 2026-11-22
+
+### Added
+- **Timezone and Regulatory Region Selector (Mobile / Android / PWA):**
+  - New "Router Timezone" card in System and Tools view with full IANA-to-POSIX timezone selector (44 timezones).
+  - New "Wi-Fi Regulatory Region (RegDomain)" card with country code selector (CE/FCC/CN) and regulatory warnings.
+  - Quick Setup Wizard extended with Timezone and Regulatory Region selectors before applying settings.
+  - `btn-sync-time` now applies timezone directly from the selector instead of hardcoded Europe/Warsaw.
+- **Timezone and Regulatory Region Selector (Windows Desktop Setup Wizard):**
+  - Wizard expanded from 4 to 5 steps; Step 4 dedicated to Timezone (POSIX mapping) and Wi-Fi Country Code selection.
+  - Execution thread (`_apply_all`) invokes `set_sys_time` with POSIX timezone string and `set_country_code` with selected country code.
+  - Summary step updated to display chosen timezone and country code.
+
 ## [1.0.5] - 2026-11-20
 
 ### Added & Improved

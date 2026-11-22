@@ -5,6 +5,172 @@
 
 const PUBLIC_KEY = "a2ffa5c9be07488bbb04a3a47d3c5f6a";
 
+// ==========================================================================
+// MAPA STREF CZASOWYCH IANA -> POSIX (dla API routera Xiaomi / OpenWrt)
+// Uzupelniaj wedlug potrzeb; klucz = strefa IANA, wartosc = string POSIX
+// ==========================================================================
+const TZ_POSIX_MAP = {
+  "Europe/Warsaw":       "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/London":       "GMT0BST,M3.5.0/1,M10.5.0",
+  "Europe/Berlin":       "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Paris":        "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Prague":       "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Vienna":       "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Budapest":     "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Stockholm":    "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Oslo":         "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Copenhagen":   "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Amsterdam":    "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Brussels":     "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Rome":         "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Madrid":       "CET-1CEST,M3.5.0,M10.5.0/3",
+  "Europe/Lisbon":       "WET0WEST,M3.5.0/1,M10.5.0",
+  "Europe/Helsinki":     "EET-2EEST,M3.5.0/3,M10.5.0/4",
+  "Europe/Riga":         "EET-2EEST,M3.5.0/3,M10.5.0/4",
+  "Europe/Tallinn":      "EET-2EEST,M3.5.0/3,M10.5.0/4",
+  "Europe/Vilnius":      "EET-2EEST,M3.5.0/3,M10.5.0/4",
+  "Europe/Bucharest":    "EET-2EEST,M3.5.0/3,M10.5.0/4",
+  "Europe/Sofia":        "EET-2EEST,M3.5.0/3,M10.5.0/4",
+  "Europe/Athens":       "EET-2EEST,M3.5.0/3,M10.5.0/4",
+  "Europe/Kyiv":         "EET-2EEST,M3.5.0/3,M10.5.0/4",
+  "Europe/Moscow":       "MSK-3",
+  "Europe/Istanbul":     "TRT-3",
+  "Asia/Shanghai":       "CST-8",
+  "Asia/Hong_Kong":      "HKT-8",
+  "Asia/Singapore":      "SGT-8",
+  "Asia/Tokyo":          "JST-9",
+  "Asia/Seoul":          "KST-9",
+  "Asia/Taipei":         "CST-8",
+  "Asia/Bangkok":        "ICT-7",
+  "Asia/Jakarta":        "WIB-7",
+  "Asia/Kolkata":        "IST-5:30",
+  "Asia/Dubai":          "GST-4",
+  "Asia/Riyadh":         "AST-3",
+  "Asia/Tehran":         "IRST-3:30IRDT,80/0,264/0",
+  "Asia/Almaty":         "ALMT-6",
+  "Asia/Karachi":        "PKT-5",
+  "Asia/Dhaka":          "BDT-6",
+  "Asia/Yangon":         "MMT-6:30",
+  "Asia/Colombo":        "IST-5:30",
+  "Asia/Kathmandu":      "NPT-5:45",
+  "Asia/Vladivostok":    "VLAT-10",
+  "Asia/Krasnoyarsk":    "KRAT-7",
+  "Asia/Yekaterinburg":  "YEKT-5",
+  "Africa/Cairo":        "EET-2",
+  "Africa/Johannesburg": "SAST-2",
+  "Africa/Lagos":        "WAT-1",
+  "Africa/Nairobi":      "EAT-3",
+  "Africa/Casablanca":   "WET0",
+  "America/New_York":    "EST5EDT,M3.2.0,M11.1.0",
+  "America/Chicago":     "CST6CDT,M3.2.0,M11.1.0",
+  "America/Denver":      "MST7MDT,M3.2.0,M11.1.0",
+  "America/Los_Angeles": "PST8PDT,M3.2.0,M11.1.0",
+  "America/Anchorage":   "AKST9AKDT,M3.2.0,M11.1.0",
+  "America/Honolulu":    "HST10",
+  "America/Phoenix":     "MST7",
+  "America/Toronto":     "EST5EDT,M3.2.0,M11.1.0",
+  "America/Vancouver":   "PST8PDT,M3.2.0,M11.1.0",
+  "America/Sao_Paulo":   "BRT3BRST,M10.3.0/0,M2.3.0/0",
+  "America/Argentina/Buenos_Aires": "ART3",
+  "America/Mexico_City": "CST6CDT,M4.1.0,M10.5.0",
+  "America/Bogota":      "COT5",
+  "America/Lima":        "PET5",
+  "America/Santiago":    "CLT4CLST,M10.2.6/24,M3.2.6/24",
+  "Pacific/Auckland":    "NZST-12NZDT,M9.5.0,M4.1.0/3",
+  "Pacific/Sydney":      "AEST-10AEDT,M10.1.0,M4.1.0/3",
+  "Pacific/Melbourne":   "AEST-10AEDT,M10.1.0,M4.1.0/3",
+  "Pacific/Brisbane":    "AEST-10",
+  "Pacific/Fiji":        "FJT-12",
+  "Pacific/Honolulu":    "HST10",
+  "UTC":                 "UTC0"
+};
+
+// Lista stref do selecta (skrocone etykiety dla UI mobilnego)
+const TZ_DISPLAY_LIST = [
+  { iana: "Europe/Warsaw",       label: "🇵🇱 Polska (CET/CEST, UTC+1/+2)" },
+  { iana: "Europe/Berlin",       label: "🇩🇪 Niemcy / DE (CET/CEST)" },
+  { iana: "Europe/London",       label: "🇬🇧 Wielka Brytania / UK (GMT/BST)" },
+  { iana: "Europe/Paris",        label: "🇫🇷 Francja / FR (CET/CEST)" },
+  { iana: "Europe/Prague",       label: "🇨🇿 Czechy / CZ (CET/CEST)" },
+  { iana: "Europe/Vienna",       label: "🇦🇹 Austria / AT (CET/CEST)" },
+  { iana: "Europe/Stockholm",    label: "🇸🇪 Szwecja / SE (CET/CEST)" },
+  { iana: "Europe/Amsterdam",    label: "🇳🇱 Holandia / NL (CET/CEST)" },
+  { iana: "Europe/Rome",         label: "🇮🇹 Wlochy / IT (CET/CEST)" },
+  { iana: "Europe/Madrid",       label: "🇪🇸 Hiszpania / ES (CET/CEST)" },
+  { iana: "Europe/Lisbon",       label: "🇵🇹 Portugalia / PT (WET/WEST)" },
+  { iana: "Europe/Helsinki",     label: "🇫🇮 Finlandia / FI (EET/EEST)" },
+  { iana: "Europe/Athens",       label: "🇬🇷 Grecja / GR (EET/EEST)" },
+  { iana: "Europe/Bucharest",    label: "🇷🇴 Rumunia / RO (EET/EEST)" },
+  { iana: "Europe/Kyiv",         label: "🇺🇦 Ukraina / UA (EET/EEST)" },
+  { iana: "Europe/Moscow",       label: "🇷🇺 Rosja - Moskwa (MSK, UTC+3)" },
+  { iana: "Europe/Istanbul",     label: "🇹🇷 Turcja / TR (TRT, UTC+3)" },
+  { iana: "Asia/Dubai",          label: "🇦🇪 ZEA / UAE (GST, UTC+4)" },
+  { iana: "Asia/Karachi",        label: "🇵🇰 Pakistan / PK (PKT, UTC+5)" },
+  { iana: "Asia/Kolkata",        label: "🇮🇳 Indie / IN (IST, UTC+5:30)" },
+  { iana: "Asia/Dhaka",          label: "🇧🇩 Bangladesz / BD (BDT, UTC+6)" },
+  { iana: "Asia/Bangkok",        label: "🇹🇭 Tajlandia / TH (ICT, UTC+7)" },
+  { iana: "Asia/Shanghai",       label: "🇨🇳 Chiny / CN (CST, UTC+8)" },
+  { iana: "Asia/Singapore",      label: "🇸🇬 Singapur / SG (SGT, UTC+8)" },
+  { iana: "Asia/Hong_Kong",      label: "🇭🇰 Hongkong / HK (HKT, UTC+8)" },
+  { iana: "Asia/Taipei",         label: "🇹🇼 Tajwan / TW (CST, UTC+8)" },
+  { iana: "Asia/Tokyo",          label: "🇯🇵 Japonia / JP (JST, UTC+9)" },
+  { iana: "Asia/Seoul",          label: "🇰🇷 Korea Poludniowa / KR (KST, UTC+9)" },
+  { iana: "Pacific/Sydney",      label: "🇦🇺 Australia - Sydney (AEST/AEDT)" },
+  { iana: "Pacific/Brisbane",    label: "🇦🇺 Australia - Brisbane (AEST, UTC+10)" },
+  { iana: "Pacific/Auckland",    label: "🇳🇿 Nowa Zelandia / NZ (NZST/NZDT)" },
+  { iana: "America/New_York",    label: "🇺🇸 USA - Wschod (EST/EDT, UTC-5/-4)" },
+  { iana: "America/Chicago",     label: "🇺🇸 USA - Centrum (CST/CDT, UTC-6/-5)" },
+  { iana: "America/Denver",      label: "🇺🇸 USA - Gory (MST/MDT, UTC-7/-6)" },
+  { iana: "America/Los_Angeles", label: "🇺🇸 USA - Zachod (PST/PDT, UTC-8/-7)" },
+  { iana: "America/Honolulu",    label: "🇺🇸 USA - Hawaje (HST, UTC-10)" },
+  { iana: "America/Toronto",     label: "🇨🇦 Kanada - Toronto (EST/EDT)" },
+  { iana: "America/Vancouver",   label: "🇨🇦 Kanada - Vancouver (PST/PDT)" },
+  { iana: "America/Sao_Paulo",   label: "🇧🇷 Brazylia - Sao Paulo (BRT/BRST)" },
+  { iana: "America/Mexico_City", label: "🇲🇽 Meksyk (CST/CDT)" },
+  { iana: "Africa/Cairo",        label: "🇪🇬 Egipt / EG (EET, UTC+2)" },
+  { iana: "Africa/Johannesburg", label: "🇿🇦 RPA / ZA (SAST, UTC+2)" },
+  { iana: "Africa/Nairobi",      label: "🇰🇪 Kenia / KE (EAT, UTC+3)" },
+  { iana: "UTC",                 label: "🌍 UTC (Czas Uniwersalny)" }
+];
+
+// Lista kodow regionow regulacyjnych (country code -> opis, profil CE/FCC)
+const REGION_LIST = [
+  { code: "PL", label: "PL - Polska (CE/ETSI, Europa)" },
+  { code: "DE", label: "DE - Niemcy (CE/ETSI)" },
+  { code: "GB", label: "GB - Wielka Brytania (CE/ETSI)" },
+  { code: "FR", label: "FR - Francja (CE/ETSI)" },
+  { code: "CZ", label: "CZ - Czechy (CE/ETSI)" },
+  { code: "AT", label: "AT - Austria (CE/ETSI)" },
+  { code: "NL", label: "NL - Holandia (CE/ETSI)" },
+  { code: "SE", label: "SE - Szwecja (CE/ETSI)" },
+  { code: "FI", label: "FI - Finlandia (CE/ETSI)" },
+  { code: "IT", label: "IT - Wlochy (CE/ETSI)" },
+  { code: "ES", label: "ES - Hiszpania (CE/ETSI)" },
+  { code: "PT", label: "PT - Portugalia (CE/ETSI)" },
+  { code: "GR", label: "GR - Grecja (CE/ETSI)" },
+  { code: "RO", label: "RO - Rumunia (CE/ETSI)" },
+  { code: "HU", label: "HU - Wegry (CE/ETSI)" },
+  { code: "UA", label: "UA - Ukraina (CE/ETSI)" },
+  { code: "TR", label: "TR - Turcja" },
+  { code: "RU", label: "RU - Rosja" },
+  { code: "US", label: "US - USA (FCC, pelna moc)" },
+  { code: "CA", label: "CA - Kanada (FCC)" },
+  { code: "JP", label: "JP - Japonia" },
+  { code: "KR", label: "KR - Korea Poludniowa" },
+  { code: "CN", label: "CN - Chiny (fabryczna moc TX)" },
+  { code: "TW", label: "TW - Tajwan" },
+  { code: "HK", label: "HK - Hongkong" },
+  { code: "SG", label: "SG - Singapur" },
+  { code: "AU", label: "AU - Australia" },
+  { code: "NZ", label: "NZ - Nowa Zelandia" },
+  { code: "IN", label: "IN - Indie" },
+  { code: "BR", label: "BR - Brazylia" },
+  { code: "MX", label: "MX - Meksyk" },
+  { code: "ZA", label: "ZA - Republika Poludniowej Afryki" },
+  { code: "AE", label: "AE - Zjednoczone Emiraty Arabskie" },
+  { code: "SA", label: "SA - Arabia Saudyjska" }
+];
+
 const state = {
   ip: localStorage.getItem("xrm_ip") || "192.168.31.1",
   stok: null,
@@ -1420,8 +1586,78 @@ async function sendChange(view, endpoint, payload, question, method = "POST") {
   } catch (e) { alert("Nie udało się potwierdzić zmiany: " + e.message); return false; }
 }
 function setupAdditionalControls() {
-  for (const id of ["btn-wizard-apply"]) {
-    $id(id).disabled = true; $id(id).title = "Funkcja nie jest jeszcze dostępna w tej wersji.";
+  // Kreator - buduj selektory strefy i regionu (moze byc wywolane przed setupSystemEnhancements)
+  buildTzSelect("wiz-tz-select");
+  buildRegionSelect("wiz-region-select", "PL");
+
+  // Kreator - przycisk Zastosuj i Uruchom Router
+  const btnWizApply = $id("btn-wizard-apply");
+  if (btnWizApply) {
+    btnWizApply.disabled = false;
+    btnWizApply.title = "";
+    btnWizApply.addEventListener("click", async () => {
+      if (!state.connected) return alert("Najpierw połącz się z routerem.");
+      const proto = $id("wiz-proto")?.value || "dhcp";
+      const ssid = $id("wiz-ssid")?.value.trim() || "";
+      const wifiPwd = $id("wiz-pwd")?.value.trim() || "";
+      const samePwd = $id("wiz-same-pwd")?.checked ?? true;
+      const tzIana = $id("wiz-tz-select")?.value || "";
+      const regionCode = $id("wiz-region-select")?.value || "";
+      const tzPosix = TZ_POSIX_MAP[tzIana] || "";
+
+      if (!ssid) return alert("Podaj nazwę sieci Wi-Fi (SSID).");
+      if (wifiPwd && wifiPwd.length < 8) return alert("Hasło Wi-Fi musi mieć co najmniej 8 znaków.");
+
+      let summary = `Typ WAN: ${proto.toUpperCase()}\nSSID: ${ssid}`;
+      if (tzIana) summary += `\nStrefa czasowa: ${tzIana} (${tzPosix || "nieznana"})`;
+      if (regionCode) summary += `\nRegion RF: ${regionCode}`;
+      if (!confirm(`Zastosować ustawienia na routerze?\n\n${summary}`)) return;
+
+      btnWizApply.disabled = true;
+      const errors = [];
+
+      // 1. Ustaw Wi-Fi
+      if (ssid) {
+        try {
+          const r = await apiRequest("xqnetwork/set_all_wifi", "POST", {
+            bsd: "1", ssid1: ssid, ssid2: ssid,
+            pwd1: wifiPwd, pwd2: wifiPwd,
+            encryption1: wifiPwd ? "sae-mixed" : "none",
+            encryption2: wifiPwd ? "sae-mixed" : "none",
+            on1: "1", on2: "1", txpwr1: "max", txpwr2: "max",
+            channel1: "0", channel2: "0", bandwidth1: "0", bandwidth2: "0",
+            hidden1: "0", hidden2: "0", isDFS: "0"
+          });
+          if (r.code !== 0) errors.push(`Wi-Fi: ${r.msg || r.code}`);
+        } catch(e) { errors.push(`Wi-Fi: ${e.message}`); }
+      }
+
+      // 2. Ustaw strefę czasową i czas
+      if (tzPosix) {
+        try {
+          const d = new Date(), pad = n => String(n).padStart(2, "0");
+          const time = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+          const query = new URLSearchParams({time, timezone: tzPosix});
+          const r = await apiRequest(`misystem/set_sys_time?${query}`);
+          if (r.code !== 0) errors.push(`Czas/TZ: ${r.msg || r.code}`);
+        } catch(e) { errors.push(`Czas/TZ: ${e.message}`); }
+      }
+
+      // 3. Ustaw region (RegDomain)
+      if (regionCode) {
+        try {
+          const r = await apiRequest("xqsystem/set_country_code", "POST", {country: regionCode});
+          if (r.code !== 0) errors.push(`Region: ${r.msg || r.code}`);
+        } catch(e) { errors.push(`Region: ${e.message}`); }
+      }
+
+      btnWizApply.disabled = false;
+      if (errors.length) {
+        alert(`Kreator zakończył z błędami:\n${errors.join("\n")}`);
+      } else {
+        alert("Kreator zakończył konfigurację routera.");
+      }
+    });
   }
   $id("btn-restart-wan").addEventListener("click", async () => {
     if (!state.connected || !confirm("Zrestartować połączenie WAN? Dostęp do Internetu zostanie przerwany.")) return;
@@ -2029,19 +2265,110 @@ function passwordDialog() {
   };
   if(dialog.showModal)dialog.showModal();else dialog.setAttribute("open","");
 }
+// Buduje select stref czasowych - wywolywane raz przy starcie
+function buildTzSelect(selectId) {
+  const sel = $id(selectId);
+  if (!sel || sel.dataset.built) return;
+  sel.dataset.built = "1";
+  const deviceTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  TZ_DISPLAY_LIST.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item.iana;
+    opt.textContent = item.label;
+    if (item.iana === deviceTz) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+// Buduje select kodow regionow
+function buildRegionSelect(selectId, currentCode) {
+  const sel = $id(selectId);
+  if (!sel) return;
+  sel.innerHTML = "";
+  REGION_LIST.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item.code;
+    opt.textContent = item.label;
+    if (currentCode && item.code === currentCode.toUpperCase()) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+// Odczytuje aktualny region z routera i aktualizuje select
+async function loadRegionFromRouter(selectId) {
+  if (!state.connected) return;
+  try {
+    const r = await apiRequest("xqsystem/country_code");
+    if (r.code === 0 && r.country) buildRegionSelect(selectId, r.country);
+  } catch (_) {}
+}
+
 function setupSystemEnhancements() {
   $id("system-change-password").onclick=passwordDialog;
   for(const [id,on] of [["btn-nfc-enable",1],["btn-nfc-disable",0]]) $id(id).onclick=async()=>{
     if(!state.connected || !confirm(`${on ? "Włączyć" : "Wyłączyć"} NFC na routerze?`)) return;
     try {const r=await apiRequest("xqnetwork/set_nfc_status","POST",{status:on});if(r.code!==0)throw Error(r.msg||r.code);alert("Router potwierdził zmianę NFC.");}catch(e){alert("Nie udało się potwierdzić zmiany NFC: "+e.message);}
   };
+  // Buduj selektory strefy i regionu po zaladowaniu DOM
+  buildTzSelect("system-tz-select");
+  buildTzSelect("wiz-tz-select");
+  buildRegionSelect("system-region-select", "PL");
+  buildRegionSelect("wiz-region-select", "PL");
+
+  // Synchronizacja czasu z urzadzeniem + strefa z selecta
   $id("btn-sync-time").onclick=async()=>{
     if(!state.connected) return;const d=new Date(),pad=n=>String(n).padStart(2,"0");
     const time=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-    const tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if(!confirm(`Ustawić czas routera na ${time} (czas urządzenia: ${tz})?`))return;
-    const query=new URLSearchParams({time});if(tz === "Europe/Warsaw")query.set("timezone","CET-1CEST");
+    const selEl = $id("system-tz-select");
+    const tz = selEl ? selEl.value : Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const posix = TZ_POSIX_MAP[tz] || "";
+    if(!confirm(`Ustawić czas routera na ${time}\nStrefa: ${tz}${posix ? " (" + posix + ")" : ""}?`))return;
+    const query=new URLSearchParams({time});
+    if(posix) query.set("timezone", posix);
     try {const r=await apiRequest(`misystem/set_sys_time?${query}`);if(r.code!==0)throw Error(r.msg||r.code);alert("Router potwierdził ustawienie czasu.");}catch(e){alert("Nie udało się ustawić czasu: "+e.message);}
+  };
+  // Zapisz strefę czasową (bez synchronizacji czasu)
+  const btnSaveTz = $id("btn-save-tz");
+  if (btnSaveTz) btnSaveTz.onclick = async () => {
+    if (!state.connected) return alert("Najpierw połącz się z routerem.");
+    const selEl = $id("system-tz-select");
+    const tz = selEl ? selEl.value : "";
+    const posix = TZ_POSIX_MAP[tz] || "";
+    if (!posix) return alert("Nieznana strefa czasowa. Wybierz strefę z listy.");
+    if (!confirm(`Ustawić strefę czasową routera na: ${tz} (${posix})?`)) return;
+    const d = new Date(), pad = n => String(n).padStart(2, "0");
+    const time = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    try {
+      const query = new URLSearchParams({time, timezone: posix});
+      const r = await apiRequest(`misystem/set_sys_time?${query}`);
+      if (r.code !== 0) throw Error(r.msg || r.code);
+      alert("Router potwierdził zmianę strefy czasowej.");
+    } catch(e) { alert("Nie udało się zmienić strefy: " + e.message); }
+  };
+  // Odczyt aktualnego regionu z routera
+  const btnReadRegion = $id("btn-read-region");
+  if (btnReadRegion) btnReadRegion.onclick = async () => {
+    if (!state.connected) return alert("Najpierw połącz się z routerem.");
+    await loadRegionFromRouter("system-region-select");
+    alert("Odczytano aktualny region routera.");
+  };
+  // Zapis regionu (country code / RegDomain)
+  const btnSaveRegion = $id("btn-save-region");
+  if (btnSaveRegion) btnSaveRegion.onclick = async () => {
+    if (!state.connected) return alert("Najpierw połącz się z routerem.");
+    const sel = $id("system-region-select");
+    const code = sel ? sel.value : "";
+    if (!code) return alert("Wybierz kod regionu z listy.");
+    const isCN = code === "CN";
+    const warn = isCN
+      ? "\n\nUWAGA: Kod CN (Chiny) odblokowuje pelna moc TX radia. Upewnij sie, ze jest to zgodne z lokalnym prawem."
+      : (code === "US" || code === "CA" ? "\n\nKod FCC (USA/CA) moze odblokowac wyzsze pasma 5 GHz i wyzsza moc TX niz dozwolona w UE." : "");
+    if (!confirm(`Ustawić region routera na: ${code}?${warn}`)) return;
+    try {
+      const r = await apiRequest("xqsystem/set_country_code", "POST", {country: code});
+      if (r.code !== 0) throw Error(r.msg || r.code);
+      alert(`Router potwierdził zmianę regionu na ${code}. Efekt moze wymagac restartu routera.`);
+    } catch(e) { alert("Nie udało się zmienić regionu: " + e.message); }
   };
   $id("btn-check-firmware").onclick=async()=>{if(!state.connected)return;try{const r=await apiRequest("xqsystem/check_rom_update");if(r.code!==0)throw Error(r.msg||r.code);alert(Number(r.needUpdate)===1 ? "Router zgłasza dostępną aktualizację firmware." : "Router nie zgłasza dostępnej aktualizacji firmware.");}catch(e){alert("Nie udało się sprawdzić aktualizacji: "+e.message);}};
   $id("btn-factory-reset").onclick=async()=>{if(!state.connected || !confirm("Przywrócić ustawienia fabryczne? Zostanie usunięta konfiguracja routera."))return;if(!confirm("Potwierdź ponownie przywrócenie ustawień fabrycznych."))return;try{const r=await apiRequest("xqsystem/reset");if(r.code!==0)throw Error(r.msg||r.code);disconnect();alert("Router potwierdził polecenie przywrócenia.");}catch(e){alert("Nie udało się potwierdzić operacji: "+e.message);}};

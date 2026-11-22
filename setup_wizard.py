@@ -1,5 +1,6 @@
 """Moduł Kreatora Pierwszej Konfiguracji (Quick Setup Wizard) dla Xiaomi Router Manager.
-Umożliwia 4-krokową, intuicyjną konfigurację nowego lub zresetowanego routera w języku polskim lub angielskim.
+Umożliwia 5-krokową, intuicyjną konfigurację nowego lub zresetowanego routera w języku polskim lub angielskim.
+Krok 4 (nowy): wybór strefy czasowej (Timezone) i kodu regionu regulacyjnego (Country Code / RegDomain).
 """
 
 import threading
@@ -11,6 +12,123 @@ try:
     from version import APP_VERSION
 except ImportError:
     APP_VERSION = "1.0.0"
+
+
+# ---------------------------------------------------------------------------
+# Mapa IANA -> string POSIX dla API routera Xiaomi / OpenWrt
+# ---------------------------------------------------------------------------
+TZ_POSIX_MAP = {
+    "Europe/Warsaw":       "CET-1CEST,M3.5.0,M10.5.0/3",
+    "Europe/Berlin":       "CET-1CEST,M3.5.0,M10.5.0/3",
+    "Europe/London":       "GMT0BST,M3.5.0/1,M10.5.0",
+    "Europe/Paris":        "CET-1CEST,M3.5.0,M10.5.0/3",
+    "Europe/Prague":       "CET-1CEST,M3.5.0,M10.5.0/3",
+    "Europe/Vienna":       "CET-1CEST,M3.5.0,M10.5.0/3",
+    "Europe/Stockholm":    "CET-1CEST,M3.5.0,M10.5.0/3",
+    "Europe/Amsterdam":    "CET-1CEST,M3.5.0,M10.5.0/3",
+    "Europe/Rome":         "CET-1CEST,M3.5.0,M10.5.0/3",
+    "Europe/Madrid":       "CET-1CEST,M3.5.0,M10.5.0/3",
+    "Europe/Lisbon":       "WET0WEST,M3.5.0/1,M10.5.0",
+    "Europe/Helsinki":     "EET-2EEST,M3.5.0/3,M10.5.0/4",
+    "Europe/Athens":       "EET-2EEST,M3.5.0/3,M10.5.0/4",
+    "Europe/Bucharest":    "EET-2EEST,M3.5.0/3,M10.5.0/4",
+    "Europe/Kyiv":         "EET-2EEST,M3.5.0/3,M10.5.0/4",
+    "Europe/Moscow":       "MSK-3",
+    "Europe/Istanbul":     "TRT-3",
+    "Asia/Shanghai":       "CST-8",
+    "Asia/Hong_Kong":      "HKT-8",
+    "Asia/Singapore":      "SGT-8",
+    "Asia/Tokyo":          "JST-9",
+    "Asia/Seoul":          "KST-9",
+    "Asia/Taipei":         "CST-8",
+    "Asia/Bangkok":        "ICT-7",
+    "Asia/Jakarta":        "WIB-7",
+    "Asia/Kolkata":        "IST-5:30",
+    "Asia/Dubai":          "GST-4",
+    "Asia/Karachi":        "PKT-5",
+    "Asia/Dhaka":          "BDT-6",
+    "America/New_York":    "EST5EDT,M3.2.0,M11.1.0",
+    "America/Chicago":     "CST6CDT,M3.2.0,M11.1.0",
+    "America/Denver":      "MST7MDT,M3.2.0,M11.1.0",
+    "America/Los_Angeles": "PST8PDT,M3.2.0,M11.1.0",
+    "America/Toronto":     "EST5EDT,M3.2.0,M11.1.0",
+    "America/Sao_Paulo":   "BRT3BRST,M10.3.0/0,M2.3.0/0",
+    "Pacific/Sydney":      "AEST-10AEDT,M10.1.0,M4.1.0/3",
+    "Pacific/Auckland":    "NZST-12NZDT,M9.5.0,M4.1.0/3",
+    "UTC":                 "UTC0",
+}
+
+TZ_DISPLAY_LIST = [
+    ("Europe/Warsaw",       "PL - Polska (CET/CEST, UTC+1/+2)"),
+    ("Europe/Berlin",       "DE - Niemcy (CET/CEST)"),
+    ("Europe/London",       "GB - Wielka Brytania (GMT/BST)"),
+    ("Europe/Paris",        "FR - Francja (CET/CEST)"),
+    ("Europe/Prague",       "CZ - Czechy (CET/CEST)"),
+    ("Europe/Vienna",       "AT - Austria (CET/CEST)"),
+    ("Europe/Stockholm",    "SE - Szwecja (CET/CEST)"),
+    ("Europe/Amsterdam",    "NL - Holandia (CET/CEST)"),
+    ("Europe/Rome",         "IT - Wlochy (CET/CEST)"),
+    ("Europe/Madrid",       "ES - Hiszpania (CET/CEST)"),
+    ("Europe/Lisbon",       "PT - Portugalia (WET/WEST)"),
+    ("Europe/Helsinki",     "FI - Finlandia (EET/EEST)"),
+    ("Europe/Athens",       "GR - Grecja (EET/EEST)"),
+    ("Europe/Bucharest",    "RO - Rumunia (EET/EEST)"),
+    ("Europe/Kyiv",         "UA - Ukraina (EET/EEST)"),
+    ("Europe/Moscow",       "RU - Moskwa (MSK, UTC+3)"),
+    ("Europe/Istanbul",     "TR - Turcja (TRT, UTC+3)"),
+    ("Asia/Dubai",          "AE - ZEA / UAE (GST, UTC+4)"),
+    ("Asia/Kolkata",        "IN - Indie (IST, UTC+5:30)"),
+    ("Asia/Bangkok",        "TH - Tajlandia (ICT, UTC+7)"),
+    ("Asia/Shanghai",       "CN - Chiny (CST, UTC+8)"),
+    ("Asia/Singapore",      "SG - Singapur (SGT, UTC+8)"),
+    ("Asia/Hong_Kong",      "HK - Hongkong (HKT, UTC+8)"),
+    ("Asia/Taipei",         "TW - Tajwan (CST, UTC+8)"),
+    ("Asia/Tokyo",          "JP - Japonia (JST, UTC+9)"),
+    ("Asia/Seoul",          "KR - Korea Poludniowa (KST, UTC+9)"),
+    ("Pacific/Sydney",      "AU - Australia Sydney (AEST/AEDT)"),
+    ("Pacific/Auckland",    "NZ - Nowa Zelandia (NZST/NZDT)"),
+    ("America/New_York",    "US - USA Wschod (EST/EDT)"),
+    ("America/Chicago",     "US - USA Centrum (CST/CDT)"),
+    ("America/Los_Angeles", "US - USA Zachod (PST/PDT)"),
+    ("America/Toronto",     "CA - Kanada Toronto (EST/EDT)"),
+    ("America/Sao_Paulo",   "BR - Brazylia Sao Paulo (BRT/BRST)"),
+    ("UTC",                 "UTC - Czas Uniwersalny (UTC+0)"),
+]
+
+REGION_LIST = [
+    ("PL", "PL - Polska (CE/ETSI, Europa)"),
+    ("DE", "DE - Niemcy (CE/ETSI)"),
+    ("GB", "GB - Wielka Brytania (CE/ETSI)"),
+    ("FR", "FR - Francja (CE/ETSI)"),
+    ("CZ", "CZ - Czechy (CE/ETSI)"),
+    ("AT", "AT - Austria (CE/ETSI)"),
+    ("NL", "NL - Holandia (CE/ETSI)"),
+    ("SE", "SE - Szwecja (CE/ETSI)"),
+    ("FI", "FI - Finlandia (CE/ETSI)"),
+    ("IT", "IT - Wlochy (CE/ETSI)"),
+    ("ES", "ES - Hiszpania (CE/ETSI)"),
+    ("PT", "PT - Portugalia (CE/ETSI)"),
+    ("GR", "GR - Grecja (CE/ETSI)"),
+    ("RO", "RO - Rumunia (CE/ETSI)"),
+    ("HU", "HU - Wegry (CE/ETSI)"),
+    ("UA", "UA - Ukraina (CE/ETSI)"),
+    ("TR", "TR - Turcja"),
+    ("RU", "RU - Rosja"),
+    ("US", "US - USA (FCC, pelna moc 5 GHz)"),
+    ("CA", "CA - Kanada (FCC)"),
+    ("JP", "JP - Japonia"),
+    ("KR", "KR - Korea Poludniowa"),
+    ("CN", "CN - Chiny (fabryczna moc TX)"),
+    ("TW", "TW - Tajwan"),
+    ("HK", "HK - Hongkong"),
+    ("SG", "SG - Singapur"),
+    ("AU", "AU - Australia"),
+    ("NZ", "NZ - Nowa Zelandia"),
+    ("IN", "IN - Indie"),
+    ("BR", "BR - Brazylia"),
+    ("AE", "AE - Zjednoczone Emiraty Arabskie"),
+    ("ZA", "ZA - Republika Poludniowej Afryki"),
+]
 
 
 def safe_int(val, default=0):
@@ -26,8 +144,8 @@ class SetupWizardDialog(ctk.CTkToplevel):
         self.parent = parent
         self.lang = getattr(parent, "current_lang", "pl")
         self.title(f"{i18n.t('wiz_title', self.lang)} v{APP_VERSION}")
-        self.geometry("640x720")
-        self.minsize(580, 660)
+        self.geometry("640x760")
+        self.minsize(580, 700)
         self.resizable(False, False)
         self.grab_set()
 
@@ -43,12 +161,12 @@ class SetupWizardDialog(ctk.CTkToplevel):
         self.lbl_hdr_sub = ctk.CTkLabel(hdr, text=i18n.t("wiz_subtitle", self.lang), font=ctk.CTkFont(size=11), text_color="#94a3b8")
         self.lbl_hdr_sub.pack(anchor="w", padx=20, pady=(0, 12))
 
-        # Steps Progress Indicator
+        # Steps Progress Indicator - teraz 5 krokow
         self.prog_bar = ctk.CTkFrame(self, fg_color="#0f172a", height=38)
         self.prog_bar.pack(fill="x")
         self.step_badges = []
-        for i, step_k in enumerate(["wiz_step1_badge", "wiz_step2_badge", "wiz_step3_badge", "wiz_step4_badge"]):
-            lbl = ctk.CTkLabel(self.prog_bar, text=i18n.t(step_k, self.lang), font=ctk.CTkFont(size=11, weight="bold"), text_color="#64748b")
+        for i, step_k in enumerate(["wiz_step1_badge", "wiz_step2_badge", "wiz_step3_badge", "wiz_step4tz_badge", "wiz_step5_badge"]):
+            lbl = ctk.CTkLabel(self.prog_bar, text=i18n.t(step_k, self.lang), font=ctk.CTkFont(size=10, weight="bold"), text_color="#64748b")
             lbl.pack(side="left", expand=True, pady=6)
             self.step_badges.append(lbl)
 
@@ -102,7 +220,7 @@ class SetupWizardDialog(ctk.CTkToplevel):
             self.btn_back.configure(state="disabled")
             self.btn_next.pack(side="right", padx=20, pady=10)
             self.btn_finish.pack_forget()
-        elif step == 4:
+        elif step == 5:
             self.btn_back.configure(state="normal")
             self.btn_next.pack_forget()
             self.btn_finish.pack(side="right", padx=20, pady=10)
@@ -127,7 +245,7 @@ class SetupWizardDialog(ctk.CTkToplevel):
                 msg = "Wi-Fi password must be at least 8 characters long." if self.lang == "en" else "Hasło do sieci Wi-Fi musi mieć co najmniej 8 znaków."
                 messagebox.showwarning(title, msg, parent=self)
                 return
-        if self.current_step < 4:
+        if self.current_step < 5:
             self._show_step(self.current_step + 1)
 
     def _prev_step(self):
@@ -298,7 +416,50 @@ class SetupWizardDialog(ctk.CTkToplevel):
         self.sw_twt.select()
         self.sw_twt.pack(padx=15, pady=(0, 8), anchor="w")
 
-    # --- Krok 4: Podsumowanie i Uruchomienie ---
+    # --- Krok 4: Strefa czasowa i Region regulacyjny (nowy) ---
+    def _build_step4tz(self):
+        is_en = (self.lang == "en")
+        f = ctk.CTkFrame(self.container, fg_color="transparent")
+        self.step_frames.append(f)
+
+        h_txt = "Timezone & Regulatory Region" if is_en else "Strefa czasowa i Region regulacyjny"
+        sub_txt = ("Select timezone and country code for Wi-Fi regulation (Tx Power, CE vs FCC)."
+                   if is_en else
+                   "Wybierz strefę czasową i kod kraju dla regulacji Wi-Fi (moc TX, CE vs FCC).")
+        ctk.CTkLabel(f, text=h_txt, font=ctk.CTkFont(size=15, weight="bold")).pack(anchor="w", pady=(0, 2))
+        ctk.CTkLabel(f, text=sub_txt, font=ctk.CTkFont(size=12), text_color="#94a3b8").pack(anchor="w", pady=(0, 10))
+
+        # Strefa czasowa
+        tz_lbl = "Timezone:" if is_en else "Strefa czasowa (Timezone):"
+        f_tz = ctk.CTkFrame(f)
+        f_tz.pack(fill="x", pady=6)
+        ctk.CTkLabel(f_tz, text=tz_lbl, width=200, anchor="w").pack(side="left", padx=15, pady=10)
+        tz_values = [lbl for (_iana, lbl) in TZ_DISPLAY_LIST]
+        self.combo_tz = ctk.CTkComboBox(f_tz, values=tz_values, width=330)
+        self.combo_tz.set(tz_values[0])  # domyslnie Polska
+        self.combo_tz.pack(side="left", padx=5)
+
+        tz_hint = ("Required for correct schedules and Xiaomi Cloud sync."
+                   if is_en else
+                   "Wymagana do poprawnych harmonogramów i synchronizacji z Xiaomi Cloud.")
+        ctk.CTkLabel(f, text=tz_hint, font=ctk.CTkFont(size=11), text_color="#64748b").pack(anchor="w", padx=5, pady=(2, 8))
+
+        # Region regulacyjny
+        reg_lbl = "Country Code (RF Region):" if is_en else "Kod regionu (Country Code / RegDomain):"
+        f_reg = ctk.CTkFrame(f)
+        f_reg.pack(fill="x", pady=6)
+        ctk.CTkLabel(f_reg, text=reg_lbl, width=200, anchor="w").pack(side="left", padx=15, pady=10)
+        reg_values = [lbl for (_code, lbl) in REGION_LIST]
+        self.combo_region = ctk.CTkComboBox(f_reg, values=reg_values, width=330)
+        self.combo_region.set(reg_values[0])  # domyslnie PL
+        self.combo_region.pack(side="left", padx=5)
+
+        warn_txt = ("⚠  CN/US unlock higher TX power. Use correct region for local radio regulations."
+                    if is_en else
+                    "⚠  CN/US odblokowują wyższą moc nadawania. Stosuj prawidłowy region zgodny z lokalnym prawem.")
+        ctk.CTkLabel(f, text=warn_txt, font=ctk.CTkFont(size=11), text_color="#f59e0b").pack(anchor="w", padx=5, pady=(2, 0))
+
+    # --- Krok 5: Podsumowanie i Uruchomienie ---
     def _build_step4(self):
         f = ctk.CTkFrame(self.container, fg_color="transparent")
         self.step_frames.append(f)
@@ -323,6 +484,16 @@ class SetupWizardDialog(ctk.CTkToplevel):
         off_txt = "DISABLED" if is_en else "WYŁĄCZONY"
         on_f_txt = "ENABLED" if is_en else "WŁĄCZONE"
         off_f_txt = "DISABLED" if is_en else "WYŁĄCZONE"
+
+        # Strefa czasowa - wydobadz IANA z wybranej etykiety
+        tz_label = self.combo_tz.get()
+        tz_iana = next((iana for (iana, lbl) in TZ_DISPLAY_LIST if lbl == tz_label), "")
+        tz_posix = TZ_POSIX_MAP.get(tz_iana, "")
+
+        # Region regulacyjny - wydobadz code z wybranej etykiety
+        reg_label = self.combo_region.get()
+        reg_code = next((code for (code, lbl) in REGION_LIST if lbl == reg_label), "")
+
         sum_txt = (
             f"📌 {'Router IP Address' if is_en else 'Adres IP Routera'}: {self.e_ip.get().strip()}\n"
             f"📌 {i18n.t('wiz_step1_pwd', self.lang)}: {'*' * len(self.e_pwd.get().strip())}\n\n"
@@ -332,7 +503,9 @@ class SetupWizardDialog(ctk.CTkToplevel):
             f"📶 {i18n.t('wiz_step3_pwd', self.lang)}: {'*' * len(self.e_wifi_pwd.get().strip())}\n"
             f"📶 Smart Connect: {on_txt if self.sw_smart.get() == 1 else off_txt}\n"
             f"⚡ Wi-Fi 7 MLO: {on_txt if self.sw_mlo.get() == 1 else off_txt}\n"
-            f"🔋 {'TWT Battery Saver' if is_en else 'TWT Oszczędzanie energii'}: {on_f_txt if self.sw_twt.get() == 1 else off_f_txt}"
+            f"🔋 {'TWT Battery Saver' if is_en else 'TWT Oszczędzanie energii'}: {on_f_txt if self.sw_twt.get() == 1 else off_f_txt}\n\n"
+            f"🌍 {'Timezone' if is_en else 'Strefa czasowa'}: {tz_iana} ({tz_posix})\n"
+            f"📡 {'Region' if is_en else 'Region RF'}: {reg_code}"
         )
         self.lbl_sum_text.configure(text=sum_txt)
 
@@ -381,6 +554,28 @@ class SetupWizardDialog(ctk.CTkToplevel):
                 cli.set_twt(enabled=is_twt)
             except Exception as e:
                 pass
+
+            # 5. Strefa czasowa
+            tz_label = self.combo_tz.get()
+            tz_iana = next((iana for (iana, lbl) in TZ_DISPLAY_LIST if lbl == tz_label), "")
+            tz_posix = TZ_POSIX_MAP.get(tz_iana, "")
+            if tz_posix:
+                try:
+                    import datetime as _dt
+                    now = _dt.datetime.now()
+                    time_str = now.strftime("%Y-%m-%d %H:%M:%S")
+                    cli.set_sys_time(time_str=time_str, timezone_str=tz_posix)
+                except Exception as e:
+                    print("TZ set warn:", e)
+
+            # 6. Region (Country Code / RegDomain)
+            reg_label = self.combo_region.get()
+            reg_code = next((code for (code, lbl) in REGION_LIST if lbl == reg_label), "")
+            if reg_code:
+                try:
+                    cli.set_country_code(reg_code)
+                except Exception as e:
+                    print("Region set warn:", e)
 
             def finish():
                 self.lbl_apply_status.configure(text="✔ " + i18n.t("wiz_success", self.lang), text_color="#22c55e")
