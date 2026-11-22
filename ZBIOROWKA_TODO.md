@@ -42,6 +42,10 @@
 ### 8. Selektor strefy i regionu w głównym oknie Windows Desktop [Plan na v1.0.7]
 - **Koncepcja:** Dodanie rozwijanej listy wyboru strefy czasowej i kodu kraju bezpośrednio do zakładki Narzędzia i diagnostyka w `gui.py` (obok przycisku synchronizacji czasu z PC).
 
+### 9. Widoczny numer wersji w interfejsie mobilnym (XRM Mobile / Android APK) [Plan na v1.0.7]
+- **Potrzeba:** Brak czytelnej informacji o aktualnie zainstalowanej wersji wewnątrz samej aplikacji mobilnej na telefonie/tablecie.
+- **Plan działania:** Dodać dyskretny, ale łatwo dostępny znacznik wersji (np. mały badge `v1.0.6` w nagłówku obok logo oraz informację w stopce lewego menu nawigacyjnego/drawera `XRM Mobile v1.0.x`), aby użytkownik natychmiast wiedział, jaki build ma uruchomiony.
+
 ---
 
 ## Archiwum wdrożeń
