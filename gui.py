@@ -17,7 +17,7 @@ sys.path.insert(0, APP_DIR)
 from miwifi_core import MiWiFiClient
 from exporter_md import export_snapshot_to_markdown, format_bytes, format_speed, format_uptime
 from i18n import t, load_settings, save_settings
-from setup_wizard import SetupWizardDialog
+from setup_wizard import SetupWizardDialog, TZ_POSIX_MAP, TZ_DISPLAY_LIST
 from version import APP_VERSION, APP_NAME
 
 ctk.set_appearance_mode("dark")
@@ -583,7 +583,7 @@ class MiWiFiManagerApp(ctk.CTk):
         self.card2_title = ctk.CTkLabel(card2, text=t("card_cpu_ram", self.current_lang), font=ctk.CTkFont(size=15, weight="bold"))
         self.card2_title.pack(anchor="w", padx=15, pady=(15, 10))
 
-        self.lbl_cpu = ctk.CTkLabel(card2, text=f"{t('lbl_cpu', self.current_lang)} 0%", anchor="w")
+        self.lbl_cpu = ctk.CTkLabel(card2, text=f"{t('lbl_cpu', self.current_lang)} --", anchor="w")
         self.lbl_cpu.pack(fill="x", padx=15, pady=(5, 2))
         self.pb_cpu = ctk.CTkProgressBar(card2)
         self.pb_cpu.set(0)
@@ -1718,24 +1718,13 @@ class MiWiFiManagerApp(ctk.CTk):
         self.entry_wifi_pwd_common.pack(side="right")
 
         self.f_show_common = ctk.CTkFrame(self.card_wifi_combined, fg_color="transparent")
-        self.f_show_common.pack(fill="x", padx=15, pady=2)
+        self.f_show_common.pack(fill="x", padx=15, pady=(2, 12))
         self.switch_show_pwd_common = ctk.CTkCheckBox(
             self.f_show_common,
             text=t("wifi_show_pwd", lg),
             command=lambda: self.entry_wifi_pwd_common.configure(show="" if self.switch_show_pwd_common.get() == 1 else "•")
         )
         self.switch_show_pwd_common.pack(side="right")
-
-        btn_save_comb = ctk.CTkButton(
-            self.card_wifi_combined,
-            text=("Zapisz Wspólną Konfigurację Wi-Fi" if lg == "pl" else "Save Combined Wi-Fi Setup"),
-            fg_color="#16a34a",
-            hover_color="#15803d",
-            height=34,
-            font=ctk.CTkFont(weight="bold"),
-            command=self._action_save_all_wifi
-        )
-        btn_save_comb.pack(fill="x", padx=15, pady=(8, 12))
 
         # KARTA LEWA: Pasmo 2.4 GHz
         self.card_2g = ctk.CTkFrame(self.scroll_wifi)
@@ -1893,13 +1882,13 @@ class MiWiFiManagerApp(ctk.CTk):
         self.btn_save_5g = ctk.CTkButton(self.card_5g, text=t("wifi_btn_save_5g", lg), fg_color="#2563eb", hover_color="#1d4ed8", command=lambda: self._action_save_single_wifi(2))
         self.btn_save_5g.pack(fill="x", padx=15, pady=(5, 15))
 
-        # Panel wspólnego zapisu (dla Smart Connect)
+        # Panel wspólnego zapisu (pod kartami 2.4 GHz i 5 GHz dla Smart Connect)
         self.frame_save_bsd = ctk.CTkFrame(self.scroll_wifi, fg_color="transparent")
-        self.frame_save_bsd.grid(row=2, column=0, columnspan=2, padx=10, pady=(10, 10), sticky="ew")
+        self.frame_save_bsd.grid(row=3, column=0, columnspan=2, padx=5, pady=(6, 10), sticky="ew")
 
         btn_save_all = ctk.CTkButton(
             self.frame_save_bsd,
-            text=t("wifi_btn_save_both", lg),
+            text=("Zapisz ustawienia Wi-Fi" if lg == "pl" else "Save Wi-Fi Settings"),
             fg_color="#16a34a",
             hover_color="#15803d",
             height=36,
@@ -2013,25 +2002,7 @@ class MiWiFiManagerApp(ctk.CTk):
 
         ctk.CTkFrame(self.card_adv_wifi, height=1, fg_color="#334155").pack(fill="x", padx=15, pady=6)
 
-        # 7. Region Regulacyjny (Country Code)
-        f_adv_cntry = ctk.CTkFrame(self.card_adv_wifi, fg_color="transparent")
-        f_adv_cntry.pack(fill="x", padx=15, pady=6)
-        f_cntry_info = ctk.CTkFrame(f_adv_cntry, fg_color="transparent")
-        f_cntry_info.pack(side="left", fill="x", expand=True)
-        ctk.CTkLabel(f_cntry_info, text=t("wifi_adv_country_title", lg), font=ctk.CTkFont(weight="bold")).pack(anchor="w")
-        ctk.CTkLabel(f_cntry_info, text=t("wifi_adv_country_desc", lg), text_color="#94a3b8", font=ctk.CTkFont(size=12)).pack(anchor="w")
-
-        f_cntry_ctrl = ctk.CTkFrame(f_adv_cntry, fg_color="transparent")
-        f_cntry_ctrl.pack(side="right", padx=5)
-        self.combo_country = ctk.CTkComboBox(f_cntry_ctrl, values=[t("wifi_adv_country_cn", lg), t("wifi_adv_country_pl", lg)], width=230)
-        self.combo_country.set(t("wifi_adv_country_cn", lg))
-        self.combo_country.pack(side="left", padx=5)
-        self.btn_save_country = ctk.CTkButton(f_cntry_ctrl, text=t("wifi_adv_country_btn_save", lg), fg_color="#2563eb", hover_color="#1d4ed8", width=110, command=self._action_save_country_code)
-        self.btn_save_country.pack(side="left", padx=5)
-
-        ctk.CTkFrame(self.card_adv_wifi, height=1, fg_color="#334155").pack(fill="x", padx=15, pady=6)
-
-        # 8. Globalna Moc Nadawania Radia Wi-Fi (Tx Power)
+        # 7. Globalna Moc Nadawania Radia Wi-Fi (Tx Power)
         f_adv_txpwr = ctk.CTkFrame(self.card_adv_wifi, fg_color="transparent")
         f_adv_txpwr.pack(fill="x", padx=15, pady=(6, 15))
         f_txpwr_info = ctk.CTkFrame(f_adv_txpwr, fg_color="transparent")
@@ -2046,22 +2017,6 @@ class MiWiFiManagerApp(ctk.CTk):
         self.combo_txpwr.pack(side="left", padx=5)
         self.btn_save_txpwr = ctk.CTkButton(f_txpwr_ctrl, text=t("btn_apply", lg), fg_color="#2563eb", hover_color="#1d4ed8", width=110, command=self._action_save_txpwr)
         self.btn_save_txpwr.pack(side="left", padx=5)
-
-    def _action_save_country_code(self):
-        val = self.combo_country.get()
-        code = "CN" if "CN" in val else "PL"
-        lg = self.current_lang
-        prompt = t("country_change_prompt", lg).format(code=code)
-        if not messagebox.askyesno(t("country_change_title", lg), prompt):
-            return
-        def run():
-            res = self.client.set_country_code(code)
-            if res.get("code") == 0 or not res.get("error"):
-                self.after(0, lambda: messagebox.showinfo(t("succ_title", lg), t("country_change_succ", lg).format(code=code)))
-                self._fetch_data_thread()
-            else:
-                self.after(0, lambda: messagebox.showerror(t("err_title", lg), f"{res.get('error') or res}"))
-        threading.Thread(target=run, daemon=True).start()
 
     def _action_save_txpwr(self):
         val = self.combo_txpwr.get()
@@ -2115,7 +2070,7 @@ class MiWiFiManagerApp(ctk.CTk):
             if hasattr(self, "frame_5g_sync") and hasattr(self, "f_tx_5g"):
                 self.frame_5g_sync.pack(fill="x", padx=15, pady=(5, 10), before=self.f_tx_5g)
             if hasattr(self, "frame_save_bsd"):
-                self.frame_save_bsd.grid_forget()
+                self.frame_save_bsd.grid(row=3, column=0, columnspan=2, padx=5, pady=(6, 10), sticky="ew")
         else:
             self.lbl_bsd_banner.configure(text=t("wifi_bsd_banner_off", lg))
             if hasattr(self, "card_wifi_combined"):
@@ -4349,6 +4304,17 @@ class MiWiFiManagerApp(ctk.CTk):
         self.btn_sync_time = ctk.CTkButton(time_row, text=t("tools_time_sync", lg), width=110, height=26, fg_color="#0284c7", hover_color="#0369a1", command=self._action_sync_time)
         self.btn_sync_time.pack(side="right")
 
+        tz_row = ctk.CTkFrame(p_hw, fg_color="transparent")
+        tz_row.pack(fill="x", padx=15, pady=3)
+        self.lbl_tools_tz = ctk.CTkLabel(tz_row, text=("Timezone:" if lg == "en" else "Strefa czasowa:"))
+        self.lbl_tools_tz.pack(side="left")
+        self.btn_save_tools_tz = ctk.CTkButton(tz_row, text=("Save" if lg == "en" else "Zapisz"), width=80, height=26, fg_color="#0284c7", hover_color="#0369a1", command=self._action_save_tools_timezone)
+        self.btn_save_tools_tz.pack(side="right", padx=(6, 0))
+        tz_labels = [lbl for _, lbl in TZ_DISPLAY_LIST]
+        self.combo_tools_tz = ctk.CTkComboBox(tz_row, values=tz_labels, width=220, height=26)
+        self.combo_tools_tz.set(tz_labels[0])
+        self.combo_tools_tz.pack(side="right")
+
         self.btn_ota = ctk.CTkButton(p_hw, text=t("btn_check_ota", lg), fg_color="#2563eb", hover_color="#1d4ed8", height=30, command=self._action_check_firmware_update)
         self.btn_ota.pack(fill="x", padx=15, pady=3)
 
@@ -4368,19 +4334,58 @@ class MiWiFiManagerApp(ctk.CTk):
                 self.after(0, lambda: messagebox.showerror("NFC", f"Błąd ustawiania NFC: {res}"))
         threading.Thread(target=run, daemon=True).start()
 
+    def _get_selected_tools_tz(self):
+        sel_label = self.combo_tools_tz.get() if hasattr(self, "combo_tools_tz") else ""
+        for iana, lbl in TZ_DISPLAY_LIST:
+            if lbl == sel_label:
+                return iana, TZ_POSIX_MAP.get(iana, "CET-1CEST,M3.5.0,M10.5.0/3")
+        return "Europe/Warsaw", TZ_POSIX_MAP.get("Europe/Warsaw", "CET-1CEST,M3.5.0,M10.5.0/3")
+
     def _action_sync_time(self):
         import datetime
         lg = self.current_lang
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        iana_tz, posix_tz = self._get_selected_tools_tz()
         def run():
-            res = self.client.set_sys_time(time_str=now_str, timezone_str="CET-1CEST")
+            res = self.client.set_sys_time(time_str=now_str, timezone_str=posix_tz)
             if res.get("code") == 0:
-                msg = f"Synchronized router time with PC ({now_str}) and timezone (CET-1CEST)." if lg == "en" else f"Zsynchronizowano czas routera z PC ({now_str}) oraz strefę czasową (CET-1CEST)."
-                self.after(0, lambda: messagebox.showinfo(t("tools_time_label", lg) if "tools_time_label" in i18n.TRANSLATIONS[lg] else "System Time", msg))
+                msg = (
+                    f"Synchronized router time with PC ({now_str}) and timezone {iana_tz} ({posix_tz})."
+                    if lg == "en"
+                    else f"Zsynchronizowano czas routera z PC ({now_str}) oraz strefę {iana_tz} ({posix_tz})."
+                )
+                self.after(0, lambda: messagebox.showinfo(t("succ_title", lg), msg))
                 self._fetch_data_thread()
             else:
                 err_m = f"Time synchronization error: {res}" if lg == "en" else f"Błąd synchronizacji czasu: {res}"
-                self.after(0, lambda: messagebox.showerror(t("msg_error_title", lg), err_m))
+                self.after(0, lambda: messagebox.showerror(t("err_title", lg), err_m))
+        threading.Thread(target=run, daemon=True).start()
+
+    def _action_save_tools_timezone(self):
+        import datetime
+        lg = self.current_lang
+        iana_tz, posix_tz = self._get_selected_tools_tz()
+        prompt = (
+            f"Set router timezone to {iana_tz} ({posix_tz})?"
+            if lg == "en"
+            else f"Ustawić strefę czasową routera na {iana_tz} ({posix_tz})?"
+        )
+        if not messagebox.askyesno(t("info_title", lg), prompt):
+            return
+        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        def run():
+            res = self.client.set_sys_time(time_str=now_str, timezone_str=posix_tz)
+            if res.get("code") == 0:
+                msg = (
+                    f"Router timezone updated to {iana_tz} ({posix_tz})."
+                    if lg == "en"
+                    else f"Zapisano strefę czasową routera: {iana_tz} ({posix_tz})."
+                )
+                self.after(0, lambda: messagebox.showinfo(t("succ_title", lg), msg))
+                self._fetch_data_thread()
+            else:
+                err_m = f"Failed to set timezone: {res}" if lg == "en" else f"Nie udało się ustawić strefy czasowej: {res}"
+                self.after(0, lambda: messagebox.showerror(t("err_title", lg), err_m))
         threading.Thread(target=run, daemon=True).start()
 
     def _action_check_firmware_update(self):
@@ -4828,7 +4833,7 @@ class MiWiFiManagerApp(ctk.CTk):
                 self.lbl_rom.configure(text=f"{t('lbl_rom', lg)} -")
                 self.lbl_uptime.configure(text=f"{t('lbl_uptime', lg)} -")
                 self.lbl_router_id.configure(text=f"{t('lbl_router_id', lg)} -")
-                self.lbl_cpu.configure(text=f"{t('lbl_cpu', lg)} 0%")
+                self.lbl_cpu.configure(text=f"{t('lbl_cpu', lg)} --")
                 self.lbl_ram.configure(text=f"{t('lbl_ram', lg)} 0 MB / 0 MB (0%)")
                 self.lbl_down.configure(text=f"{t('lbl_down', lg)} 0 KB/s")
                 self.lbl_up.configure(text=f"{t('lbl_up', lg)} 0 KB/s")
@@ -5013,8 +5018,13 @@ class MiWiFiManagerApp(ctk.CTk):
                 c_val = safe_float(cpu_load)
                 if c_val > 1.0:
                     c_val = c_val / 100.0
-                self.pb_cpu.set(min(c_val, 1.0))
-                self.lbl_cpu.configure(text=f"{t('lbl_cpu', lg)} {c_val * 100:.1f}%")
+                pct = c_val * 100.0
+                if pct < 1.0:
+                    self.pb_cpu.set(0.01)
+                    self.lbl_cpu.configure(text=f"{t('lbl_cpu', lg)} < 1%")
+                else:
+                    self.pb_cpu.set(min(c_val, 1.0))
+                    self.lbl_cpu.configure(text=f"{t('lbl_cpu', lg)} {pct:.1f}%")
             else:
                 self.lbl_cpu.configure(text=f"{t('lbl_cpu', lg)} {('no data' if lg == 'en' else 'brak danych')}")
 
@@ -5407,19 +5417,14 @@ class MiWiFiManagerApp(ctk.CTk):
                 t_str = f"{st.get('year')}-{safe_int(st.get('month')):02d}-{safe_int(st.get('day')):02d} {safe_int(st.get('hour')):02d}:{safe_int(st.get('min')):02d}:{safe_int(st.get('sec')):02d}"
                 tz_str = st.get('timezone', 'CST-8')
                 self.lbl_sys_time.configure(text=f"{t('tools_time_label', self.current_lang)} {t_str} ({tz_str})")
+                if hasattr(self, "combo_tools_tz") and tz_str:
+                    for iana, lbl in TZ_DISPLAY_LIST:
+                        posix = TZ_POSIX_MAP.get(iana, "")
+                        if posix == tz_str or (tz_str and posix.startswith(tz_str)):
+                            self.combo_tools_tz.set(lbl)
+                            break
         except Exception as e:
             print("Błąd aktualizacji czasu systemowego:", e)
-
-        # 12. Region Regulacyjny (Country Code)
-        try:
-            cc = snap.get("country_code", {}).get("current", "")
-            if cc:
-                if cc.upper() == "PL":
-                    self.combo_country.set(t("wifi_adv_country_pl", self.current_lang))
-                elif cc.upper() == "CN":
-                    self.combo_country.set(t("wifi_adv_country_cn", self.current_lang))
-        except Exception as e:
-            print("Błąd aktualizacji kodu kraju:", e)
 
     def _toggle_autorefresh(self):
         self.auto_refresh_running = self.switch_autorefresh.get() == 1

@@ -132,6 +132,20 @@ body {
   font-weight: 700;
   color: var(--text-main);
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.version-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background-color: rgba(56, 189, 248, 0.14);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  line-height: 1.4;
 }
 
 .logo-subtitle {
@@ -471,6 +485,14 @@ body {
 .drawer-footer-action {
   margin-top: auto;
   padding-top: 10px;
+}
+
+.drawer-version-footer {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.3px;
 }
 
 .btn-wizard {

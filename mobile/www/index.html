@@ -18,7 +18,7 @@
         <div class="logo-box">
           <span class="logo-icon">📶</span>
           <div class="logo-text">
-            <span class="logo-title">Xiaomi Router Manager</span>
+            <span class="logo-title">Xiaomi Router Manager <span class="version-badge">v1.0.7</span></span>
             <span class="logo-subtitle" id="header-model-badge">BE7000 / BE6500 / AX3600</span>
           </div>
         </div>
@@ -171,6 +171,7 @@
             <span class="wiz-icon">🪄</span>
             <span class="wiz-text">Kreator Szybkiego Startu</span>
           </button>
+          <div class="drawer-version-footer">XRM Mobile v1.0.7</div>
         </div>
       </nav>
     </aside>
@@ -793,7 +794,7 @@
         </div>
 
         <div class="card-footer-box">
-          <button class="btn-success full-width" id="btn-save-wifi">★ Zastosuj i Zsynchronizuj Ustawienia Wi-Fi (Zapis obu pasm / Smart Connect)</button>
+          <button class="btn-success full-width" id="btn-save-wifi">Zapisz ustawienia Wi-Fi</button>
         </div>
 
         <!-- Karta: Zaawansowane Ustawienia Wi-Fi (Funkcje Systemowe i Roaming) -->
@@ -1225,7 +1226,6 @@
           <div class="card"><h3>Diody LED routera</h3><div class="form-group"><label class="toggle-switch"><input type="checkbox" id="led-switch" disabled><span class="toggle-slider"></span></label><span id="led-status-lbl" class="bold">Brak danych</span></div><button class="btn-primary" id="btn-save-led" disabled>Zapisz stan diod</button></div>
           <div class="card"><h3>Konserwacja i system</h3><p id="system-router-time">Czas routera: --</p><button class="btn-secondary" id="btn-nfc-enable">Włącz NFC</button><button class="btn-secondary" id="btn-nfc-disable">Wyłącz NFC</button><button class="btn-secondary" id="btn-sync-time">Synchronizuj czas z urządzeniem</button><button class="btn-secondary" id="btn-check-firmware">Sprawdź aktualizacje firmware</button></div>
           <div class="card"><h3>Strefa czasowa routera</h3><p class="card-desc">Ustaw strefę czasową routera niezależnie od synchronizacji czasu. Wpływa na harmonogramy, logi i chmurę Xiaomi Cloud.</p><div class="form-group"><label class="form-label">Strefa czasowa (Timezone):</label><select id="system-tz-select" class="form-select"><option value="">-- ładowanie... --</option></select></div><button class="btn-primary" id="btn-save-tz">Zapisz strefę czasową</button></div>
-          <div class="card"><h3>Region regulacyjny Wi-Fi (RegDomain)</h3><p class="card-desc">Kod kraju determinuje dozwoloną moc nadawania radia Wi-Fi (Tx Power, CE vs FCC) oraz poprawne parowanie z Xiaomi Cloud / Mi Home.</p><div class="form-group"><label class="form-label">Kod regionu (Country Code):</label><select id="system-region-select" class="form-select"><option value="">-- ładowanie... --</option></select></div><div class="backup-actions-bar"><button class="btn-secondary" id="btn-read-region">Odczytaj z routera</button><button class="btn-primary" id="btn-save-region">Zapisz region</button></div><p class="card-desc" style="color:#f59e0b">⚠️ Zmiana regionu może wymagać restartu routera i wpływa na dostępne kanały oraz moc radia Wi-Fi.</p></div>
         </div>
         <div class="card danger-card">
           <div class="card-head">
@@ -1281,11 +1281,6 @@
             <label class="form-label">🌍 Strefa czasowa routera (Timezone):</label>
             <select id="wiz-tz-select" class="form-select"><option value="">-- ładowanie... --</option></select>
             <p class="card-desc" style="margin-top:4px">Wymagane do poprawnych harmonogramów i synchronizacji z Xiaomi Cloud.</p>
-          </div>
-          <div class="form-group">
-            <label class="form-label">📡 Region regulacyjny Wi-Fi (Country Code / RegDomain):</label>
-            <select id="wiz-region-select" class="form-select"><option value="">-- ładowanie... --</option></select>
-            <p class="card-desc" style="margin-top:4px;color:#f59e0b">Determinuje dopuszczalną moc nadawania radia Wi-Fi (CE dla Europy, FCC dla USA/CN dla Chin).</p>
           </div>
           <button class="btn-primary" id="btn-wizard-apply">🚀 Zastosuj i Uruchom Router</button>
         </div>

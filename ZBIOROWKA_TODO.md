@@ -31,24 +31,27 @@
 ### 5. Wybór strefy czasowej i regionu w aplikacji mobilnej oraz kreatorze (Zrealizowane w v1.0.6)
 - **Status:** Zrealizowane 2026-11-22 w v1.0.6 (mobile PWA / Android APK oraz kreator Windows setup_wizard.py).
 
-### 6. Poprawa komunikatu zapisu regionu Wi-Fi (set_country_code) [Plan na v1.0.7]
-- **Problem:** API routera przy zapisie regionu zwraca specyficzną odpowiedź (chińskie znaki), co aplikacja interpretuje jako błąd, mimo że region w rzeczywistości zapisuje się poprawnie (potwierdzone odczytem, po rozłączeniu i wyczyszczeniu pamięci).
-- **Plan działania:** przechwycenie specyficznego kodu/odpowiedzi z routera i wyświetlenie czytelnego komunikatu sukcesu w PL/EN (np. "Region zapisany pomyślnie. Zmiana może wymagać restartu routera").
+### 6. Region Wi-Fi (set_country_code) (Usunięte z UI w v1.0.7)
+- **Status:** Zamknięte 2026-11-26 w v1.0.7. Test na żywym BE7000 potwierdził, że oryginalny firmware Xiaomi blokuje zmianę `CountryCode` przez HTTP API (`code: 1606`, fabryczna blokada w partycji `bdata`). Usunięto bezcelową edycję regionu Wi-Fi z UI Windows i Android (oraz Kreatora).
 
-### 7. Prezentacja minimalnego obciążenia CPU [Plan na v1.0.7]
-- **Problem:** Wskazanie "0%" obciążenia procesora w stanie bezczynności wygląda niewiarygodnie i sprawia wrażenie "zaciętego wskaźnika".
-- **Plan działania:** formatowanie zerowego obciążenia jako `< 1%` lub `0,1%` w telemetrii desktopowej i mobilnej.
+### 7. Prezentacja minimalnego obciążenia CPU (Zrealizowane w v1.0.7)
+- **Status:** Zrealizowane 2026-11-26 w v1.0.7 (Windows i Android). Obciążenie `< 1.0%` wyświetlane jako `< 1%` z minimalnym paskiem 1%.
 
-### 8. Selektor strefy i regionu w głównym oknie Windows Desktop [Plan na v1.0.7]
-- **Koncepcja:** Dodanie rozwijanej listy wyboru strefy czasowej i kodu kraju bezpośrednio do zakładki Narzędzia i diagnostyka w `gui.py` (obok przycisku synchronizacji czasu z PC).
+### 8. Selektor strefy czasowej w głównym oknie Windows Desktop (Zrealizowane w v1.0.7)
+- **Status:** Zrealizowane 2026-11-26 w v1.0.7. Dodano listę strefy czasowej w zakładce Narzędzia i Konserwacja (`gui.py`) z zapisem i synchronizacją ze snapshotem routera.
 
-### 9. Widoczny numer wersji w interfejsie mobilnym (XRM Mobile / Android APK) [Plan na v1.0.7]
-- **Potrzeba:** Brak czytelnej informacji o aktualnie zainstalowanej wersji wewnątrz samej aplikacji mobilnej na telefonie/tablecie.
-- **Plan działania:** Dodać dyskretny, ale łatwo dostępny znacznik wersji (np. mały badge `v1.0.6` w nagłówku obok logo oraz informację w stopce lewego menu nawigacyjnego/drawera `XRM Mobile v1.0.x`), aby użytkownik natychmiast wiedział, jaki build ma uruchomiony.
+### 9. Widoczny numer wersji w interfejsie mobilnym (XRM Mobile / Android APK) (Zrealizowane w v1.0.7)
+- **Status:** Zrealizowane 2026-11-26 w v1.0.7. Dodano badge `v1.0.7` w nagłówku oraz stopkę `XRM Mobile v1.0.7` w drawerze nawigacyjnym.
 
 ---
 
 ## Archiwum wdrożeń
+
+### v1.0.7 (Zrealizowane 2026-11-26)
+- **Usunięcie nieaktywnej zmiany regionu Wi-Fi (`set_country_code`) z Windows i Android:** nowsze fabryczne firmware Xiaomi blokuje zmianę `CountryCode` w `bdata` (kod `1606`), więc edycję usunięto z Wi-Fi, System i Narzędzia oraz Kreatora.
+- **Minimalne obciążenie CPU `< 1%` (Windows i Android):** brak mylącego `0%` w stanie bezczynności.
+- **Selektor strefy czasowej w głównym oknie Windows (`gui.py`):** zakładka Narzędzia i Konserwacja, zsynchronizowana z odczytem z routera i synchronizacją czasu z PC.
+- **Widoczny numer wersji w UI mobilnym (Android):** badge `v1.0.7` przy tytule w nagłówku oraz stopka `XRM Mobile v1.0.7` w menu nawigacyjnym.
 
 ### v1.0.6 (Zrealizowane 2026-11-22)
 - **Selektor strefy czasowej i kodu regionu (Mobile & Windows):**

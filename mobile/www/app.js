@@ -135,6 +135,7 @@ const TZ_DISPLAY_LIST = [
 
 // Lista kodow regionow regulacyjnych (country code -> opis, profil CE/FCC)
 const REGION_LIST = [
+  { code: "EU", label: "EU - Europa / Polska (CE/ETSI)" },
   { code: "PL", label: "PL - Polska (CE/ETSI, Europa)" },
   { code: "DE", label: "DE - Niemcy (CE/ETSI)" },
   { code: "GB", label: "GB - Wielka Brytania (CE/ETSI)" },
@@ -575,16 +576,19 @@ function renderDashboardStatus(s, init, wan) {
     document.getElementById("dash-uptime").textContent = formatUptime(rawUp);
   }
 
-  // Obciążenie CPU (gui.py L4810-4820)
+  // Obciążenie CPU (gui.py L5010-5020)
   const cpuObj = s?.cpu || {};
   let cpuLoad = parseFloat(cpuObj.load !== undefined ? cpuObj.load : (cpuObj.core || 0));
+  if (isNaN(cpuLoad)) cpuLoad = 0;
   if (cpuLoad > 1.0) cpuLoad = cpuLoad / 100.0;
-  const cpuPct = (cpuLoad * 100).toFixed(1);
+  const cpuPctNum = cpuLoad * 100;
+  const cpuLabel = cpuPctNum < 1.0 ? "< 1%" : `${cpuPctNum.toFixed(1)}%`;
+  const cpuBarWidth = cpuPctNum < 1.0 ? 1 : Math.min(100, cpuPctNum);
   if (document.getElementById("dash-cpu-val")) {
-    document.getElementById("dash-cpu-val").textContent = `${cpuPct}%`;
+    document.getElementById("dash-cpu-val").textContent = cpuLabel;
   }
   if (document.getElementById("dash-cpu-bar")) {
-    document.getElementById("dash-cpu-bar").style.width = `${Math.min(100, parseFloat(cpuPct))}%`;
+    document.getElementById("dash-cpu-bar").style.width = `${cpuBarWidth}%`;
   }
 
   // Pamięć RAM (gui.py L4821-4835)
@@ -1588,7 +1592,6 @@ async function sendChange(view, endpoint, payload, question, method = "POST") {
 function setupAdditionalControls() {
   // Kreator - buduj selektory strefy i regionu (moze byc wywolane przed setupSystemEnhancements)
   buildTzSelect("wiz-tz-select");
-  buildRegionSelect("wiz-region-select", "PL");
 
   // Kreator - przycisk Zastosuj i Uruchom Router
   const btnWizApply = $id("btn-wizard-apply");
@@ -1602,7 +1605,6 @@ function setupAdditionalControls() {
       const wifiPwd = $id("wiz-pwd")?.value.trim() || "";
       const samePwd = $id("wiz-same-pwd")?.checked ?? true;
       const tzIana = $id("wiz-tz-select")?.value || "";
-      const regionCode = $id("wiz-region-select")?.value || "";
       const tzPosix = TZ_POSIX_MAP[tzIana] || "";
 
       if (!ssid) return alert("Podaj nazwę sieci Wi-Fi (SSID).");
@@ -1610,7 +1612,6 @@ function setupAdditionalControls() {
 
       let summary = `Typ WAN: ${proto.toUpperCase()}\nSSID: ${ssid}`;
       if (tzIana) summary += `\nStrefa czasowa: ${tzIana} (${tzPosix || "nieznana"})`;
-      if (regionCode) summary += `\nRegion RF: ${regionCode}`;
       if (!confirm(`Zastosować ustawienia na routerze?\n\n${summary}`)) return;
 
       btnWizApply.disabled = true;
@@ -1641,14 +1642,6 @@ function setupAdditionalControls() {
           const r = await apiRequest(`misystem/set_sys_time?${query}`);
           if (r.code !== 0) errors.push(`Czas/TZ: ${r.msg || r.code}`);
         } catch(e) { errors.push(`Czas/TZ: ${e.message}`); }
-      }
-
-      // 3. Ustaw region (RegDomain)
-      if (regionCode) {
-        try {
-          const r = await apiRequest("xqsystem/set_country_code", "POST", {country: regionCode});
-          if (r.code !== 0) errors.push(`Region: ${r.msg || r.code}`);
-        } catch(e) { errors.push(`Region: ${e.message}`); }
       }
 
       btnWizApply.disabled = false;
@@ -2294,26 +2287,15 @@ function buildRegionSelect(selectId, currentCode) {
   });
 }
 
-// Odczytuje aktualny region z routera i aktualizuje select
-async function loadRegionFromRouter(selectId) {
-  if (!state.connected) return;
-  try {
-    const r = await apiRequest("xqsystem/country_code");
-    if (r.code === 0 && r.country) buildRegionSelect(selectId, r.country);
-  } catch (_) {}
-}
-
 function setupSystemEnhancements() {
   $id("system-change-password").onclick=passwordDialog;
   for(const [id,on] of [["btn-nfc-enable",1],["btn-nfc-disable",0]]) $id(id).onclick=async()=>{
     if(!state.connected || !confirm(`${on ? "Włączyć" : "Wyłączyć"} NFC na routerze?`)) return;
     try {const r=await apiRequest("xqnetwork/set_nfc_status","POST",{status:on});if(r.code!==0)throw Error(r.msg||r.code);alert("Router potwierdził zmianę NFC.");}catch(e){alert("Nie udało się potwierdzić zmiany NFC: "+e.message);}
   };
-  // Buduj selektory strefy i regionu po zaladowaniu DOM
+  // Buduj selektory strefy po zaladowaniu DOM
   buildTzSelect("system-tz-select");
   buildTzSelect("wiz-tz-select");
-  buildRegionSelect("system-region-select", "PL");
-  buildRegionSelect("wiz-region-select", "PL");
 
   // Synchronizacja czasu z urzadzeniem + strefa z selecta
   $id("btn-sync-time").onclick=async()=>{
@@ -2344,31 +2326,6 @@ function setupSystemEnhancements() {
       if (r.code !== 0) throw Error(r.msg || r.code);
       alert("Router potwierdził zmianę strefy czasowej.");
     } catch(e) { alert("Nie udało się zmienić strefy: " + e.message); }
-  };
-  // Odczyt aktualnego regionu z routera
-  const btnReadRegion = $id("btn-read-region");
-  if (btnReadRegion) btnReadRegion.onclick = async () => {
-    if (!state.connected) return alert("Najpierw połącz się z routerem.");
-    await loadRegionFromRouter("system-region-select");
-    alert("Odczytano aktualny region routera.");
-  };
-  // Zapis regionu (country code / RegDomain)
-  const btnSaveRegion = $id("btn-save-region");
-  if (btnSaveRegion) btnSaveRegion.onclick = async () => {
-    if (!state.connected) return alert("Najpierw połącz się z routerem.");
-    const sel = $id("system-region-select");
-    const code = sel ? sel.value : "";
-    if (!code) return alert("Wybierz kod regionu z listy.");
-    const isCN = code === "CN";
-    const warn = isCN
-      ? "\n\nUWAGA: Kod CN (Chiny) odblokowuje pelna moc TX radia. Upewnij sie, ze jest to zgodne z lokalnym prawem."
-      : (code === "US" || code === "CA" ? "\n\nKod FCC (USA/CA) moze odblokowac wyzsze pasma 5 GHz i wyzsza moc TX niz dozwolona w UE." : "");
-    if (!confirm(`Ustawić region routera na: ${code}?${warn}`)) return;
-    try {
-      const r = await apiRequest("xqsystem/set_country_code", "POST", {country: code});
-      if (r.code !== 0) throw Error(r.msg || r.code);
-      alert(`Router potwierdził zmianę regionu na ${code}. Efekt moze wymagac restartu routera.`);
-    } catch(e) { alert("Nie udało się zmienić regionu: " + e.message); }
   };
   $id("btn-check-firmware").onclick=async()=>{if(!state.connected)return;try{const r=await apiRequest("xqsystem/check_rom_update");if(r.code!==0)throw Error(r.msg||r.code);alert(Number(r.needUpdate)===1 ? "Router zgłasza dostępną aktualizację firmware." : "Router nie zgłasza dostępnej aktualizacji firmware.");}catch(e){alert("Nie udało się sprawdzić aktualizacji: "+e.message);}};
   $id("btn-factory-reset").onclick=async()=>{if(!state.connected || !confirm("Przywrócić ustawienia fabryczne? Zostanie usunięta konfiguracja routera."))return;if(!confirm("Potwierdź ponownie przywrócenie ustawień fabrycznych."))return;try{const r=await apiRequest("xqsystem/reset");if(r.code!==0)throw Error(r.msg||r.code);disconnect();alert("Router potwierdził polecenie przywrócenia.");}catch(e){alert("Nie udało się potwierdzić operacji: "+e.message);}};

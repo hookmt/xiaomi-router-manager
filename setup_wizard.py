@@ -96,6 +96,7 @@ TZ_DISPLAY_LIST = [
 ]
 
 REGION_LIST = [
+    ("EU", "EU - Europa / Polska (CE/ETSI)"),
     ("PL", "PL - Polska (CE/ETSI, Europa)"),
     ("DE", "DE - Niemcy (CE/ETSI)"),
     ("GB", "GB - Wielka Brytania (CE/ETSI)"),
@@ -416,16 +417,16 @@ class SetupWizardDialog(ctk.CTkToplevel):
         self.sw_twt.select()
         self.sw_twt.pack(padx=15, pady=(0, 8), anchor="w")
 
-    # --- Krok 4: Strefa czasowa i Region regulacyjny (nowy) ---
+    # --- Krok 4: Strefa czasowa ---
     def _build_step4tz(self):
         is_en = (self.lang == "en")
         f = ctk.CTkFrame(self.container, fg_color="transparent")
         self.step_frames.append(f)
 
-        h_txt = "Timezone & Regulatory Region" if is_en else "Strefa czasowa i Region regulacyjny"
-        sub_txt = ("Select timezone and country code for Wi-Fi regulation (Tx Power, CE vs FCC)."
+        h_txt = "Router Timezone" if is_en else "Strefa czasowa routera"
+        sub_txt = ("Select router timezone for accurate clock, schedules and logs."
                    if is_en else
-                   "Wybierz strefę czasową i kod kraju dla regulacji Wi-Fi (moc TX, CE vs FCC).")
+                   "Wybierz strefę czasową dla poprawnego zegara, harmonogramów i logów.")
         ctk.CTkLabel(f, text=h_txt, font=ctk.CTkFont(size=15, weight="bold")).pack(anchor="w", pady=(0, 2))
         ctk.CTkLabel(f, text=sub_txt, font=ctk.CTkFont(size=12), text_color="#94a3b8").pack(anchor="w", pady=(0, 10))
 
@@ -443,21 +444,6 @@ class SetupWizardDialog(ctk.CTkToplevel):
                    if is_en else
                    "Wymagana do poprawnych harmonogramów i synchronizacji z Xiaomi Cloud.")
         ctk.CTkLabel(f, text=tz_hint, font=ctk.CTkFont(size=11), text_color="#64748b").pack(anchor="w", padx=5, pady=(2, 8))
-
-        # Region regulacyjny
-        reg_lbl = "Country Code (RF Region):" if is_en else "Kod regionu (Country Code / RegDomain):"
-        f_reg = ctk.CTkFrame(f)
-        f_reg.pack(fill="x", pady=6)
-        ctk.CTkLabel(f_reg, text=reg_lbl, width=200, anchor="w").pack(side="left", padx=15, pady=10)
-        reg_values = [lbl for (_code, lbl) in REGION_LIST]
-        self.combo_region = ctk.CTkComboBox(f_reg, values=reg_values, width=330)
-        self.combo_region.set(reg_values[0])  # domyslnie PL
-        self.combo_region.pack(side="left", padx=5)
-
-        warn_txt = ("⚠  CN/US unlock higher TX power. Use correct region for local radio regulations."
-                    if is_en else
-                    "⚠  CN/US odblokowują wyższą moc nadawania. Stosuj prawidłowy region zgodny z lokalnym prawem.")
-        ctk.CTkLabel(f, text=warn_txt, font=ctk.CTkFont(size=11), text_color="#f59e0b").pack(anchor="w", padx=5, pady=(2, 0))
 
     # --- Krok 5: Podsumowanie i Uruchomienie ---
     def _build_step4(self):
@@ -490,10 +476,6 @@ class SetupWizardDialog(ctk.CTkToplevel):
         tz_iana = next((iana for (iana, lbl) in TZ_DISPLAY_LIST if lbl == tz_label), "")
         tz_posix = TZ_POSIX_MAP.get(tz_iana, "")
 
-        # Region regulacyjny - wydobadz code z wybranej etykiety
-        reg_label = self.combo_region.get()
-        reg_code = next((code for (code, lbl) in REGION_LIST if lbl == reg_label), "")
-
         sum_txt = (
             f"📌 {'Router IP Address' if is_en else 'Adres IP Routera'}: {self.e_ip.get().strip()}\n"
             f"📌 {i18n.t('wiz_step1_pwd', self.lang)}: {'*' * len(self.e_pwd.get().strip())}\n\n"
@@ -504,8 +486,7 @@ class SetupWizardDialog(ctk.CTkToplevel):
             f"📶 Smart Connect: {on_txt if self.sw_smart.get() == 1 else off_txt}\n"
             f"⚡ Wi-Fi 7 MLO: {on_txt if self.sw_mlo.get() == 1 else off_txt}\n"
             f"🔋 {'TWT Battery Saver' if is_en else 'TWT Oszczędzanie energii'}: {on_f_txt if self.sw_twt.get() == 1 else off_f_txt}\n\n"
-            f"🌍 {'Timezone' if is_en else 'Strefa czasowa'}: {tz_iana} ({tz_posix})\n"
-            f"📡 {'Region' if is_en else 'Region RF'}: {reg_code}"
+            f"🌍 {'Timezone' if is_en else 'Strefa czasowa'}: {tz_iana} ({tz_posix})"
         )
         self.lbl_sum_text.configure(text=sum_txt)
 
@@ -567,15 +548,6 @@ class SetupWizardDialog(ctk.CTkToplevel):
                     cli.set_sys_time(time_str=time_str, timezone_str=tz_posix)
                 except Exception as e:
                     print("TZ set warn:", e)
-
-            # 6. Region (Country Code / RegDomain)
-            reg_label = self.combo_region.get()
-            reg_code = next((code for (code, lbl) in REGION_LIST if lbl == reg_label), "")
-            if reg_code:
-                try:
-                    cli.set_country_code(reg_code)
-                except Exception as e:
-                    print("Region set warn:", e)
 
             def finish():
                 self.lbl_apply_status.configure(text="✔ " + i18n.t("wiz_success", self.lang), text_color="#22c55e")

@@ -1022,8 +1022,91 @@ class MiWiFiClient:
             return {"error": str(e)}
 
     def set_country_code(self, country: str) -> Dict[str, Any]:
-        """Ustawia kod kraju (region regulacyjny) dla radia Wi-Fi (np. 'PL' lub 'CN')."""
-        return self.api_request("api/xqsystem/set_country_code", method="POST", data={"country": country})
+        """Ustawia kod kraju (region regulacyjny) dla radia Wi-Fi (np. 'EU', 'PL' lub 'CN').
+        Uwzglednia liste obslugiwanych kodow firmware (np. BE7000 CN akceptuje CN/HK/TW/KR/EU,
+        wiec kody europejskie typu PL automatycznie mapuje na EU) oraz wykonuje weryfikacje
+        odczytem (read-back) przez get_country_code().
+        """
+        eu_codes = {
+            "PL", "DE", "FR", "CZ", "AT", "NL", "SE", "FI", "IT", "ES", "PT",
+            "GR", "RO", "HU", "SK", "BE", "DK", "IE", "BG", "HR", "LT", "LV",
+            "EE", "SI", "LU", "MT", "CY", "GB", "CH", "NO", "UA",
+        }
+        requested = (country or "").strip().upper()
+        target = requested
+        mapped_from = None
+        supported: list = []
+
+        try:
+            pre = self.get_country_code()
+            raw_list = pre.get("list") if isinstance(pre, dict) else None
+            if isinstance(raw_list, list):
+                supported = [
+                    str(item.get("code", "")).strip().upper()
+                    for item in raw_list
+                    if isinstance(item, dict) and item.get("code")
+                ]
+            if supported and target not in supported:
+                if target in eu_codes and "EU" in supported:
+                    mapped_from = target
+                    target = "EU"
+        except Exception:
+            pass
+
+        payload = {"country": target, "countrycode": target, "code": target}
+        try:
+            res = self.api_request("api/xqsystem/set_country_code", method="POST", data=payload)
+        except Exception as e:
+            res = {"error": str(e)}
+
+        if not (isinstance(res, dict) and res.get("code") == 0):
+            try:
+                qs = urllib.parse.urlencode(payload)
+                res_get = self.api_request(f"api/xqsystem/set_country_code?{qs}")
+                if isinstance(res_get, dict) and res_get.get("code") == 0:
+                    res = res_get
+            except Exception:
+                pass
+
+        if isinstance(res, dict) and res.get("code") == 0:
+            res.setdefault("country", target)
+            if mapped_from:
+                res["mapped_from"] = mapped_from
+            return res
+
+        try:
+            check = self.get_country_code()
+            actual = (check.get("current") or check.get("country") or "").strip().upper()
+            if actual == target and target:
+                out = {
+                    "code": 0,
+                    "verified": True,
+                    "country": target,
+                    "raw_response": res,
+                }
+                if mapped_from:
+                    out["mapped_from"] = mapped_from
+                return out
+        except Exception:
+            pass
+
+        if isinstance(res, dict):
+            if supported:
+                res["supported_codes"] = supported
+            raw_msg = str(res.get("msg") or res.get("error") or "")
+            err_code = res.get("code")
+            if supported and target not in supported:
+                sup_txt = ", ".join(supported)
+                res["error_kind"] = "unsupported_code"
+                res["error"] = f"Router firmware does not support country code '{target}'. Supported codes: {sup_txt}."
+            elif err_code == 1606 or "操作失败" in raw_msg or "国家码" in raw_msg:
+                res["error_kind"] = "firmware_locked"
+                res["error"] = (
+                    f"Router firmware blocks changing Wi-Fi region to '{target}' via API (code {err_code}). "
+                    "On Chinese/stock builds, CountryCode is usually factory-locked in the bdata partition."
+                )
+            return res
+        return {"error": str(res)}
 
     def check_firmware_update(self) -> Dict[str, Any]:
         """Sprawdza dostępność aktualizacji oprogramowania (OTA) w chmurze Xiaomi."""

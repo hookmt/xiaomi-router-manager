@@ -2,6 +2,21 @@
 
 All notable changes to **Xiaomi Router Manager (XRM)** will be documented in this file.
 
+## [1.0.7] - 2026-11-26
+
+### Added & Improved
+- **Minimal CPU Load Display (Windows & Android):**
+  - Idle CPU load below `1.0%` is now formatted as `< 1%` (with minimum 1% progress bar fill) instead of `0%` / `0.0%` on both desktop and mobile dashboards.
+- **Timezone Selector in Windows Main Window (`gui.py`):**
+  - Added a Timezone dropdown with a dedicated Save button directly inside the Tools & Diagnostics tab (next to PC time sync), reusing the full IANA-to-POSIX table from `setup_wizard.py`.
+  - PC time synchronization now uses the currently selected timezone instead of a hardcoded value, and the selector syncs automatically with router snapshots.
+- **Visible Version Badge in Android / Mobile UI (`v1.0.7`):**
+  - Added a subtle `v1.0.7` badge next to the app title in the top header and an `XRM Mobile v1.0.7` footer inside the navigation drawer.
+
+### Removed
+- **Wi-Fi Regulatory Region (`set_country_code`) UI (Windows & Android):**
+  - Removed Wi-Fi country code editing from Windows (`gui.py`, `setup_wizard.py`) and Android (`mobile/www/`), as modern stock Xiaomi firmware locks `CountryCode` in the `bdata` partition and rejects changes via HTTP API (code `1606`). The router's read-only region code remains visible in Dashboard ROM info.
+
 ## [1.0.6] - 2026-11-22
 
 ### Added
