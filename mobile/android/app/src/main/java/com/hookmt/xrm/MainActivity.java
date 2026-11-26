@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     HttpURLConnection conn = (HttpURLConnection) new URL("http", host, path).openConnection();
                     conn.setConnectTimeout(6000);
-                    int readTimeoutMs = (path.contains("wifi_channel_optimize") || path.contains("wifi_check") || path.contains("set_all_wifi")) ? 30000 : 10000;
+                    int readTimeoutMs = (path.contains("channel_scan") || path.contains("wifi_channel_optimize") || path.contains("wifi_check") || path.contains("set_all_wifi")) ? 30000 : 10000;
                     conn.setReadTimeout(readTimeoutMs);
                     conn.setInstanceFollowRedirects(false);
                     conn.setRequestMethod(method);

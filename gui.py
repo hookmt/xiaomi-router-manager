@@ -109,28 +109,28 @@ def get_wifi_enc_options(lang: str = "pl") -> list:
 
 def enc_to_code(val: str) -> str:
     s = str(val).lower()
-    if "sae-mixed" in s or "personal (sae-mi" in s or ("mixed" in s and "wpa3" in s):
-        return "sae-mixed"
-    if "sae" in s:
-        return "sae"
-    if "psk2" in s or "aes" in s:
-        return "psk2"
-    if "mixed-psk" in s or "mixed" in s:
+    if "psk2+ccmp" in s or "wpa2/wpa3" in s or "sae-mixed" in s or "personal (sae-mi" in s or ("mixed" in s and "wpa3" in s):
+        return "psk2+ccmp"
+    if "mixed-psk" in s or "psk-mixed" in s or "wpa/wpa2" in s:
         return "mixed-psk"
+    if "psk2" in s or "wpa2" in s:
+        return "psk2"
+    if "ccmp" in s or "wpa3" in s or "sae" in s:
+        return "ccmp"
     if "none" in s or "brak" in s or "otwart" in s or "open" in s:
         return "none"
-    return "sae-mixed"
+    return "psk2+ccmp"
 
 
 def code_to_enc(code: str, lang: str = "pl") -> str:
     c = str(code).lower()
-    if c in ("sae-mixed", "psk2+ccmp"):
+    if c in ("psk2+ccmp", "sae-mixed"):
         return t("wifi_enc_sae_mixed", lang)
-    if c == "sae":
+    if c in ("ccmp", "sae"):
         return t("wifi_enc_sae", lang)
     if c == "psk2":
         return t("wifi_enc_psk2", lang)
-    if c == "mixed-psk":
+    if c in ("mixed-psk", "psk-mixed"):
         return t("wifi_enc_mixed_psk", lang)
     if c == "none":
         return t("wifi_enc_none", lang)
@@ -138,27 +138,29 @@ def code_to_enc(code: str, lang: str = "pl") -> str:
 
 
 WIFI_ENC_OPTIONS = [
-    "WPA2/WPA3 Personal (sae-mixed)",
-    "WPA3-Personal SAE (sae)",
-    "WPA2-PSK AES (psk2)",
+    "WPA2/WPA3 Personal (psk2+ccmp)",
+    "WPA3 Personal (ccmp)",
+    "WPA2 Personal (psk2)",
     "WPA/WPA2 Mixed (mixed-psk)",
     "Brak / Otwarta (none)"
 ]
 
 WIFI_ENC_MAP_CODE = {
-    "WPA2/WPA3 Personal (sae-mixed)": "sae-mixed",
-    "WPA3-Personal SAE (sae)": "sae",
-    "WPA2-PSK AES (psk2)": "psk2",
+    "WPA2/WPA3 Personal (psk2+ccmp)": "psk2+ccmp",
+    "WPA3 Personal (ccmp)": "ccmp",
+    "WPA2 Personal (psk2)": "psk2",
     "WPA/WPA2 Mixed (mixed-psk)": "mixed-psk",
     "Brak / Otwarta (none)": "none"
 }
 
 WIFI_CODE_TO_ENC = {
-    "sae-mixed": "WPA2/WPA3 Personal (sae-mixed)",
-    "sae": "WPA3-Personal SAE (sae)",
-    "psk2": "WPA2-PSK AES (psk2)",
-    "psk2+ccmp": "WPA2/WPA3 Personal (sae-mixed)",
+    "psk2+ccmp": "WPA2/WPA3 Personal (psk2+ccmp)",
+    "sae-mixed": "WPA2/WPA3 Personal (psk2+ccmp)",
+    "ccmp": "WPA3 Personal (ccmp)",
+    "sae": "WPA3 Personal (ccmp)",
+    "psk2": "WPA2 Personal (psk2)",
     "mixed-psk": "WPA/WPA2 Mixed (mixed-psk)",
+    "psk-mixed": "WPA/WPA2 Mixed (mixed-psk)",
     "none": "Brak / Otwarta (none)"
 }
 
@@ -1708,7 +1710,7 @@ class MiWiFiManagerApp(ctk.CTk):
         self.f_enc_common.pack(fill="x", padx=15, pady=4)
         ctk.CTkLabel(self.f_enc_common, text=("Wspólne szyfrowanie:" if lg == "pl" else "Combined Security:"), font=ctk.CTkFont(weight="bold")).pack(side="left")
         self.combo_wifi_enc_common = ctk.CTkComboBox(self.f_enc_common, values=get_wifi_enc_options(lg), width=280)
-        self.combo_wifi_enc_common.set(code_to_enc("sae-mixed", lg))
+        self.combo_wifi_enc_common.set(code_to_enc("psk2+ccmp", lg))
         self.combo_wifi_enc_common.pack(side="right")
 
         self.f_pwd_common = ctk.CTkFrame(self.card_wifi_combined, fg_color="transparent")
@@ -1752,7 +1754,7 @@ class MiWiFiManagerApp(ctk.CTk):
         self.lbl_enc_2g = ctk.CTkLabel(self.f_enc_2g, text=t("wifi_enc", lg))
         self.lbl_enc_2g.pack(side="left")
         self.combo_wifi_enc_2g = ctk.CTkComboBox(self.f_enc_2g, values=get_wifi_enc_options(lg), width=220)
-        self.combo_wifi_enc_2g.set(code_to_enc("sae-mixed", lg))
+        self.combo_wifi_enc_2g.set(code_to_enc("psk2+ccmp", lg))
         self.combo_wifi_enc_2g.pack(side="right")
 
         self.f_pwd_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
@@ -1835,7 +1837,7 @@ class MiWiFiManagerApp(ctk.CTk):
         self.f_enc_5g.pack(fill="x", padx=15, pady=4)
         ctk.CTkLabel(self.f_enc_5g, text=t("wifi_enc", lg)).pack(side="left")
         self.combo_wifi_enc_5g = ctk.CTkComboBox(self.f_enc_5g, values=get_wifi_enc_options(lg), width=220)
-        self.combo_wifi_enc_5g.set(code_to_enc("sae-mixed", lg))
+        self.combo_wifi_enc_5g.set(code_to_enc("psk2+ccmp", lg))
         self.combo_wifi_enc_5g.pack(side="right")
 
         self.f_pwd_5g = ctk.CTkFrame(self.card_5g, fg_color="transparent")
@@ -2237,7 +2239,7 @@ class MiWiFiManagerApp(ctk.CTk):
             on_5g = 1 if self.switch_wifi_on_5g.get() == 1 else 0
 
         lg = self.current_lang
-        if enc_2g == "sae" or (bsd == 0 and enc_5g == "sae"):
+        if enc_2g in ("ccmp", "sae") or (bsd == 0 and enc_5g in ("ccmp", "sae")):
             if not messagebox.askyesno(t("warn_title", lg), t("wifi_enc_warn_wpa3", lg)):
                 return
 
@@ -2476,11 +2478,11 @@ class MiWiFiManagerApp(ctk.CTk):
         card = ctk.CTkFrame(dialog, corner_radius=10)
         card.pack(fill="both", expand=True, padx=20, pady=10)
 
-        ssid_2g = self.entry_wifi_ssid_2g.get().strip() if hasattr(self, "entry_wifi_ssid_2g") else "hook_mt"
+        ssid_2g = self.entry_wifi_ssid_2g.get().strip() if hasattr(self, "entry_wifi_ssid_2g") else "MyWiFi"
         pwd_2g = self.entry_wifi_pwd_2g.get().strip() if hasattr(self, "entry_wifi_pwd_2g") else ""
         enc_2g = self.combo_wifi_enc_2g.get() if hasattr(self, "combo_wifi_enc_2g") else "WPA2/WPA3 Personal"
 
-        ssid_5g = self.entry_wifi_ssid_5g.get().strip() if hasattr(self, "entry_wifi_ssid_5g") else "hook_mt"
+        ssid_5g = self.entry_wifi_ssid_5g.get().strip() if hasattr(self, "entry_wifi_ssid_5g") else "MyWiFi"
         pwd_5g = self.entry_wifi_pwd_5g.get().strip() if hasattr(self, "entry_wifi_pwd_5g") else ""
 
         no_pwd_str = t("wcard_no_pwd", lg)
@@ -5219,7 +5221,7 @@ class MiWiFiManagerApp(ctk.CTk):
 
                 if w_idx == 1:
                     # Pasmo 2.4G
-                    if not self.entry_wifi_ssid_2g.get() or self.entry_wifi_ssid_2g.get() == "hook_mt":
+                    if ssid:
                         self.entry_wifi_ssid_2g.delete(0, "end")
                         self.entry_wifi_ssid_2g.insert(0, ssid)
                     if not self.entry_wifi_pwd_2g.get() or pwd:
@@ -5229,7 +5231,7 @@ class MiWiFiManagerApp(ctk.CTk):
                     self.combo_wifi_tx_2g.set(code_to_tx(tx, self.current_lang))
 
                     if hasattr(self, "entry_wifi_ssid_common"):
-                        if not self.entry_wifi_ssid_common.get() or self.entry_wifi_ssid_common.get() == "hook_mt":
+                        if ssid:
                             self.entry_wifi_ssid_common.delete(0, "end")
                             self.entry_wifi_ssid_common.insert(0, ssid)
                     if hasattr(self, "entry_wifi_pwd_common"):
@@ -5266,7 +5268,7 @@ class MiWiFiManagerApp(ctk.CTk):
                     )
                 elif w_idx == 2:
                     # Pasmo 5G
-                    if not self.entry_wifi_ssid_5g.get() or self.entry_wifi_ssid_5g.get() == "hook_mt":
+                    if ssid:
                         self.entry_wifi_ssid_5g.delete(0, "end")
                         self.entry_wifi_ssid_5g.insert(0, ssid)
                     if not self.entry_wifi_pwd_5g.get() or pwd:
@@ -5478,15 +5480,78 @@ class MiWiFiManagerApp(ctk.CTk):
 
         def run():
             try:
-                res = self.client.optimize_wifi()
+                res = self.client.scan_wifi_channels(poll_timeout=35)
+                if not isinstance(res, dict) or res.get("code") != 0:
+                    raise RuntimeError(f"Router response: {res}")
+                if res.get("status") != 0:
+                    raise RuntimeError("Scan did not finish in time." if lg == "en" else "Skanowanie kanałów nie zakończyło się w limicie czasu.")
+
+                bands = []
+                rec_2g = None
+                rec_5g = None
+                for key, label in [("2G", "2.4 GHz"), ("5G", "5 GHz")]:
+                    info = res.get(key)
+                    if isinstance(info, dict) and info.get("code") == 0:
+                        cc = str(info.get("cchannel", "")).strip()
+                        sc = str(info.get("schannel", "")).strip()
+                        cscore = info.get("cscore", "-")
+                        sscore = info.get("sscore", "-")
+                        if cc and cc.lower() != "nil":
+                            if sc and sc.lower() != "nil" and sc.isdigit() and sc != "0" and sc != cc:
+                                bands.append(
+                                    f"- {label}: current ch {cc} (score {cscore}) -> recommended ch {sc} (score {sscore})"
+                                    if lg == "en"
+                                    else f"- {label}: bieżący kanał {cc} (wynik {cscore}) -> zalecany kanał {sc} (wynik {sscore})"
+                                )
+                                if key == "2G":
+                                    rec_2g = int(sc)
+                                elif key == "5G":
+                                    rec_5g = int(sc)
+                            else:
+                                bands.append(
+                                    f"- {label}: channel {cc} is already optimal (score {cscore})"
+                                    if lg == "en"
+                                    else f"- {label}: kanał {cc} jest już optymalny (wynik {cscore})"
+                                )
+                if "5G" not in res:
+                    bands.append(
+                        "- 5 GHz: managed automatically by router (Auto / DFS)"
+                        if lg == "en"
+                        else "- 5 GHz: zarządzane automatycznie przez router (Auto / DFS)"
+                    )
+
                 def on_done():
                     if hasattr(self, "pbar_opt"):
                         self.pbar_opt.stop()
                     if hasattr(self, "frame_opt_progress"):
                         self.frame_opt_progress.grid_forget()
                     self.btn_opt_wifi.configure(state="normal", text=t("wifi_btn_opt", lg))
-                    messagebox.showinfo(t("opt_wifi_dlg_title", lg), t("opt_wifi_dlg_succ", lg))
-                    self._fetch_data_thread()
+
+                    details = "\n".join(bands) if bands else (
+                        "Router finished spectrum scan." if lg == "en" else "Router zakończył skanowanie pasma."
+                    )
+                    if rec_2g is not None or rec_5g is not None:
+                        ask = (
+                            f"Wi-Fi spectrum scan complete:\n\n{details}\n\n"
+                            "Apply recommended channel(s) now? (Wi-Fi will reconnect for ~10s)"
+                            if lg == "en"
+                            else f"Skanowanie eteru Wi-Fi zakończone:\n\n{details}\n\n"
+                            "Czy ustawić zalecany kanał teraz? (Wi-Fi rozłączy się na ok. 10 s)"
+                        )
+                        if messagebox.askyesno(t("opt_wifi_dlg_title", lg), ask):
+                            if rec_2g is not None and str(rec_2g) in WIFI_2G_CHANNELS:
+                                self.combo_wifi_ch_2g.set(str(rec_2g))
+                            if rec_5g is not None and str(rec_5g) in WIFI_5G_CHANNELS:
+                                self.combo_wifi_ch_5g.set(str(rec_5g))
+                            self._apply_scanned_wifi_channels(rec_2g, rec_5g)
+                    else:
+                        msg = (
+                            f"Wi-Fi spectrum scan complete:\n\n{details}"
+                            if lg == "en"
+                            else f"Skanowanie eteru Wi-Fi zakończone:\n\n{details}"
+                        )
+                        messagebox.showinfo(t("opt_wifi_dlg_title", lg), msg)
+                        self._fetch_data_thread()
                 self.after(0, on_done)
             except Exception as e:
                 def on_err():
@@ -5498,6 +5563,55 @@ class MiWiFiManagerApp(ctk.CTk):
                     messagebox.showerror(t("opt_wifi_dlg_title", lg), t("opt_wifi_dlg_err", lg).format(err=e))
                 self.after(0, on_err)
         threading.Thread(target=run, daemon=True).start()
+
+    def _apply_scanned_wifi_channels(self, rec_2g=None, rec_5g=None):
+        lg = self.current_lang
+        bsd = 1 if self.switch_bsd.get() == 1 else 0
+        ssid_2g = self.entry_wifi_ssid_common.get().strip() if (bsd == 1 and hasattr(self, "entry_wifi_ssid_common") and self.entry_wifi_ssid_common.get().strip()) else self.entry_wifi_ssid_2g.get().strip()
+        pwd_2g = self.entry_wifi_pwd_common.get().strip() if (bsd == 1 and hasattr(self, "entry_wifi_pwd_common") and self.entry_wifi_pwd_common.get().strip()) else self.entry_wifi_pwd_2g.get().strip()
+        # Zachowaj surowy kod szyfrowania z aktualnej migawki routera, aby zmiana kanału nigdy nie zmieniła szyfrowania
+        raw_enc_map = {}
+        for idx, w in enumerate(self.snapshot.get("wifi_detail", {}).get("info", []) or []):
+            w_idx = safe_int(w.get("wifiIndex", idx + 1))
+            if w.get("encryption"):
+                raw_enc_map[w_idx] = str(w.get("encryption"))
+        enc_2g = raw_enc_map.get(1) or enc_to_code(self.combo_wifi_enc_common.get() if (bsd == 1 and hasattr(self, "combo_wifi_enc_common")) else self.combo_wifi_enc_2g.get())
+        ssid_5g = ssid_2g if bsd == 1 else self.entry_wifi_ssid_5g.get().strip()
+        pwd_5g = pwd_2g if bsd == 1 else self.entry_wifi_pwd_5g.get().strip()
+        enc_5g = (raw_enc_map.get(2) or enc_2g) if bsd == 1 else (raw_enc_map.get(2) or enc_to_code(self.combo_wifi_enc_5g.get()))
+        ch_2g = rec_2g if rec_2g is not None else channel_to_code(self.combo_wifi_ch_2g.get())
+        ch_5g = rec_5g if rec_5g is not None else channel_to_code(self.combo_wifi_ch_5g.get())
+        wifi1 = {
+            "ssid": ssid_2g, "pwd": pwd_2g, "encryption": enc_2g,
+            "channel": ch_2g, "bandwidth": bandwidth_to_code(self.combo_wifi_bw_2g.get()),
+            "txpwr": WIFI_TX_MAP_CODE.get(self.combo_wifi_tx_2g.get(), "max"),
+            "hidden": 1 if self.switch_wifi_hidden_2g.get() == 1 else 0,
+            "on": 1 if self.switch_wifi_on_2g.get() == 1 else 0,
+        }
+        wifi2 = {
+            "ssid": ssid_5g, "pwd": pwd_5g, "encryption": enc_5g,
+            "channel": ch_5g, "bandwidth": bandwidth_to_code(self.combo_wifi_bw_5g.get()),
+            "txpwr": WIFI_TX_MAP_CODE.get(self.combo_wifi_tx_5g.get(), "max"),
+            "hidden": 1 if self.switch_wifi_hidden_5g.get() == 1 else 0,
+            "on": 1 if self.switch_wifi_on_5g.get() == 1 else 0,
+        }
+        def run_save():
+            try:
+                r = self.client.set_all_wifi(bsd=bsd, wifi1=wifi1, wifi2=wifi2)
+                if isinstance(r, dict) and r.get("code") == 0:
+                    self.after(0, lambda: messagebox.showinfo(
+                        t("opt_wifi_dlg_title", lg),
+                        "Recommended Wi-Fi channel(s) applied!" if lg == "en" else "Zastosowano zalecane kanały Wi-Fi!"
+                    ))
+                    time.sleep(2)
+                    self._fetch_data_thread()
+                else:
+                    resp_msg = str(r.get("msg") or r) if isinstance(r, dict) else str(r)
+                    self.after(0, lambda m=resp_msg: messagebox.showerror(t("err_title", lg), m))
+            except Exception as exc:
+                err_msg = str(exc) or type(exc).__name__
+                self.after(0, lambda m=err_msg: messagebox.showerror(t("err_title", lg), m))
+        threading.Thread(target=run_save, daemon=True).start()
 
     def _reboot_router(self):
         if not self.client.connected:

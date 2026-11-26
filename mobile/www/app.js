@@ -953,7 +953,9 @@ function setEncryptionSelect(id, code) {
   } else if (![...select.options].some(option => option.value === value)) {
     const option = document.createElement("option");
     option.value = value;
-    option.textContent = value === "psk2+ccmp" ? "WPA2/WPA3 Personal (psk2+ccmp)" : `Szyfrowanie: ${value}`;
+    option.textContent = value === "sae-mixed"
+      ? "WPA2/WPA3 Personal (sae-mixed)"
+      : (value === "sae" ? "WPA3 Personal (sae)" : `Szyfrowanie: ${value}`);
     select.append(option);
   }
   select.value = value;
@@ -1001,6 +1003,7 @@ function renderWifiInfo(info, bsd) {
   const wifi5g = info.find(w => parseInt(w.channel || 0) > 14 || parseInt(w.wifiIndex || 0) >= 2) || info[1];
 
   if (wifi2g) {
+    state.wifiRawEnc2g = wifi2g.encryption || "";
     if (document.getElementById("wifi-2g-ssid")) document.getElementById("wifi-2g-ssid").value = wifi2g.ssid || "";
     if (document.getElementById("wifi-2g-pwd")) document.getElementById("wifi-2g-pwd").value = wifi2g.password || "";
     setEncryptionSelect("wifi-2g-enc", wifi2g.encryption);
@@ -1023,6 +1026,7 @@ function renderWifiInfo(info, bsd) {
   }
 
   if (wifi5g) {
+    state.wifiRawEnc5g = wifi5g.encryption || "";
     if (document.getElementById("wifi-5g-ssid")) document.getElementById("wifi-5g-ssid").value = wifi5g.ssid || "";
     if (document.getElementById("wifi-5g-pwd")) document.getElementById("wifi-5g-pwd").value = wifi5g.password || "";
     setEncryptionSelect("wifi-5g-enc", wifi5g.encryption);
@@ -1631,8 +1635,8 @@ function setupAdditionalControls() {
           const r = await apiRequest("xqnetwork/set_all_wifi", "POST", {
             bsd: "1", ssid1: ssid, ssid2: ssid,
             pwd1: wifiPwd, pwd2: wifiPwd,
-            encryption1: wifiPwd ? "sae-mixed" : "none",
-            encryption2: wifiPwd ? "sae-mixed" : "none",
+            encryption1: wifiPwd ? "psk2+ccmp" : "none",
+            encryption2: wifiPwd ? "psk2+ccmp" : "none",
             on1: "1", on2: "1", txpwr1: "max", txpwr2: "max",
             channel1: "0", channel2: "0", bandwidth1: "0", bandwidth2: "0",
             hidden1: "0", hidden2: "0", isDFS: "0"
@@ -2053,23 +2057,115 @@ function setupSystemTools() {
     }
   });
 
-  // Optymalizacja Wi-Fi (1:1 z miwifi_core.py: wifi_channel_optimize z fallbackiem na wifi_check)
+  // Prawdziwa optymalizacja Wi-Fi (misystem/channel_scan_start -> channel_scan_result -> potwierdzenie ustawienia)
   document.getElementById("btn-wifi-opt")?.addEventListener("click", async () => {
     if (!state.connected) return alert("Najpierw połącz się z routerem.");
     const btn = document.getElementById("btn-wifi-opt");
     btn.disabled = true;
-    btn.textContent = "Skanowanie pasm...";
+    btn.textContent = state.lang === "en" ? "Scanning spectrum..." : "Skanowanie eteru...";
     try {
-      let res = null;
-      try {
-        res = await apiRequest("xqnetwork/wifi_channel_optimize");
-      } catch (_) {}
-      if (!res || res.code !== 0) {
-        res = await apiRequest("xqnetwork/wifi_check");
+      const startRes = await apiRequest("misystem/channel_scan_start");
+      if (!startRes || startRes.code !== 0) {
+        throw new Error(startRes?.msg || `code ${startRes?.code ?? "?"}`);
       }
-      alert(res && res.code === 0 ? t("msg_opt_complete") : "Błąd routera: " + (res?.msg || res?.code || "nieznany"));
+      let scanRes = null;
+      const deadline = Date.now() + 35000;
+      await new Promise(r => setTimeout(r, 2000));
+      while (Date.now() < deadline) {
+        const poll = await apiRequest("misystem/channel_scan_result");
+        if (poll && poll.code === 0 && poll.status === 0) {
+          scanRes = poll;
+          break;
+        }
+        await new Promise(r => setTimeout(r, 2000));
+      }
+      if (!scanRes) {
+        throw new Error(state.lang === "en" ? "Scan timed out." : "Przekroczono czas skanowania kanałów.");
+      }
+
+      const lines = [];
+      let rec2g = null;
+      let rec5g = null;
+      for (const [key, label] of [["2G", "2.4 GHz"], ["5G", "5 GHz"]]) {
+        const info = scanRes[key];
+        if (info && info.code === 0) {
+          const cc = String(info.cchannel ?? "").trim();
+          const sc = String(info.schannel ?? "").trim();
+          const cscore = info.cscore ?? "-";
+          const sscore = info.sscore ?? "-";
+          if (cc && cc.toLowerCase() !== "nil") {
+            if (sc && sc.toLowerCase() !== "nil" && /^\d+$/.test(sc) && sc !== "0" && sc !== cc) {
+              lines.push(
+                state.lang === "en"
+                  ? `- ${label}: current ch ${cc} (score ${cscore}) -> recommended ch ${sc} (score ${sscore})`
+                  : `- ${label}: bieżący kanał ${cc} (wynik ${cscore}) -> zalecany kanał ${sc} (wynik ${sscore})`
+              );
+              if (key === "2G") rec2g = sc;
+              if (key === "5G") rec5g = sc;
+            } else {
+              lines.push(
+                state.lang === "en"
+                  ? `- ${label}: channel ${cc} is already optimal (score ${cscore})`
+                  : `- ${label}: kanał ${cc} jest już optymalny (wynik ${cscore})`
+              );
+            }
+          }
+        }
+      }
+      if (!scanRes["5G"]) {
+        lines.push(
+          state.lang === "en"
+            ? "- 5 GHz: managed automatically by router (Auto / DFS)"
+            : "- 5 GHz: zarządzane automatycznie przez router (Auto / DFS)"
+        );
+      }
+
+      const details = lines.length ? lines.join("\n") : (state.lang === "en" ? "Spectrum scan finished." : "Zakończono skanowanie pasm.");
+      if (rec2g || rec5g) {
+        const ask = state.lang === "en"
+          ? `Wi-Fi spectrum scan complete:\n\n${details}\n\nApply recommended channel(s) now? (Wi-Fi will reconnect for ~10s)`
+          : `Skanowanie eteru Wi-Fi zakończone:\n\n${details}\n\nCzy ustawić zalecany kanał teraz? (Wi-Fi rozłączy się na ok. 10 s)`;
+        if (confirm(ask)) {
+          if (rec2g && $id("wifi-2g-channel")) $id("wifi-2g-channel").value = rec2g;
+          if (rec5g && $id("wifi-5g-channel")) $id("wifi-5g-channel").value = rec5g;
+          const bsd = $id("wifi-switch-smartconnect").checked ? 1 : 0;
+          const ssid2g = $id("wifi-2g-ssid").value.trim();
+          const pwd2g = $id("wifi-2g-pwd").value;
+          const enc2g = state.wifiRawEnc2g || $id("wifi-2g-enc").value;
+          const tx2g = $id("wifi-2g-tx").value;
+          const ch2g = rec2g || $id("wifi-2g-channel").value;
+          const bw2g = $id("wifi-2g-bw").value;
+          const hid2g = $id("wifi-2g-hidden").checked ? 1 : 0;
+          const on2g = $id("wifi-2g-enable").checked ? 1 : 0;
+          const tx5g = $id("wifi-5g-tx").value;
+          const ch5g = rec5g || $id("wifi-5g-channel").value;
+          const bw5g = $id("wifi-5g-bw").value;
+          const hid5g = $id("wifi-5g-hidden").checked ? 1 : 0;
+          const on5g = $id("wifi-5g-enable").checked ? 1 : 0;
+          const ssid5g = bsd === 0 ? ($id("wifi-5g-ssid").value.trim() || ssid2g) : ssid2g;
+          const pwd5g = bsd === 0 ? ($id("wifi-5g-pwd").value || pwd2g) : pwd2g;
+          const enc5g = bsd === 0 ? (state.wifiRawEnc5g || $id("wifi-5g-enc").value || enc2g) : (state.wifiRawEnc5g || enc2g);
+          const payload = {
+            bsd: String(bsd), on1: String(on2g), ssid1: ssid2g, pwd1: pwd2g,
+            encryption1: enc2g, channel1: ch2g, bandwidth1: bw2g, hidden1: String(hid2g), txpwr1: tx2g,
+            on2: String(on5g), ssid2: ssid5g, pwd2: pwd5g, encryption2: enc5g,
+            channel2: ch5g, bandwidth2: bw5g, hidden2: String(hid5g), txpwr2: tx5g,
+            channel: ch2g, bandwidth: bw2g, txpwr: tx2g, channel50: ch5g,
+            bandwidth50: bw5g, txpwr50: tx5g, isDFS: "0"
+          };
+          const saveRes = await apiRequest("xqnetwork/set_all_wifi", "POST", payload);
+          if (saveRes && saveRes.code === 0) {
+            alert(state.lang === "en" ? "Recommended Wi-Fi channel(s) applied!" : "Zastosowano zalecane kanały Wi-Fi!");
+            refreshData();
+          } else {
+            alert("Błąd zapisu kanału: " + (saveRes?.msg || saveRes?.code || "nieznany"));
+          }
+        }
+      } else {
+        alert(state.lang === "en" ? `Wi-Fi spectrum scan complete:\n\n${details}` : `Skanowanie eteru Wi-Fi zakończone:\n\n${details}`);
+      }
     } catch (e) {
-      alert("Nie udało się potwierdzić optymalizacji Wi-Fi.");
+      alert((state.lang === "en" ? "Wi-Fi scan error: " : "Błąd skanowania Wi-Fi: ") + e.message);
     } finally {
       btn.disabled = false;
       btn.textContent = "✨ Optymalizuj kanały Wi-Fi";

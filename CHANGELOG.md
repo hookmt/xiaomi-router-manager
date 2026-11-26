@@ -2,6 +2,25 @@
 
 All notable changes to **Xiaomi Router Manager (XRM)** will be documented in this file.
 
+## [1.0.8] - 2026-11-26
+
+### Added & Improved
+- **Critical Fix: Xiaomi BE7000 Wi-Fi Encryption API Mapping (Windows & Android):**
+  - Aligned Wi-Fi encryption codes directly with stock MiWiFi LuCI `<select name="encryption">` values (`psk2+ccmp` = WPA2/WPA3 Personal Mixed, `ccmp` = WPA3 Personal, `psk2` = WPA2 Personal, `mixed-psk` = WPA/WPA2 Mixed, `none` = Open).
+  - Previously, sending OpenWrt's `sae-mixed` caused BE7000 to switch to pure WPA3 (`ccmp`), disconnecting WPA2-only clients (e.g. NAS/IoT devices).
+  - Channel optimization now preserves the exact raw `encryption` code reported by the router snapshot so optimizing Wi-Fi channels never alters security settings.
+- **Real Wi-Fi Spectrum Scan & Channel Optimization (Windows & Android):**
+  - Replaced legacy non-existent endpoints (`xqnetwork/wifi_channel_optimize` / `wifi_check`, which returned HTTP 404 on BE7000) with the official MiWiFi LuCI scan flow: `api/misystem/channel_scan_start` followed by polling `api/misystem/channel_scan_result` until `status == 0`.
+  - Displays real current vs recommended channel(s) and interference scores from the router, and asks for user confirmation before applying the recommended channel(s) via `set_all_wifi` (preserving SSID, password, encryption, bandwidth, and TX power).
+- **Permanent Android APK Release Signing Key (CI / GitHub Secrets):**
+  - Configured persistent PKCS12 release signing in `mobile/android/app/build.gradle` and `.github/workflows/build-and-release.yml` using encrypted GitHub Secrets (with debug fallback for local builds). Future APK releases from v1.0.8 onward install cleanly in-place without uninstalling.
+- **Mobile Phone Portrait & Landscape Layout Overhaul (`mobile/www/`):**
+  - Fixed navigation drawer vertical scrolling on phones in landscape orientation (`height: 100dvh`, `min-height: 0`, `flex-shrink: 0`).
+  - Flattened `System i Narzędzia` in the navigation drawer from a 1-item collapsible group into a direct single-tap button.
+  - Fixed 4th QoS profile button (`Streaming`) clipping on narrow phones by switching `#qos-mode-selector` to a 2x2 grid below `700px`.
+  - Fixed Port 2.5G advanced role selector overflow (`.select-role-wrapper`) and hidden native checkbox rendering on `.toggle-switch` controls (LAG, Dual WAN, IPTV, Gaming, LED).
+  - Extended `#main-header` wrapping to `max-width: 960px` (landscape phones) and applied `minmax(0, 1fr)` + `min-width: 0; width: 100%` globally to `.form-row-2` / inputs / selects to eliminate right-edge card overflow (NAT, LAN, Ports, Wi-Fi).
+
 ## [1.0.7] - 2026-11-26
 
 ### Added & Improved

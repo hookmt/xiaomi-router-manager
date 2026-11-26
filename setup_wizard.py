@@ -526,7 +526,9 @@ class SetupWizardDialog(ctk.CTkToplevel):
 
             # 3. Wi-Fi
             try:
-                cli.set_all_wifi(ssid=ssid, pwd=wifi_pwd, encryption="sae-mixed", txpwr="max")
+                enc_code = "psk2+ccmp" if wifi_pwd else "none"
+                wifi_cfg = {"on": 1, "ssid": ssid, "pwd": wifi_pwd, "encryption": enc_code, "txpwr": "max", "channel": 0, "bandwidth": 0, "hidden": 0}
+                cli.set_all_wifi(bsd=1, wifi1=wifi_cfg, wifi2=wifi_cfg)
             except Exception as e:
                 print("Wi-Fi set warn:", e)
 

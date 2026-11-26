@@ -43,9 +43,35 @@
 ### 9. Widoczny numer wersji w interfejsie mobilnym (XRM Mobile / Android APK) (Zrealizowane w v1.0.7)
 - **Status:** Zrealizowane 2026-11-26 w v1.0.7. Dodano badge `v1.0.7` w nagłówku oraz stopkę `XRM Mobile v1.0.7` w drawerze nawigacyjnym.
 
+### 10. Stały klucz podpisu Android APK (release keystore w GitHub Secrets) (Zrealizowane w v1.0.8)
+- **Status:** Zrealizowane 2026-11-26 w v1.0.8. Wygenerowano stały klucz PKCS12 (kopia zapasowa poza repozytorium Git), wrzucono do GitHub Secrets i podpięto w `build.gradle` + `.github/workflows/build-and-release.yml`.
+
+### 11. Prawdziwa optymalizacja kanałów Wi-Fi na BE7000 (Windows + Android) (Zrealizowane w v1.0.8)
+- **Status:** Zrealizowane 2026-11-26 w v1.0.8. Wdrożono `api/misystem/channel_scan_start` + polling `api/misystem/channel_scan_result` + podgląd bieżącego/zalecanego kanału z potwierdzeniem zastosowania w `miwifi_core.py`, `gui.py` i `mobile/www/app.js`.
+
+### 12. Przepełnienie selektora roli portów i przełącznika LAG (Android) (Zrealizowane w v1.0.8)
+- **Status:** Zrealizowane 2026-11-26 w v1.0.8 (`select-role-wrapper` i `.toggle-switch input { display: none; }` w `mobile/www/style.css`).
+
+### 13. Przewijanie menu bocznego (drawer) w układzie poziomym na telefonie (Zrealizowane w v1.0.8)
+- **Status:** Zrealizowane 2026-11-26 w v1.0.8 (`flex-shrink: 0`, `min-height: 0`, `height: 100dvh` w `mobile/www/style.css`).
+
+### 14. Obcięty 4. przycisk profilu QoS na telefonie (`Streaming`) (Zrealizowane w v1.0.8)
+- **Status:** Zrealizowane 2026-11-26 w v1.0.8 (siatka 2x2 dla `#qos-mode-selector` poniżej `700px`).
+
+### 15. Spłaszczenie menu `System i Narzędzia` w drawerze mobilnym (Zrealizowane w v1.0.8)
+- **Status:** Zrealizowane 2026-11-26 w v1.0.8 (bezpośredni przycisk `.nav-item-direct` w `mobile/www/index.html`).
+
+### 16. Przepełnienie nagłówka i pól `.form-row-2` w układzie poziomym telefonu (Zrealizowane w v1.0.8)
+- **Status:** Zrealizowane 2026-11-26 w v1.0.8 (zawijanie `#main-header` do `960px` oraz `minmax(0, 1fr)` / `min-width: 0` dla `.form-row-2` i pól formularzy).
+
 ---
 
 ## Archiwum wdrożeń
+
+### v1.0.8 (Zrealizowane 2026-11-26)
+- **Prawdziwa optymalizacja kanałów Wi-Fi (Windows + Android):** skan `misystem/channel_scan_start` + wynik `channel_scan_result` + potwierdzenie zastosowania zalecanego kanału.
+- **Stały klucz podpisu Android APK w GitHub Secrets:** płynne aktualizacje APK od v1.0.8 bez odinstalowywania.
+- **Komplet poprawek układu mobilnego (pion i poziom):** przewijanie drawera, spłaszczenie `System i Narzędzia`, siatka 2x2 w QoS, selektor Porty 2.5G + przełącznik `.toggle-switch`, zawijanie nagłówka do 960 px oraz globalna naprawa pól `.form-row-2`.
 
 ### v1.0.7 (Zrealizowane 2026-11-26)
 - **Usunięcie nieaktywnej zmiany regionu Wi-Fi (`set_country_code`) z Windows i Android:** nowsze fabryczne firmware Xiaomi blokuje zmianę `CountryCode` w `bdata` (kod `1606`), więc edycję usunięto z Wi-Fi, System i Narzędzia oraz Kreatora.

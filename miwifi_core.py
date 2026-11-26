@@ -742,12 +742,28 @@ class MiWiFiClient:
 
         return results
 
+    def scan_wifi_channels(self, poll_timeout: int = 35) -> Dict[str, Any]:
+        """Uruchamia prawdziwy skan zatloczenia pasm Wi-Fi (api/misystem/channel_scan_start)
+        i odpytuje api/misystem/channel_scan_result do zakonczenia (status == 0).
+        """
+        start_res = self.api_request("api/misystem/channel_scan_start", method="GET", timeout=15)
+        if not isinstance(start_res, dict) or start_res.get("code") != 0:
+            raise RuntimeError(f"channel_scan_start failed: {start_res}")
+
+        deadline = time.time() + poll_timeout
+        time.sleep(2.0)
+        last_res: Dict[str, Any] = {}
+        while time.time() < deadline:
+            res = self.api_request("api/misystem/channel_scan_result", method="GET", timeout=15)
+            last_res = res if isinstance(res, dict) else {}
+            if last_res.get("code") == 0 and last_res.get("status") == 0:
+                return last_res
+            time.sleep(2.0)
+        return last_res
+
     def optimize_wifi(self) -> Dict[str, Any]:
         """Wywołuje skanowanie i optymalizację kanałów Wi-Fi przez router."""
-        try:
-            return self.api_request("api/xqnetwork/wifi_channel_optimize", method="GET", timeout=25)
-        except Exception:
-            return self.api_request("api/xqnetwork/wifi_check", method="GET", timeout=25)
+        return self.scan_wifi_channels()
 
     # --- Konfiguracja WAN ---
 
@@ -879,7 +895,7 @@ class MiWiFiClient:
         """
         Zmienia parametry pojedynczego pasma Wi-Fi:
         - wifi_idx: 1 (2.4 GHz) lub 2 (5 GHz)
-        - encryption: 'none', 'psk2' (WPA2-PSK), 'sae' (WPA3-SAE), 'sae-mixed' (WPA2/WPA3 Mixed), 'mixed-psk'
+        - encryption: 'none', 'psk2' (WPA2 Personal), 'ccmp' (WPA3 Personal), 'psk2+ccmp' (WPA2/WPA3 Personal Mixed), 'mixed-psk' (WPA/WPA2 Mixed)
         - hidden: 0 (widoczne) lub 1 (ukryte)
         - txpwr: 'max' (wzmocniona), 'mid' (standardowa), 'min' (niska)
         - on: 1 (włączone) lub 0 (wyłączone)
@@ -927,7 +943,7 @@ class MiWiFiClient:
             # Pola konwencjonalne (kompatybilne z AX3600 i starszymi)
             "on1": str(wifi1.get("on", 1)),
             "ssid1": wifi1.get("ssid", ""),
-            "pwd1": wifi1.get("pwd", ""),
+            "pwd1": wifi1.get("pwd", wifi1.get("password", "")),
             "encryption1": wifi1.get("encryption", "psk2"),
             "channel1": c1,
             "bandwidth1": b1,
@@ -935,7 +951,7 @@ class MiWiFiClient:
             "txpwr1": t1,
             "on2": str(wifi2.get("on", 1)),
             "ssid2": wifi2.get("ssid", ""),
-            "pwd2": wifi2.get("pwd", ""),
+            "pwd2": wifi2.get("pwd", wifi2.get("password", "")),
             "encryption2": wifi2.get("encryption", "psk2"),
             "channel2": c2,
             "bandwidth2": b2,

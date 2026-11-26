@@ -18,7 +18,7 @@
         <div class="logo-box">
           <span class="logo-icon">📶</span>
           <div class="logo-text">
-            <span class="logo-title">Xiaomi Router Manager <span class="version-badge">v1.0.7</span></span>
+            <span class="logo-title">Xiaomi Router Manager <span class="version-badge">v1.0.8</span></span>
             <span class="logo-subtitle" id="header-model-badge">BE7000 / BE6500 / AX3600</span>
           </div>
         </div>
@@ -150,20 +150,11 @@
           </div>
         </div>
 
-        <!-- Grupa 4: System i Narzędzia -->
-        <div class="nav-group open">
-          <div class="nav-group-header" data-group="sys">
-            <span class="group-icon">🛠️</span>
-            <span class="group-title">System i Narzędzia</span>
-            <span class="group-arrow">▾</span>
-          </div>
-          <div class="nav-group-items">
-            <button class="nav-item" data-view="reboot">
-              <span class="item-icon">🔄</span>
-              <span class="item-title">System i konserwacja</span>
-            </button>
-          </div>
-        </div>
+        <!-- Grupa 4: System i Narzędzia (bezpośredni przycisk bez rozwijania) -->
+        <button class="nav-item nav-item-direct" data-view="reboot">
+          <span class="item-icon">🛠️</span>
+          <span class="item-title">System i Narzędzia</span>
+        </button>
 
         <!-- Wyróżniony przycisk Kreatora Setup na dole menu -->
         <div class="drawer-footer-action">
@@ -171,7 +162,7 @@
             <span class="wiz-icon">🪄</span>
             <span class="wiz-text">Kreator Szybkiego Startu</span>
           </button>
-          <div class="drawer-version-footer">XRM Mobile v1.0.7</div>
+          <div class="drawer-version-footer">XRM Mobile v1.0.8</div>
         </div>
       </nav>
     </aside>
@@ -605,10 +596,11 @@
             <div class="form-group">
               <label class="form-label" id="wifi-2g-enc-lbl">Wspólne szyfrowanie:</label>
               <select id="wifi-2g-enc" class="form-select">
-                <option value="sae-mixed">WPA2/WPA3 Personal (sae-mixed)</option>
+                <option value="psk2+ccmp">WPA2/WPA3 Personal (psk2+ccmp)</option>
+                <option value="ccmp">WPA3 Personal (ccmp)</option>
                 <option value="psk2">WPA2 Personal (psk2)</option>
-                <option value="sae">WPA3 Personal (sae)</option>
-                <option value="none">Brak zabezpieczeń (Otwarte)</option>
+                <option value="mixed-psk">WPA/WPA2 Mixed (mixed-psk)</option>
+                <option value="none">Brak zabezpieczeń (none)</option>
               </select>
             </div>
 
@@ -710,10 +702,11 @@
               <div class="form-group">
                 <label class="form-label">Szyfrowanie 5G:</label>
                 <select id="wifi-5g-enc" class="form-select">
-                  <option value="sae-mixed">WPA2/WPA3 Personal (sae-mixed)</option>
+                  <option value="psk2+ccmp">WPA2/WPA3 Personal (psk2+ccmp)</option>
+                  <option value="ccmp">WPA3 Personal (ccmp)</option>
                   <option value="psk2">WPA2 Personal (psk2)</option>
-                  <option value="sae">WPA3 Personal (sae)</option>
-                  <option value="none">Brak zabezpieczeń (Otwarte)</option>
+                  <option value="mixed-psk">WPA/WPA2 Mixed (mixed-psk)</option>
+                  <option value="none">Brak zabezpieczeń (none)</option>
                 </select>
               </div>
 
@@ -1370,7 +1363,7 @@
             <div class="wcard-badge" id="wcard-type-badge">★ Domowa Sieć Wi-Fi (Smart Connect)</div>
             <div class="wcard-field">
               <span class="wcard-lbl">Nazwa sieci (SSID):</span>
-              <span class="wcard-val bold" id="wcard-ssid-val">hook_mt</span>
+              <span class="wcard-val bold" id="wcard-ssid-val">MyWiFi</span>
             </div>
             <div class="wcard-field">
               <span class="wcard-lbl">Szyfrowanie:</span>

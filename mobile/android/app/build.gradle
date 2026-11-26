@@ -10,19 +10,32 @@ android {
         applicationId "com.hookmt.xrm"
         minSdk 24
         targetSdk 34
-        versionCode 107
-        versionName "1.0.7"
+        versionCode 108
+        versionName "1.0.8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildFeatures { buildConfig true }
+    signingConfigs {
+        release {
+            def ksPath = System.getenv("ANDROID_KEYSTORE_PATH")
+            if (ksPath != null && !ksPath.isEmpty() && file(ksPath).exists()) {
+                storeFile file(ksPath)
+                storeType "PKCS12"
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
     buildTypes {
         release {
-            buildConfigField 'boolean', 'PREVIEW_READ_ONLY', 'false' 
+            buildConfigField 'boolean', 'PREVIEW_READ_ONLY', 'false'
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
+            def ksPath = System.getenv("ANDROID_KEYSTORE_PATH")
+            signingConfig (ksPath != null && !ksPath.isEmpty() && file(ksPath).exists() ? signingConfigs.release : signingConfigs.debug)
         }
         debug {
             buildConfigField 'boolean', 'PREVIEW_READ_ONLY', 'false'
