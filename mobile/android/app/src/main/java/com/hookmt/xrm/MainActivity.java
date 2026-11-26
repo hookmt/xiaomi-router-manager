@@ -52,9 +52,11 @@ public class MainActivity extends AppCompatActivity {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        webView.clearCache(true);
         WebViewAssetLoader assets = new WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this)).build();
         webView.setWebViewClient(new WebViewClient() {
@@ -116,7 +118,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     HttpURLConnection conn = (HttpURLConnection) new URL("http", host, path).openConnection();
                     conn.setConnectTimeout(6000);
-                    conn.setReadTimeout(10000);
+                    int readTimeoutMs = (path.contains("wifi_channel_optimize") || path.contains("wifi_check") || path.contains("set_all_wifi")) ? 30000 : 10000;
+                    conn.setReadTimeout(readTimeoutMs);
                     conn.setInstanceFollowRedirects(false);
                     conn.setRequestMethod(method);
                     if (method.equals("POST")) {

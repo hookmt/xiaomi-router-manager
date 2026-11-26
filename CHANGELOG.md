@@ -12,6 +12,10 @@ All notable changes to **Xiaomi Router Manager (XRM)** will be documented in thi
   - PC time synchronization now uses the currently selected timezone instead of a hardcoded value, and the selector syncs automatically with router snapshots.
 - **Visible Version Badge in Android / Mobile UI (`v1.0.7`):**
   - Added a subtle `v1.0.7` badge next to the app title in the top header and an `XRM Mobile v1.0.7` footer inside the navigation drawer.
+- **Android / Mobile UX & Stability Fixes (`MainActivity.java`, `mobile/www/`):**
+  - Disabled WebView asset HTTP cache (`LOAD_NO_CACHE` + `clearCache(true)`) so in-place APK updates immediately load the new UI without reinstalling.
+  - Moved the `+ Nowa rezerwacja` button directly into the Static DHCP Reservations card and converted DHCP reservations from a horizontally scrolling table to stacked `.device-card` rows matching Network Devices.
+  - Added `xqnetwork/wifi_check` fallback and a 30-second read timeout for Wi-Fi channel optimization (matching desktop `miwifi_core.py`).
 
 ### Removed
 - **Wi-Fi Regulatory Region (`set_country_code`) UI (Windows & Android):**

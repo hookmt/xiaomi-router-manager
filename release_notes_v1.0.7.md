@@ -11,8 +11,11 @@ Wydanie v1.0.7 wprowadza usprawnienia po testach terenowych na routerze Xiaomi B
 #### 2. Prezentacja minimalnego obciążenia CPU (`< 1%`) - Windows i Android
 - Wskazanie obciążenia procesora poniżej `1.0%` w stanie bezczynności jest teraz formatowane jako `< 1%` (z minimalnym wypełnieniem paska 1%) zamiast `0%` / `0.0%`.
 
-#### 3. Widoczny numer wersji w interfejsie mobilnym (Android APK / PWA)
+#### 3. Usprawnienia aplikacji mobilnej (Android APK / PWA)
 - Dodano dyskretny znacznik `v1.0.7` obok tytułu aplikacji w górnym nagłówku oraz stopkę `XRM Mobile v1.0.7` na dole menu nawigacyjnego (drawera).
+- Wyłączono pamięć podręczną zasobów WebView (`LOAD_NO_CACHE` + `clearCache`), dzięki czemu aktualizacje APK „na starą wersję” od razu ładują nowe UI bez konieczności odinstalowywania aplikacji.
+- Przeniesiono przycisk `+ Nowa rezerwacja` bezpośrednio do sekcji **Statyczne Rezerwacje Adresów IP (Static DHCP)** i przebudowano listę rezerwacji z tabeli na karty w dwóch wierszach (bez przewijania na boki na telefonie).
+- Dodano fallback na `xqnetwork/wifi_check` oraz wydłużono timeout odczytu do 30 s dla optymalizacji kanałów Wi-Fi (zgodnie z wersją Windows).
 
 #### 4. Usunięcie nieaktywnej zmiany regionu Wi-Fi (`set_country_code`) - Windows i Android
 - Usunięto edycję kodu regionu Wi-Fi z zakładek Wi-Fi, System i Narzędzia oraz Kreatora w obu aplikacjach, ponieważ nowsze fabryczne firmware Xiaomi (m.in. seria BE) blokuje zmianę `CountryCode` w partycji `bdata` i odrzuca żądania HTTP API (kod `1606`). Aktualny kod regionu routera pozostaje widoczny do odczytu przy wersji ROM na Pulpicie.

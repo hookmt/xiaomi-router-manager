@@ -896,10 +896,10 @@ function updateWanFormVisibility(type) {
   }
 }
 
-// 4. Rezerwacje DHCP (macbind_info)
+// 4. Rezerwacje DHCP (macbind_info) - układ kart bez przewijania w poziomie
 function renderBinds() {
-  const tbody = document.getElementById("binds-tbody");
-  if (!tbody) return;
+  const container = document.getElementById("binds-list-container");
+  if (!container) return;
   const query = (document.getElementById("dhcp-search-input")?.value || "").toLowerCase().trim();
   document.getElementById("nav-badge-binds").textContent = state.binds.length;
 
@@ -913,23 +913,31 @@ function renderBinds() {
   sortNetworkEntries(filtered, document.getElementById("bind-sort-select")?.value);
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Brak skonfigurowanych rezerwacji DHCP.</td></tr>`;
+    container.innerHTML = `<div class="empty-state">Brak skonfigurowanych rezerwacji DHCP.</div>`;
     return;
   }
 
-  tbody.innerHTML = filtered.map((b, idx) => {
+  container.innerHTML = filtered.map(b => {
     const ipStr = extractIpString(b.ip);
     const bName = b.name || b.origin_name || "Bez nazwy";
     return `
-      <tr>
-        <td><strong>${escapeHtml(bName)}</strong></td>
-        <td class="mono highlight">${escapeHtml(ipStr)}</td>
-        <td class="mono">${escapeHtml(b.mac)}</td>
-        <td class="text-right">
-          <button class="btn-secondary btn-sm" onclick="openReserveModal(${escapeHtml(JSON.stringify(b.mac))}, ${escapeHtml(JSON.stringify(ipStr))}, ${escapeHtml(JSON.stringify(bName))})">Edytuj</button>
-          <button class="btn-danger btn-sm" onclick="deleteMacBind(${escapeHtml(JSON.stringify(b.mac))}, ${escapeHtml(JSON.stringify(bName))})">Usuń</button>
-        </td>
-      </tr>
+      <div class="device-card">
+        <div class="dev-main">
+          <div class="dev-info-left">
+            <div class="dev-name-row">
+              <span class="dev-name">${escapeHtml(bName)}</span>
+            </div>
+            <div class="dev-meta-row">
+              <span class="ip-addr">${escapeHtml(ipStr)}</span>
+              <span class="mac-addr">${escapeHtml(b.mac)}</span>
+            </div>
+          </div>
+          <div class="dev-actions">
+            <button class="btn-secondary btn-sm" onclick="openReserveModal(${escapeHtml(JSON.stringify(b.mac))}, ${escapeHtml(JSON.stringify(ipStr))}, ${escapeHtml(JSON.stringify(bName))})">Edytuj</button>
+            <button class="btn-danger btn-sm" onclick="deleteMacBind(${escapeHtml(JSON.stringify(b.mac))}, ${escapeHtml(JSON.stringify(bName))})">Usuń</button>
+          </div>
+        </div>
+      </div>
     `;
   }).join("");
 }
@@ -2045,14 +2053,21 @@ function setupSystemTools() {
     }
   });
 
-  // Optymalizacja Wi-Fi
+  // Optymalizacja Wi-Fi (1:1 z miwifi_core.py: wifi_channel_optimize z fallbackiem na wifi_check)
   document.getElementById("btn-wifi-opt")?.addEventListener("click", async () => {
+    if (!state.connected) return alert("Najpierw połącz się z routerem.");
     const btn = document.getElementById("btn-wifi-opt");
     btn.disabled = true;
     btn.textContent = "Skanowanie pasm...";
     try {
-      const res = await apiRequest("xqnetwork/wifi_channel_optimize");
-      alert(res.code === 0 ? t("msg_opt_complete") : "Błąd routera: " + (res.msg || res.code));
+      let res = null;
+      try {
+        res = await apiRequest("xqnetwork/wifi_channel_optimize");
+      } catch (_) {}
+      if (!res || res.code !== 0) {
+        res = await apiRequest("xqnetwork/wifi_check");
+      }
+      alert(res && res.code === 0 ? t("msg_opt_complete") : "Błąd routera: " + (res?.msg || res?.code || "nieznany"));
     } catch (e) {
       alert("Nie udało się potwierdzić optymalizacji Wi-Fi.");
     } finally {

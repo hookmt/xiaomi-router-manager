@@ -505,9 +505,6 @@
             <h2 class="view-title">Ustawienia LAN i Serwer DHCP</h2>
             <p class="view-desc">Konfiguracja adresu IP routera, puli przydziału adresów oraz tabela stałych rezerwacji DHCP.</p>
           </div>
-          <div class="header-actions">
-            <button class="btn-primary" id="btn-add-reserve-manual">+ Nowa rezerwacja</button>
-          </div>
         </div>
 
         <div class="grid-2-col">
@@ -563,23 +560,12 @@
               <span class="card-icon">📌</span>
               <h3>Statyczne Rezerwacje Adresów IP (Static DHCP)</h3>
             </div>
+            <button class="btn-primary" id="btn-add-reserve-manual">+ Nowa rezerwacja</button>
             <input type="text" id="dhcp-search-input" class="input-search compact" placeholder="Filtruj rezerwacje...">
             <select id="bind-sort-select" class="form-select sort-select" aria-label="Sortowanie rezerwacji"><option value="original">Kolejność routera</option><option value="ip-asc">IP rosnąco</option><option value="ip-desc">IP malejąco</option><option value="name-asc">Nazwa A-Z</option><option value="name-desc">Nazwa Z-A</option></select>
           </div>
-          <div class="table-responsive">
-            <table class="data-table" id="table-dhcp-binds">
-              <thead>
-                <tr>
-                  <th>Nazwa / Urządzenie</th>
-                  <th>Adres IP</th>
-                  <th>Adres MAC</th>
-                  <th class="text-right">Akcje</th>
-                </tr>
-              </thead>
-              <tbody id="binds-tbody">
-                <!-- Wiersze generowane dynamicznie w app.js -->
-              </tbody>
-            </table>
+          <div id="binds-list-container" class="devices-list-container">
+            <!-- Karty rezerwacji DHCP generowane dynamicznie w app.js -->
           </div>
         </div>
       </section>
