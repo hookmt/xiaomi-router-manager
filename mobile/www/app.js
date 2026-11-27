@@ -34,33 +34,33 @@ const TZ_POSIX_MAP = {
   "Europe/Athens":       "EET-2EEST,M3.5.0/3,M10.5.0/4",
   "Europe/Kyiv":         "EET-2EEST,M3.5.0/3,M10.5.0/4",
   "Europe/Moscow":       "MSK-3",
-  "Europe/Istanbul":     "TRT-3",
+  "Europe/Istanbul":     "<+03>-3",
   "Asia/Shanghai":       "CST-8",
-  "Asia/Hong_Kong":      "HKT-8",
-  "Asia/Singapore":      "SGT-8",
+  "Asia/Hong_Kong":      "CST-8",
+  "Asia/Singapore":      "<+08>-8",
   "Asia/Tokyo":          "JST-9",
   "Asia/Seoul":          "KST-9",
   "Asia/Taipei":         "CST-8",
-  "Asia/Bangkok":        "ICT-7",
+  "Asia/Bangkok":        "<+07>-7",
   "Asia/Jakarta":        "WIB-7",
   "Asia/Kolkata":        "IST-5:30",
-  "Asia/Dubai":          "GST-4",
-  "Asia/Riyadh":         "AST-3",
-  "Asia/Tehran":         "IRST-3:30IRDT,80/0,264/0",
-  "Asia/Almaty":         "ALMT-6",
+  "Asia/Dubai":          "<+04>-4",
+  "Asia/Riyadh":         "<+03>-3",
+  "Asia/Tehran":         "<+0330>-3:30",
+  "Asia/Almaty":         "<+06>-6",
   "Asia/Karachi":        "PKT-5",
-  "Asia/Dhaka":          "BDT-6",
-  "Asia/Yangon":         "MMT-6:30",
-  "Asia/Colombo":        "IST-5:30",
-  "Asia/Kathmandu":      "NPT-5:45",
-  "Asia/Vladivostok":    "VLAT-10",
-  "Asia/Krasnoyarsk":    "KRAT-7",
-  "Asia/Yekaterinburg":  "YEKT-5",
+  "Asia/Dhaka":          "<+06>-6",
+  "Asia/Yangon":         "<+0630>-6:30",
+  "Asia/Colombo":        "<+0530>-5:30",
+  "Asia/Kathmandu":      "<+0545>-5:45",
+  "Asia/Vladivostok":    "<+10>-10",
+  "Asia/Krasnoyarsk":    "<+07>-7",
+  "Asia/Yekaterinburg":  "<+05>-5",
   "Africa/Cairo":        "EET-2",
   "Africa/Johannesburg": "SAST-2",
   "Africa/Lagos":        "WAT-1",
   "Africa/Nairobi":      "EAT-3",
-  "Africa/Casablanca":   "WET0",
+  "Africa/Casablanca":   "<+01>-1",
   "America/New_York":    "EST5EDT,M3.2.0,M11.1.0",
   "America/Chicago":     "CST6CDT,M3.2.0,M11.1.0",
   "America/Denver":      "MST7MDT,M3.2.0,M11.1.0",
@@ -70,7 +70,7 @@ const TZ_POSIX_MAP = {
   "America/Phoenix":     "MST7",
   "America/Toronto":     "EST5EDT,M3.2.0,M11.1.0",
   "America/Vancouver":   "PST8PDT,M3.2.0,M11.1.0",
-  "America/Sao_Paulo":   "BRT3BRST,M10.3.0/0,M2.3.0/0",
+  "America/Sao_Paulo":   "BRT+3BRT,M11.1.0/0,M2.3.0/0",
   "America/Argentina/Buenos_Aires": "ART3",
   "America/Mexico_City": "CST6CDT,M4.1.0,M10.5.0",
   "America/Bogota":      "COT5",
@@ -80,9 +80,66 @@ const TZ_POSIX_MAP = {
   "Pacific/Sydney":      "AEST-10AEDT,M10.1.0,M4.1.0/3",
   "Pacific/Melbourne":   "AEST-10AEDT,M10.1.0,M4.1.0/3",
   "Pacific/Brisbane":    "AEST-10",
-  "Pacific/Fiji":        "FJT-12",
+  "Pacific/Fiji":        "<+12>-12",
   "Pacific/Honolulu":    "HST10",
-  "UTC":                 "UTC0"
+  "UTC":                 "CST"
+};
+
+// Oficjalne indeksy V2 TIMEZONEMAP z panelu LuCI Xiaomi (wymagane przez POST misystem/set_sys_time)
+const TZ_INDEX_MAP = {
+  "Europe/Warsaw":       "2.54",
+  "Europe/London":       "2.50",
+  "Europe/Berlin":       "2.54",
+  "Europe/Paris":        "2.54",
+  "Europe/Prague":       "2.54",
+  "Europe/Vienna":       "2.54",
+  "Europe/Budapest":     "2.54",
+  "Europe/Stockholm":    "2.54",
+  "Europe/Oslo":         "2.54",
+  "Europe/Copenhagen":   "2.54",
+  "Europe/Amsterdam":    "2.54",
+  "Europe/Brussels":     "2.54",
+  "Europe/Rome":         "2.54",
+  "Europe/Madrid":       "2.54",
+  "Europe/Lisbon":       "2.49",
+  "Europe/Helsinki":     "2.62",
+  "Europe/Riga":         "2.62",
+  "Europe/Tallinn":      "2.62",
+  "Europe/Vilnius":      "2.62",
+  "Europe/Bucharest":    "2.62",
+  "Europe/Sofia":        "2.62",
+  "Europe/Athens":       "2.62",
+  "Europe/Kyiv":         "2.62",
+  "Europe/Moscow":       "2.68",
+  "Europe/Istanbul":     "2.69",
+  "Asia/Shanghai":       "2.84",
+  "Asia/Hong_Kong":      "2.84",
+  "Asia/Singapore":      "2.83",
+  "Asia/Tokyo":          "2.93",
+  "Asia/Seoul":          "2.92",
+  "Asia/Taipei":         "2.85",
+  "Asia/Bangkok":        "2.81",
+  "Asia/Jakarta":        "2.82",
+  "Asia/Kolkata":        "2.77",
+  "Asia/Dubai":          "2.71",
+  "Asia/Karachi":        "2.74",
+  "Asia/Dhaka":          "2.79",
+  "Africa/Cairo":        "2.60",
+  "Africa/Johannesburg": "2.61",
+  "Africa/Nairobi":      "2.67",
+  "America/New_York":    "2.27",
+  "America/Chicago":     "2.21",
+  "America/Denver":      "2.15",
+  "America/Los_Angeles": "2.12",
+  "America/Honolulu":    "2.3",
+  "America/Toronto":     "2.27",
+  "America/Vancouver":   "2.12",
+  "America/Sao_Paulo":   "2.43",
+  "America/Mexico_City": "2.22",
+  "Pacific/Auckland":    "2.107",
+  "Pacific/Sydney":      "2.97",
+  "Pacific/Brisbane":    "2.98",
+  "UTC":                 "2.48"
 };
 
 // Lista stref do selecta (skrocone etykiety dla UI mobilnego)
@@ -195,8 +252,70 @@ const state = {
   portsStatus: [],
   topoGraph: {},
   aimesh: {},
+  ledStatus: null,
   activeEditingIndex: -1
 };
+
+function cleanModelName(raw) {
+  return String(raw || "Xiaomi").replace(/Xiaomi路由器/g, "Xiaomi Router ").trim();
+}
+
+function isFactoryReset(initInfo) {
+  if (!initInfo || typeof initInfo !== "object") return false;
+  return initInfo.inited === 0 || String(initInfo.inited) === "0";
+}
+
+function extractWanDns(wanDetails) {
+  if (!wanDetails || typeof wanDetails !== "object") return [];
+  const dnsList = [];
+  const pushVal = val => {
+    if (Array.isArray(val)) {
+      val.forEach(item => pushVal(item));
+    } else if (typeof val === "string" && val.trim()) {
+      val.replace(/;/g, ",").split(",").forEach(part => {
+        const s = part.trim();
+        if (s && !dnsList.includes(s)) dnsList.push(s);
+      });
+    }
+  };
+  pushVal(wanDetails.dnsServer);
+  pushVal(wanDetails.details?.dns);
+  pushVal(wanDetails.dnsAddrs);
+  pushVal(wanDetails.dnsAddrs1);
+  pushVal(wanDetails.dnsAddrs2);
+  return dnsList;
+}
+
+function getRouterRoleInfo() {
+  const init = state.initInfo || {};
+  const graph = state.topoGraph || {};
+  const leafs = Array.isArray(graph.leafs) ? graph.leafs : (Array.isArray(graph.re) ? graph.re : []);
+  const hasSats = leafs.length > 0 || (Array.isArray(state.devices) && state.devices.some(d => Number(d.isap) > 0));
+  const netmode = Number(init.netmode ?? graph.mode ?? 0);
+  let role = "MASTER / STANDALONE";
+  if ([1, 2, 3, 4].includes(netmode)) role = "SATELITA / AP";
+  else if (hasSats) role = "MASTER (MESH)";
+  const model = cleanModelName(init.displayName || init.hardware || "Xiaomi Router");
+  const rname = init.routername || graph.name || "-";
+  return { role, model, rname, ip: state.ip, netmode, hasSats };
+}
+
+async function setRouterTimeAndZone({ time = null, timezone = null, index = null }) {
+  let lastRes = { code: 0 };
+  if (timezone) {
+    const payload = { timezone };
+    if (index) payload.index = String(index);
+    const resTz = await apiRequest("misystem/set_sys_time", "POST", payload);
+    if (resTz.code !== 0) return resTz;
+    lastRes = resTz;
+  }
+  if (time) {
+    const resTime = await apiRequest("misystem/set_sys_time", "POST", { time });
+    if (resTime.code !== 0) return resTime;
+    lastRes = resTime;
+  }
+  return lastRes;
+}
 
 // Słownik tłumaczeń (PL / EN)
 const I18N = {
@@ -206,7 +325,7 @@ const I18N = {
     status_connecting: "Łączenie...",
     btn_connect: "Połącz",
     btn_disconnect: "Rozłącz",
-    msg_confirm_reboot: "Czy na pewno chcesz zrestartować router Xiaomi BE7000? Spowoduje to chwilowy brak Internetu.",
+    msg_confirm_reboot: "Czy na pewno chcesz zrestartować router? Spowoduje to chwilowy brak Internetu.",
     msg_confirm_delete_bind: "Czy na pewno chcesz usunąć rezerwację DHCP dla:",
     msg_fill_all_fields: "Wypełnij poprawnie wszystkie wymagane pola!",
     msg_res_saved: "Pomyślnie zapisano rezerwację DHCP dla: ",
@@ -228,7 +347,7 @@ const I18N = {
     status_connecting: "Connecting...",
     btn_connect: "Connect",
     btn_disconnect: "Disconnect",
-    msg_confirm_reboot: "Are you sure you want to reboot Xiaomi BE7000? Internet connection will be interrupted.",
+    msg_confirm_reboot: "Are you sure you want to reboot the router? Internet connection will be interrupted.",
     msg_confirm_delete_bind: "Are you sure you want to delete DHCP reservation for:",
     msg_fill_all_fields: "Please fill all required fields correctly!",
     msg_res_saved: "DHCP reservation saved for: ",
@@ -332,12 +451,16 @@ function extractStok(text) {
 
 // Logowanie przez gotowy token stok lub pełny link
 async function loginWithStok(stokOrUrl) {
-  state.deviceId = null; state.initInfo = {};
+  state.deviceId = null; state.initInfo = {}; state.topoGraph = {}; state.ledStatus = null;
   const token = extractStok(stokOrUrl);
   if (!token) return false;
   state.stok = token;
   try {
-    const res = await apiRequest("misystem/status");
+    const [initRes, res] = await Promise.all([
+      apiRequest("xqsystem/init_info").catch(() => ({})),
+      apiRequest("misystem/status")
+    ]);
+    if (initRes && initRes.code === 0) state.initInfo = initRes;
     if (res.code === 0) {
       setConnected(true);
       void refreshData();
@@ -350,8 +473,12 @@ async function loginWithStok(stokOrUrl) {
 }
 
 // Same nonce and hash selection as the tested desktop client. Only one login request.
-async function loginWithPassword(pwd, user = "admin") {
+async function loginWithPassword(pwd, user = "admin", isInit = false) {
   state.stok = null;
+  state.deviceId = null;
+  state.initInfo = {};
+  state.topoGraph = {};
+  state.ledStatus = null;
   try {
     const init = await apiRequest("xqsystem/init_info");
     state.initInfo = init;
@@ -369,7 +496,9 @@ async function loginWithPassword(pwd, user = "admin") {
     const algorithm = Number(init.newEncryptMode) === 1 ? "SHA-256" : "SHA-1";
     const inner = await digest(algorithm, pwd + PUBLIC_KEY);
     const pwdHash = await digest(algorithm, nonce + inner);
-    const resp = await apiRequest("xqsystem/login", "POST", { username: user, password: pwdHash, logtype: "2", nonce });
+    const body = { username: user, password: pwdHash, logtype: "2", nonce };
+    if (isInit || isFactoryReset(init)) { body.init = "1"; body.privacy = "0"; }
+    const resp = await apiRequest("xqsystem/login", "POST", body);
     if (resp.code !== 0) return false;
     state.stok = extractStok(resp.token || resp.url || "");
     if (!state.stok) return false;
@@ -406,11 +535,24 @@ function setConnected(val) {
 function disconnect() {
   viewLoaded.clear();
   state.wifiRendered = false; state.wanRendered = false; state.deviceId = null;
+  state.initInfo = {}; state.status = {}; state.devices = []; state.binds = [];
+  state.topoGraph = {}; state.ledStatus = null;
   state.wifiInfo = []; state.wanInfo = {}; state.pendingQosBand = null; state.qosActive = false; state.portServices = {}; state.portsStatus = []; state.portLinks = [];
   const led=document.getElementById("led-switch"), ledSave=document.getElementById("btn-save-led");
   if (led) led.disabled=true; if (ledSave) ledSave.disabled=true;
   state.stok = null;
   setConnected(false);
+  const resetText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  resetText("dash-router-title", state.lang === "en" ? "Router: disconnected" : "Router: brak połączenia");
+  for (const id of ["dash-model","dash-fw","dash-uptime","dash-routerid","dash-cpu-val","dash-ram-val","dash-down-speed","dash-up-speed","dash-wan-ip","dash-wan-dns","dash-dev-count","dash-led-status","dash-net-mode"]) {
+    resetText(id, "--");
+  }
+  const cpuBar = document.getElementById("dash-cpu-bar"); if (cpuBar) cpuBar.style.width = "0%";
+  const ramBar = document.getElementById("dash-ram-bar"); if (ramBar) ramBar.style.width = "0%";
+  for (const id of ["wan-pppoe-user","wan-pppoe-pwd","wan-static-ip","wan-static-mask","wan-static-gw","wan-mtu-input","wan-dns1","wan-dns2","wan-mac-clone"]) {
+    const el = document.getElementById(id); if (el) el.value = "";
+  }
+  updateWizardFactoryBanner();
 }
 
 // Formatowanie jednostek
@@ -436,7 +578,8 @@ function formatUptime(seconds) {
   const m = Math.floor((s % 3600) / 60);
   if (d > 0) return `${d}d ${h}h ${m}m`;
   if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
+  if (m > 0) return `${m}m`;
+  return `${s}s`;
 }
 
 // Rozpoznawanie typu połączenia urządzenia (odwzorowanie 1:1 z gui.py L696-731)
@@ -485,11 +628,13 @@ async function refreshData() {
   if (!state.connected || !state.stok || state.refreshing) return;
   state.refreshing = true;
   try {
-    const [initResp, statusResp, devResp, wanResp] = await Promise.allSettled([
+    const [initResp, statusResp, devResp, wanResp, ledResp, topoResp] = await Promise.allSettled([
       apiRequest("xqsystem/init_info"),
       apiRequest("misystem/status"),
       apiRequest("misystem/devicelist"),
-      apiRequest("xqnetwork/wan_info")
+      apiRequest("xqnetwork/wan_info"),
+      apiRequest("misystem/led"),
+      apiRequest("misystem/topo_graph")
     ]);
 
     if (initResp.status === "fulfilled" && initResp.value.code === 0) {
@@ -500,9 +645,21 @@ async function refreshData() {
       state.status = statusResp.value;
     }
 
+    if (ledResp.status === "fulfilled" && ledResp.value && (ledResp.value.code === undefined || Number(ledResp.value.code) === 0) && ledResp.value.status !== undefined) {
+      state.ledStatus = Number(ledResp.value.status);
+    }
+
+    if (topoResp.status === "fulfilled" && topoResp.value && topoResp.value.code === 0 && topoResp.value.graph && typeof topoResp.value.graph === "object") {
+      state.topoGraph = topoResp.value.graph;
+    }
+
     if (wanResp.status === "fulfilled" && wanResp.value.code === 0) {
       state.wanInfo = wanResp.value.info || wanResp.value;
       if (state.currentView !== "wan" || !state.wanRendered) { renderWanInfo(state.wanInfo); state.wanRendered = true; }
+    }
+
+    if (devResp.status === "fulfilled" && devResp.value.code === 0) {
+      state.devices = devResp.value.list || [];
     }
 
     if (statusResp.status === "fulfilled" && statusResp.value.code === 0) {
@@ -510,9 +667,16 @@ async function refreshData() {
     }
 
     if (devResp.status === "fulfilled" && devResp.value.code === 0) {
-      state.devices = devResp.value.list || [];
       renderDevices();
     }
+
+    if (state.currentView === "mesh" && state.topoGraph && Object.keys(state.topoGraph).length) {
+      renderMesh(state.topoGraph);
+    }
+
+    const drawerIp = document.getElementById("drawer-ip-text");
+    if (drawerIp) drawerIp.textContent = `${state.lang === "en" ? "Gateway" : "Brama"}: ${state.ip}`;
+    updateWizardFactoryBanner();
 
     // Odczyt rezerwacji, Wi-Fi, portów i zaawansowanych ustawień
     await fetchBindsAndPorts();
@@ -552,7 +716,7 @@ async function fetchBindsAndPorts() {
 // 1. Dashboard (Pulpit) - odwzorowanie 1:1 z gui.py L4795-4858
 function renderDashboardStatus(s, init, wan) {
   // Model, ROM, Czas pracy i ID Routera
-  const model = init?.displayName || init?.hardware || "Xiaomi BE7000";
+  const model = cleanModelName(init?.displayName || init?.hardware || "Xiaomi");
   const hwCode = init?.hardware ? ` (kod ${init.hardware})` : "";
   const fw = `${init?.romversion || "-"} (${init?.countrycode || "-"})`;
   const routerId = init?.routerId || init?.id || s?.hardware?.mac || "-";
@@ -615,10 +779,10 @@ function renderDashboardStatus(s, init, wan) {
     document.getElementById("dash-ram-bar").style.width = `${Math.min(100, parseFloat(memPct))}%`;
   }
 
-  // Transfer WAN
+  // Transfer WAN (bieżąca prędkość upspeed, nigdy skumulowany licznik upload!)
   const wanSpeed = s?.wan || {};
   const down = parseFloat(wanSpeed.downspeed || 0);
-  const up = parseFloat(wanSpeed.upload || wanSpeed.upspeed || 0);
+  const up = parseFloat(wanSpeed.upspeed || 0);
   if (document.getElementById("dash-down-speed")) {
     document.getElementById("dash-down-speed").textContent = formatSpeed(down);
   }
@@ -631,14 +795,33 @@ function renderDashboardStatus(s, init, wan) {
     const wanDetails = wan.info || wan;
     const ipv4 = wanDetails.ipv4;
     const wIp = (Array.isArray(ipv4) && ipv4.length > 0 && ipv4[0].ip) ? ipv4[0].ip : (wanDetails.ip || "-");
-    const dnsList = wanDetails.dnsServer || wanDetails.details?.dns || [];
-    const dnsStr = Array.isArray(dnsList) ? dnsList.join(", ") : String(dnsList || "-");
+    const dnsList = extractWanDns(wanDetails);
+    const dnsStr = dnsList.join(", ");
     
     if (document.getElementById("dash-wan-ip")) {
       document.getElementById("dash-wan-ip").textContent = wIp;
     }
     if (document.getElementById("dash-wan-dns")) {
       document.getElementById("dash-wan-dns").textContent = dnsStr || "-";
+    }
+  }
+
+  // Podsumowanie: Diody LED i Tryb sieci
+  const ledEl = document.getElementById("dash-led-status");
+  if (ledEl) {
+    if (state.ledStatus === 1) ledEl.textContent = state.lang === "en" ? "Enabled" : "Włączone";
+    else if (state.ledStatus === 0) ledEl.textContent = state.lang === "en" ? "Disabled" : "Wyłączone";
+    else ledEl.textContent = "--";
+  }
+  const modeEl = document.getElementById("dash-net-mode");
+  if (modeEl) {
+    const { netmode, hasSats } = getRouterRoleInfo();
+    if ([1, 2, 3, 4].includes(netmode)) {
+      modeEl.textContent = state.lang === "en" ? "Satellite / AP" : "Satelita / AP";
+    } else if (hasSats) {
+      modeEl.textContent = state.lang === "en" ? "Master (Mesh)" : "Router Główny (Mesh)";
+    } else {
+      modeEl.textContent = state.lang === "en" ? "Router (Standalone)" : "Router (Standalone)";
     }
   }
 }
@@ -717,6 +900,22 @@ function renderDevices() {
     return;
   }
 
+  // Mapa węzłów Mesh (parent MAC/id -> nazwa węzła) dla widoku urządzeń
+  const graph = state.topoGraph || {};
+  const leafs = Array.isArray(graph.leafs) ? graph.leafs : (Array.isArray(graph.re) ? graph.re : []);
+  const nodeNameByKey = new Map();
+  const hasMeshNodes = leafs.length > 0 || state.devices.some(dev => Number(dev.isap) > 0);
+  if (hasMeshNodes) {
+    const masterLabel = cleanModelName(graph.hardware === "RC06" ? "BE7000 (Master)" : (graph.name || "Router Główny"));
+    if (graph.mac) nodeNameByKey.set(String(graph.mac).toUpperCase().trim(), masterLabel);
+    if (graph.id) nodeNameByKey.set(String(graph.id).toUpperCase().trim(), masterLabel);
+    leafs.forEach(sat => {
+      const sLabel = cleanModelName(sat.name || (sat.hardware === "RN02" ? "BE6500" : sat.hardware) || "Satelita");
+      if (sat.mac) nodeNameByKey.set(String(sat.mac).toUpperCase().trim(), sLabel);
+      if (sat.id) nodeNameByKey.set(String(sat.id).toUpperCase().trim(), sLabel);
+    });
+  }
+
   container.innerHTML = filtered.map(d => {
     const conn = getDeviceConnInfo(d);
     const dMacUpper = (d.mac || "").toUpperCase().trim();
@@ -731,7 +930,11 @@ function renderDevices() {
 
     const auth = d.authority || {};
     const wanAllowed = auth.wan === undefined ? true : (auth.wan === 1);
-    const isAdmin = auth.admin === 1 || d.is_cur === 1 || d.isap === 1;
+    const isAdmin = auth.admin === 1 || d.is_cur === 1 || Number(d.isap) > 0;
+    const parentKey = String(d.parent || "").toUpperCase().trim();
+    const nodeLabel = (!d.is_offline && hasMeshNodes && Number(d.isap || 0) === 0)
+      ? (nodeNameByKey.get(parentKey) || (parentKey ? "" : (state.lang === "en" ? "Main Router" : "Router Główny")))
+      : "";
 
     // Przyciski akcji
     let actionButtonsHtml = "";
@@ -745,7 +948,7 @@ function renderDevices() {
       // 1. Zarezerwowane vs Rezerwuj IP
       if (isBound) {
         actionButtonsHtml += `
-          <span class="badge badge-bound">● Zarezerwowany</span>
+          <span class="badge badge-bound">● Stałe IP</span>
           <button class="btn-sm btn-secondary" onclick="openReserveModal(${escapeHtml(JSON.stringify(d.mac))}, ${escapeHtml(JSON.stringify(ipStr))}, ${escapeHtml(JSON.stringify(d.name))})">Edytuj</button>
         `;
       } else if (d.mac && d.mac !== "-") {
@@ -754,7 +957,7 @@ function renderDevices() {
         `;
       }
 
-      // 2. Blokada internetu WAN (zabezpieczenie admina)
+      // 2. Blokada internetu WAN (zabezpieczenie admina i węzłów Mesh/AP)
       if (isAdmin) {
         actionButtonsHtml += `<span class="badge badge-admin">[Stacja Admina / AP]</span>`;
       } else {
@@ -773,6 +976,7 @@ function renderDevices() {
             <div class="dev-name-row">
               <span class="dev-name">${escapeHtml(d.name)}</span>
               <span class="badge ${conn.cls}">${conn.label}</span>
+              ${nodeLabel ? `<span class="badge badge-node">📡 ${escapeHtml(nodeLabel)}</span>` : ""}
             </div>
             <div class="dev-meta-row">
               <span class="ip-addr">${escapeHtml(ipStr)}</span>
@@ -801,12 +1005,12 @@ function renderWanInfo(info) {
   const det = info.details || {};
   const ipv4 = info.ipv4;
   const wIp = (Array.isArray(ipv4) && ipv4.length > 0 && ipv4[0].ip) ? ipv4[0].ip : (info.ip || "-");
-  const wMask = (Array.isArray(ipv4) && ipv4.length > 0 && ipv4[0].mask) ? ipv4[0].mask : (info.mask || "255.255.255.0");
+  const wMask = (Array.isArray(ipv4) && ipv4.length > 0 && ipv4[0].mask) ? ipv4[0].mask : (info.mask || "-");
   const wGw = info.gateWay || info.gateway || "-";
-  const dnsList = info.dnsServer || det.dns || [];
-  const dnsStr = Array.isArray(dnsList) ? dnsList.join(", ") : String(dnsList || "-");
+  const dnsList = extractWanDns(info);
+  const dnsStr = dnsList.join(", ") || "-";
   const wMac = info.mac || "-";
-  const wMtu = det.mtu || info.mtu || "1472";
+  const wMtu = det.mtu || info.mtu || "";
 
   // Dashboard WAN
   if (document.getElementById("dash-wan-ip")) document.getElementById("dash-wan-ip").textContent = wIp;
@@ -825,7 +1029,7 @@ function renderWanInfo(info) {
   if (document.getElementById("wan-stat-gw")) document.getElementById("wan-stat-gw").textContent = wGw;
   if (document.getElementById("wan-stat-dns")) document.getElementById("wan-stat-dns").textContent = dnsStr;
   if (document.getElementById("wan-stat-mac")) document.getElementById("wan-stat-mac").textContent = wMac;
-  if (document.getElementById("wan-stat-mtu")) document.getElementById("wan-stat-mtu").textContent = wMtu;
+  if (document.getElementById("wan-stat-mtu")) document.getElementById("wan-stat-mtu").textContent = wMtu || "-";
   if (info.uptime && document.getElementById("wan-stat-uptime")) {
     document.getElementById("wan-stat-uptime").textContent = formatUptime(info.uptime);
   }
@@ -1419,10 +1623,16 @@ function setupUI() {
 function renderMesh(graph) {
   const text = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = String(value ?? "--"); };
   const hardware = {RC06:"Xiaomi Router 7000 (BE7000)", RN02:"Xiaomi Router BE6500"};
-  text("mesh-master-name", [hardware[graph.hardware] || graph.hardware || "Router", graph.name].filter(Boolean).join(" - "));
-  text("mesh-master-ip", graph.ip || state.ip);
-  text("mesh-master-mac", graph.mac || "--");
-  text("mesh-master-clients", graph.onlines ?? state.devices.length);
+  const macByIp = new Map();
+  (state.devices || []).forEach(d => {
+    const ip = extractIpString(d.ip);
+    if (ip && ip !== "-" && d.mac) macByIp.set(ip, d.mac);
+  });
+
+  const masterIp = graph.ip || state.ip;
+  const masterMac = graph.mac || state.status?.hardware?.mac || state.wanInfo?.mac || macByIp.get(masterIp) || "--";
+  const masterKeySet = new Set([masterMac, graph.id].filter(Boolean).map(v => String(v).toUpperCase().trim()));
+
   const leafs = Array.isArray(graph.leafs) ? graph.leafs : Array.isArray(graph.re) ? graph.re : null;
   const satellites = leafs ? [...leafs] : [];
   const known = new Set(satellites.map(node => extractIpString(node.ip)));
@@ -1432,6 +1642,49 @@ function renderMesh(graph) {
       satellites.push({name:d.name || d.oname,ip,mac:d.mac,hardware:d.hardware}); known.add(ip);
     }
   }
+
+  // Przypisanie klientów do Mastera vs Satelitów
+  const satKeyToIdx = new Map();
+  const satClients = satellites.map((sat, idx) => {
+    const sIp = extractIpString(sat.ip);
+    const sMac = sat.mac || macByIp.get(sIp) || "";
+    if (sMac) satKeyToIdx.set(String(sMac).toUpperCase().trim(), idx);
+    if (sat.id) satKeyToIdx.set(String(sat.id).toUpperCase().trim(), idx);
+    return [];
+  });
+  const masterClients = [];
+  (state.devices || []).forEach(d => {
+    if (Number(d.isap || 0) > 0) return;
+    const pKey = String(d.parent || "").toUpperCase().trim();
+    if (pKey && satKeyToIdx.has(pKey)) {
+      satClients[satKeyToIdx.get(pKey)].push(d);
+    } else if (!pKey || masterKeySet.has(pKey) || !satellites.length) {
+      masterClients.push(d);
+    } else {
+      masterClients.push(d);
+    }
+  });
+
+  const renderClientChips = (targetEl, clients) => {
+    if (!targetEl) return;
+    targetEl.replaceChildren();
+    if (!clients.length) return;
+    clients.forEach(c => {
+      const chip = document.createElement("span");
+      chip.className = "mesh-client-chip";
+      const ip = extractIpString(c.ip);
+      const name = c.name || c.oname || c.mac || "Klient";
+      chip.textContent = `${name}${ip !== "-" ? " (" + ip + ")" : ""}`;
+      targetEl.append(chip);
+    });
+  };
+
+  text("mesh-master-name", [cleanModelName(hardware[graph.hardware] || graph.hardware || state.initInfo?.displayName || "Router"), graph.name].filter(Boolean).join(" - "));
+  text("mesh-master-ip", masterIp);
+  text("mesh-master-mac", masterMac);
+  text("mesh-master-clients", Math.max(Number(graph.onlines ?? 0), masterClients.length));
+  renderClientChips(document.getElementById("mesh-master-clients-list"), masterClients);
+
   const container = document.getElementById("mesh-satellites-list");
   container.replaceChildren();
   if (!satellites.length) {
@@ -1439,15 +1692,27 @@ function renderMesh(graph) {
     empty.textContent = leafs ? "Nie wykryto dodatkowych węzłów Mesh." : "Router nie podał listy węzłów Mesh.";
     container.append(empty); return;
   }
-  satellites.forEach(sat => {
+  satellites.forEach((sat, idx) => {
+    const sIp = extractIpString(sat.ip);
+    const sMac = sat.mac || macByIp.get(sIp) || "--";
+    const sClients = satClients[idx] || [];
     const card=document.createElement("div"); card.className="mesh-node-card satellite";
-    const title=document.createElement("h3"); title.textContent=[hardware[sat.hardware] || sat.hardware || "Satelita",sat.name].filter(Boolean).join(" - ");
+    const title=document.createElement("h3"); title.textContent=[cleanModelName(hardware[sat.hardware] || sat.hardware || "Satelita"), sat.name].filter(Boolean).join(" - ");
     const info=document.createElement("div"); info.className="node-meta";
-    const parts=[`IP: ${extractIpString(sat.ip)}`,`MAC: ${sat.mac || "--"}`];
-    if (sat.onlines !== undefined) parts.push(`Klienci: ${sat.onlines}`);
+    const parts=[`IP: ${sIp}`,`MAC: ${sMac}`];
+    const cnt = Math.max(Number(sat.onlines ?? 0), sClients.length);
+    parts.push(`Klienci: ${cnt}`);
     const link=String(sat.link_type || sat.backhaul || "").toLowerCase();
     if (link) parts.push(link.includes("wire") || link.includes("lan") ? "Połączenie kablowe" : "Połączenie Wi-Fi");
-    info.textContent=parts.join("  |  "); card.append(title,info); container.append(card);
+    info.textContent=parts.join("  |  ");
+    card.append(title, info);
+    if (sClients.length) {
+      const chipsBox = document.createElement("div");
+      chipsBox.className = "mesh-clients-list";
+      renderClientChips(chipsBox, sClients);
+      card.append(chipsBox);
+    }
+    container.append(card);
   });
 }
 
@@ -1480,8 +1745,26 @@ async function loadViewData(view) {
           const hh = String(tObj.hour || 0).padStart(2, "0");
           const mm = String(tObj.min || 0).padStart(2, "0");
           const ss = String(tObj.sec || 0).padStart(2, "0");
-          const tz = tObj.timezone || "";
-          tStr = `${y}-${m}-${d} ${hh}:${mm}:${ss}${tz ? " (" + tz + ")" : ""}`;
+          const tz = String(tObj.timezone || "");
+          const tzShort = tz ? tz.split(",")[0] : "";
+          const tzIdx = String(tObj.index || "");
+          tStr = `${y}-${m}-${d} ${hh}:${mm}:${ss}${tzShort ? " (" + tzShort + ")" : ""}`;
+          const tzSel = $id("system-tz-select");
+          if (tzSel && (tzIdx || tz)) {
+            let matchedIana = null;
+            if (tzIdx) {
+              const found = TZ_DISPLAY_LIST.find(item => TZ_INDEX_MAP[item.iana] === tzIdx);
+              if (found) matchedIana = found.iana;
+            }
+            if (!matchedIana && tz) {
+              const found = TZ_DISPLAY_LIST.find(item => {
+                const p = TZ_POSIX_MAP[item.iana] || "";
+                return p === tz || p.startsWith(tz);
+              });
+              if (found) matchedIana = found.iana;
+            }
+            if (matchedIana) tzSel.value = matchedIana;
+          }
         } else if (typeof time.time === "string") {
           tStr = time.time;
         } else if (time.datetime || time.localtime) {
@@ -1491,7 +1774,13 @@ async function loadViewData(view) {
       }
       const ledAvailable=led && (led.code === undefined || Number(led.code) === 0) && [0,1].includes(Number(led.status)) && led.status !== null && led.status !== undefined;
       $id("led-switch").disabled=!ledAvailable;$id("btn-save-led").disabled=!ledAvailable;
-      if (ledAvailable) { $id("led-switch").checked=Number(led.status)===1;$id("led-status-lbl").textContent=Number(led.status)===1 ? "Włączone" : "Wyłączone"; }
+      if (ledAvailable) {
+        state.ledStatus = Number(led.status);
+        $id("led-switch").checked=state.ledStatus===1;
+        $id("led-status-lbl").textContent=state.ledStatus===1 ? "Włączone" : "Wyłączone";
+        const dashLed = $id("dash-led-status");
+        if (dashLed) dashLed.textContent = state.ledStatus===1 ? (state.lang === "en" ? "Enabled" : "Włączone") : (state.lang === "en" ? "Disabled" : "Wyłączone");
+      }
     } else if (view === "wifi") {
       if (!state.wifiInfo.length) throw Error("Brak danych Wi-Fi");
       const first = state.wifiInfo[0] || {};
@@ -1601,9 +1890,42 @@ async function sendChange(view, endpoint, payload, question, method = "POST") {
     alert("Router potwierdził zapis."); viewLoaded.delete(view); await loadViewData(view); return true;
   } catch (e) { alert("Nie udało się potwierdzić zmiany: " + e.message); return false; }
 }
+function updateWizardFactoryBanner() {
+  const banner = $id("wiz-factory-banner");
+  if (!banner) return;
+  if (!state.connected) {
+    banner.classList.add("hidden");
+    return;
+  }
+  if (isFactoryReset(state.initInfo)) {
+    banner.textContent = state.lang === "en"
+      ? "Factory state detected (inited=0). The wizard will run native Xiaomi first-time initialization."
+      : "Wykryto stan fabryczny routera (inited=0). Kreator wykona pełną inicjalizację pierwszego uruchomienia Xiaomi.";
+    banner.classList.remove("hidden");
+  } else {
+    banner.classList.add("hidden");
+  }
+}
+
 function setupAdditionalControls() {
   // Kreator - buduj selektory strefy i regionu (moze byc wywolane przed setupSystemEnhancements)
   buildTzSelect("wiz-tz-select");
+
+  const wizProto = $id("wiz-proto");
+  const syncWizProtoBoxes = () => {
+    const v = wizProto?.value || "dhcp";
+    $id("wiz-pppoe-box")?.classList.toggle("hidden", v !== "pppoe");
+    $id("wiz-static-box")?.classList.toggle("hidden", v !== "static");
+  };
+  wizProto?.addEventListener("change", syncWizProtoBoxes);
+  syncWizProtoBoxes();
+
+  const wizSamePwd = $id("wiz-same-pwd");
+  const syncWizAdminBox = () => {
+    $id("wiz-admin-pwd-box")?.classList.toggle("hidden", wizSamePwd?.checked ?? true);
+  };
+  wizSamePwd?.addEventListener("change", syncWizAdminBox);
+  syncWizAdminBox();
 
   // Kreator - przycisk Zastosuj i Uruchom Router
   const btnWizApply = $id("btn-wizard-apply");
@@ -1616,11 +1938,22 @@ function setupAdditionalControls() {
       const ssid = $id("wiz-ssid")?.value.trim() || "";
       const wifiPwd = $id("wiz-pwd")?.value.trim() || "";
       const samePwd = $id("wiz-same-pwd")?.checked ?? true;
+      const adminPwd = samePwd ? wifiPwd : ($id("wiz-admin-pwd")?.value.trim() || "");
       const tzIana = $id("wiz-tz-select")?.value || "";
       const tzPosix = TZ_POSIX_MAP[tzIana] || "";
+      const tzIdx = TZ_INDEX_MAP[tzIana] || "2.54";
 
       if (!ssid) return alert("Podaj nazwę sieci Wi-Fi (SSID).");
       if (wifiPwd && wifiPwd.length < 8) return alert("Hasło Wi-Fi musi mieć co najmniej 8 znaków.");
+      if (isFactoryReset(state.initInfo) && adminPwd.length < 8) {
+        return alert("Dla nowego/zresetowanego routera hasło administratora musi mieć co najmniej 8 znaków.");
+      }
+      if (proto === "pppoe" && (!$id("wiz-pppoe-user")?.value.trim() || !$id("wiz-pppoe-pwd")?.value)) {
+        return alert("Podaj login i hasło PPPoE.");
+      }
+      if (proto === "static" && (!validIPv4($id("wiz-static-ip")?.value.trim() || "") || !validIPv4($id("wiz-static-mask")?.value.trim() || "") || !validIPv4($id("wiz-static-gw")?.value.trim() || ""))) {
+        return alert("Podaj poprawne IP, maskę i bramę dla statycznego WAN.");
+      }
 
       let summary = `Typ WAN: ${proto.toUpperCase()}\nSSID: ${ssid}`;
       if (tzIana) summary += `\nStrefa czasowa: ${tzIana} (${tzPosix || "nieznana"})`;
@@ -1629,29 +1962,95 @@ function setupAdditionalControls() {
       btnWizApply.disabled = true;
       const errors = [];
 
-      // 1. Ustaw Wi-Fi
-      if (ssid) {
+      if (isFactoryReset(state.initInfo)) {
+        // Protokół fabrycznej inicjalizacji Xiaomi (inited == 0)
         try {
-          const r = await apiRequest("xqnetwork/set_all_wifi", "POST", {
-            bsd: "1", ssid1: ssid, ssid2: ssid,
-            pwd1: wifiPwd, pwd2: wifiPwd,
-            encryption1: wifiPwd ? "psk2+ccmp" : "none",
-            encryption2: wifiPwd ? "psk2+ccmp" : "none",
-            on1: "1", on2: "1", txpwr1: "max", txpwr2: "max",
-            channel1: "0", channel2: "0", bandwidth1: "0", bandwidth2: "0",
-            hidden1: "0", hidden2: "0", isDFS: "0"
-          });
-          if (r.code !== 0) errors.push(`Wi-Fi: ${r.msg || r.code}`);
-        } catch(e) { errors.push(`Wi-Fi: ${e.message}`); }
+          if (proto === "dhcp") {
+            await apiRequest("xqnetwork/set_wan_new", "POST", { wanType: "dhcp", autoset: "1" }).catch(() => {});
+          } else if (proto === "pppoe") {
+            const wRes = await apiRequest("xqnetwork/set_wan", "POST", {
+              wanType: "pppoe",
+              pppoeName: $id("wiz-pppoe-user").value.trim(),
+              pppoePwd: $id("wiz-pppoe-pwd").value
+            });
+            if (wRes.code !== 0) errors.push(`WAN: ${wRes.msg || wRes.code}`);
+          } else if (proto === "static") {
+            const wRes = await apiRequest("xqnetwork/set_wan", "POST", {
+              wanType: "static",
+              staticIp: $id("wiz-static-ip").value.trim(),
+              staticMask: $id("wiz-static-mask").value.trim(),
+              staticGateway: $id("wiz-static-gw").value.trim()
+            });
+            if (wRes.code !== 0) errors.push(`WAN: ${wRes.msg || wRes.code}`);
+          }
+
+          const pwdPack = await shaPasswordChange("admin", adminPwd);
+          const initPayload = {
+            locale: "zh_CN",
+            name: ssid,
+            encryption: wifiPwd ? "mixed-psk" : "none",
+            txpwr: "1",
+            update: "0",
+            bw160: "1",
+            bsd: "1",
+            ssid,
+            password: wifiPwd,
+            nonce: pwdPack.nonce,
+            oldPwd: pwdPack.oldPwd,
+            newPwd: pwdPack.newPwd,
+            newPwd256: pwdPack.newPwd256,
+            routerPwd: adminPwd
+          };
+          const rInit = await apiRequest("misystem/set_router_normal", "POST", initPayload);
+          if (rInit.code !== 0) errors.push(`Inicjalizacja: ${rInit.msg || rInit.code}`);
+        } catch (e) {
+          errors.push(`Inicjalizacja: ${e.message}`);
+        }
+      } else {
+        // Router już zainicjalizowany: WAN + Wi-Fi
+        if (proto === "pppoe") {
+          try {
+            const r = await apiRequest("xqnetwork/set_wan", "POST", {
+              wanType: "pppoe",
+              pppoeName: $id("wiz-pppoe-user").value.trim(),
+              pppoePwd: $id("wiz-pppoe-pwd").value
+            });
+            if (r.code !== 0) errors.push(`WAN: ${r.msg || r.code}`);
+          } catch (e) { errors.push(`WAN: ${e.message}`); }
+        } else if (proto === "static") {
+          try {
+            const r = await apiRequest("xqnetwork/set_wan", "POST", {
+              wanType: "static",
+              staticIp: $id("wiz-static-ip").value.trim(),
+              staticMask: $id("wiz-static-mask").value.trim(),
+              staticGateway: $id("wiz-static-gw").value.trim()
+            });
+            if (r.code !== 0) errors.push(`WAN: ${r.msg || r.code}`);
+          } catch (e) { errors.push(`WAN: ${e.message}`); }
+        }
+
+        if (ssid) {
+          try {
+            const r = await apiRequest("xqnetwork/set_all_wifi", "POST", {
+              bsd: "1", ssid1: ssid, ssid2: ssid,
+              pwd1: wifiPwd, pwd2: wifiPwd,
+              encryption1: wifiPwd ? "psk2+ccmp" : "none",
+              encryption2: wifiPwd ? "psk2+ccmp" : "none",
+              on1: "1", on2: "1", txpwr1: "max", txpwr2: "max",
+              channel1: "0", channel2: "0", bandwidth1: "0", bandwidth2: "0",
+              hidden1: "0", hidden2: "0", isDFS: "0"
+            });
+            if (r.code !== 0) errors.push(`Wi-Fi: ${r.msg || r.code}`);
+          } catch(e) { errors.push(`Wi-Fi: ${e.message}`); }
+        }
       }
 
-      // 2. Ustaw strefę czasową i czas
+      // 2. Ustaw strefę czasową i czas (POST zgodnie z oficjalnym LuCI)
       if (tzPosix) {
         try {
           const d = new Date(), pad = n => String(n).padStart(2, "0");
           const time = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-          const query = new URLSearchParams({time, timezone: tzPosix});
-          const r = await apiRequest(`misystem/set_sys_time?${query}`);
+          const r = await setRouterTimeAndZone({ time, timezone: tzPosix, index: tzIdx });
           if (r.code !== 0) errors.push(`Czas/TZ: ${r.msg || r.code}`);
         } catch(e) { errors.push(`Czas/TZ: ${e.message}`); }
       }
@@ -1661,6 +2060,7 @@ function setupAdditionalControls() {
         alert(`Kreator zakończył z błędami:\n${errors.join("\n")}`);
       } else {
         alert("Kreator zakończył konfigurację routera.");
+        void refreshData();
       }
     });
   }
@@ -2115,8 +2515,8 @@ function setupSystemTools() {
       if (!scanRes["5G"]) {
         lines.push(
           state.lang === "en"
-            ? "- 5 GHz: managed automatically by router (Auto / DFS)"
-            : "- 5 GHz: zarządzane automatycznie przez router (Auto / DFS)"
+            ? "- 5 GHz: router API does not provide 5 GHz spectrum scan (unchanged)"
+            : "- 5 GHz: brak skanu tego pasma w API routera (bez zmian)"
         );
       }
 
@@ -2176,9 +2576,10 @@ function setupSystemTools() {
   // Eksport Markdown
   document.getElementById("btn-export-md")?.addEventListener("click", () => {
     const now = new Date().toISOString();
-    let md = `# Raport Xiaomi Router Manager (BE7000)\n\n`;
+    const cleanModel = cleanModelName(state.initInfo?.displayName || state.initInfo?.hardware || "Xiaomi Router");
+    let md = `# Raport Xiaomi Router Manager (${cleanModel})\n\n`;
     md += `- **Data raportu:** ${now}\n`;
-    md += `- **Model:** ${state.initInfo?.displayName || "BE7000"}\n`;
+    md += `- **Model:** ${cleanModel}\n`;
     md += `- **Adres IP:** ${state.ip}\n`;
     md += `- **Uptime:** ${document.getElementById("dash-uptime")?.textContent || "--"}\n`;
     md += `- **Podłączone urządzenia:** ${state.devices.length}\n\n`;
@@ -2408,38 +2809,90 @@ function setupSystemEnhancements() {
   buildTzSelect("system-tz-select");
   buildTzSelect("wiz-tz-select");
 
-  // Synchronizacja czasu z urzadzeniem + strefa z selecta
+  // Synchronizacja czasu z urzadzeniem + strefa z selecta (POST zgodnie z LuCI Xiaomi)
   $id("btn-sync-time").onclick=async()=>{
     if(!state.connected) return;const d=new Date(),pad=n=>String(n).padStart(2,"0");
     const time=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     const selEl = $id("system-tz-select");
     const tz = selEl ? selEl.value : Intl.DateTimeFormat().resolvedOptions().timeZone;
     const posix = TZ_POSIX_MAP[tz] || "";
+    const tzIdx = TZ_INDEX_MAP[tz] || "2.54";
     if(!confirm(`Ustawić czas routera na ${time}\nStrefa: ${tz}${posix ? " (" + posix + ")" : ""}?`))return;
-    const query=new URLSearchParams({time});
-    if(posix) query.set("timezone", posix);
-    try {const r=await apiRequest(`misystem/set_sys_time?${query}`);if(r.code!==0)throw Error(r.msg||r.code);alert("Router potwierdził ustawienie czasu.");}catch(e){alert("Nie udało się ustawić czasu: "+e.message);}
+    try {
+      const r = await setRouterTimeAndZone({ time, timezone: posix || null, index: tzIdx });
+      if(r.code!==0)throw Error(r.msg||r.code);
+      alert("Router potwierdził ustawienie czasu i strefy.");
+      viewLoaded.delete("reboot");
+      await loadViewData("reboot");
+    }catch(e){alert("Nie udało się ustawić czasu: "+e.message);}
   };
-  // Zapisz strefę czasową (bez synchronizacji czasu)
+  // Zapisz strefę czasową (POST z timezone + index, identycznie jak panel Xiaomi)
   const btnSaveTz = $id("btn-save-tz");
   if (btnSaveTz) btnSaveTz.onclick = async () => {
     if (!state.connected) return alert("Najpierw połącz się z routerem.");
     const selEl = $id("system-tz-select");
     const tz = selEl ? selEl.value : "";
     const posix = TZ_POSIX_MAP[tz] || "";
+    const tzIdx = TZ_INDEX_MAP[tz] || "2.54";
     if (!posix) return alert("Nieznana strefa czasowa. Wybierz strefę z listy.");
     if (!confirm(`Ustawić strefę czasową routera na: ${tz} (${posix})?`)) return;
-    const d = new Date(), pad = n => String(n).padStart(2, "0");
-    const time = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     try {
-      const query = new URLSearchParams({time, timezone: posix});
-      const r = await apiRequest(`misystem/set_sys_time?${query}`);
+      const r = await setRouterTimeAndZone({ timezone: posix, index: tzIdx });
       if (r.code !== 0) throw Error(r.msg || r.code);
       alert("Router potwierdził zmianę strefy czasowej.");
+      viewLoaded.delete("reboot");
+      await loadViewData("reboot");
     } catch(e) { alert("Nie udało się zmienić strefy: " + e.message); }
   };
   $id("btn-check-firmware").onclick=async()=>{if(!state.connected)return;try{const r=await apiRequest("xqsystem/check_rom_update");if(r.code!==0)throw Error(r.msg||r.code);alert(Number(r.needUpdate)===1 ? "Router zgłasza dostępną aktualizację firmware." : "Router nie zgłasza dostępnej aktualizacji firmware.");}catch(e){alert("Nie udało się sprawdzić aktualizacji: "+e.message);}};
-  $id("btn-factory-reset").onclick=async()=>{if(!state.connected || !confirm("Przywrócić ustawienia fabryczne? Zostanie usunięta konfiguracja routera."))return;if(!confirm("Potwierdź ponownie przywrócenie ustawień fabrycznych."))return;try{const r=await apiRequest("xqsystem/reset");if(r.code!==0)throw Error(r.msg||r.code);disconnect();alert("Router potwierdził polecenie przywrócenia.");}catch(e){alert("Nie udało się potwierdzić operacji: "+e.message);}};
+  $id("btn-factory-reset").onclick=()=>{
+    if(!state.connected) return alert("Najpierw połącz się z routerem.");
+    const { role, model, rname, ip } = getRouterRoleInfo();
+    const isEn = state.lang === "en";
+    const dialog = document.createElement("dialog");
+    dialog.className = "nat-dialog";
+    dialog.innerHTML = `<form method="dialog">
+      <div class="reset-role-banner">
+        <div class="role-title">⚠ ${escapeHtml(role)}</div>
+        <div class="role-meta">${escapeHtml(model)} | '${escapeHtml(rname)}' | IP: ${escapeHtml(ip)}</div>
+      </div>
+      <p style="color:#fca5a5;font-size:13px;">${isEn
+        ? "WARNING: This will erase all router settings, Wi-Fi networks and DHCP leases! Make sure you are NOT wiping your main production router."
+        : "UWAGA: Ta operacja usunie wszystkie ustawienia, sieci Wi-Fi i konfigurację tego routera! Upewnij się, że NIE resetujesz przypadkiem głównego routera produkcyjnego."}</p>
+      <label>${isEn ? "Type RESET in capital letters to confirm:" : "Aby ostatecznie potwierdzić kasowanie, wpisz słowo RESET wielkimi literami:"}
+        <input name="confirmWord" type="text" placeholder="RESET" autocomplete="off" required>
+      </label>
+      <div class="nat-dialog-actions">
+        <button type="button" class="btn-secondary cancel">${isEn ? "Cancel" : "Anuluj"}</button>
+        <button type="submit" class="btn-danger">${isEn ? "Confirm RESET" : "Potwierdź RESET"}</button>
+      </div>
+    </form>`;
+    document.body.append(dialog);
+    const form = dialog.querySelector("form");
+    const close = () => { dialog.close?.(); dialog.remove(); };
+    dialog.querySelector(".cancel").onclick = close;
+    dialog.addEventListener("cancel", () => dialog.remove());
+    form.onsubmit = async ev => {
+      ev.preventDefault();
+      if (form.elements.confirmWord.value.trim() !== "RESET") {
+        alert(isEn ? "Factory reset cancelled (confirmation word mismatch)." : "Operacja resetu została anulowana (błędne słowo potwierdzające).");
+        return;
+      }
+      close();
+      try {
+        const r = await apiRequest("xqsystem/reset?format=1");
+        if (r.code !== 0) throw Error(r.msg || r.code);
+        window.AndroidRouter?.forgetPassword();
+        disconnect();
+        alert(isEn
+          ? "Full factory reset (?format=1) confirmed. After ~60-90s the router will boot in factory state (default password: admin)."
+          : "Router potwierdził pełny reset fabryczny (?format=1). Po ok. 60-90 s uruchomi się w stanie fabrycznym (domyślne hasło: admin).");
+      } catch (e) {
+        alert((isEn ? "Failed to confirm factory reset: " : "Nie udało się potwierdzić operacji: ") + e.message);
+      }
+    };
+    if (dialog.showModal) dialog.showModal(); else dialog.setAttribute("open", "");
+  };
   $id("btn-save-snapshot").onclick=async()=>{
     if(!state.connected || !confirm("Utworzyć kopię? Plik może zawierać hasła i inne wrażliwe dane konfiguracji."))return;
     const button=$id("btn-save-snapshot");button.disabled=true;

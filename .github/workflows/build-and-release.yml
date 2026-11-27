@@ -54,14 +54,14 @@ jobs:
 
       - name: Prepare APK Asset
         run: |
-          find mobile/android/app/build/outputs/apk/ -name "*.apk" -not -name "*androidTest*" | head -n 1 | xargs -I {} cp {} Xiaomi_Router_Manager_v1.0.8.apk
-          ls -lh Xiaomi_Router_Manager_v1.0.8.apk
+          find mobile/android/app/build/outputs/apk/ -name "*.apk" -not -name "*androidTest*" | head -n 1 | xargs -I {} cp {} Xiaomi_Router_Manager_v1.0.9.apk
+          ls -lh Xiaomi_Router_Manager_v1.0.9.apk
 
       - name: Upload Android APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Xiaomi_Router_Manager_v1.0.8.apk
-          path: Xiaomi_Router_Manager_v1.0.8.apk
+          name: Xiaomi_Router_Manager_v1.0.9.apk
+          path: Xiaomi_Router_Manager_v1.0.9.apk
           retention-days: 14
 
   build-windows:
@@ -79,22 +79,22 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install customtkinter requests pyinstaller
+          pip install customtkinter requests cryptography pillow pyinstaller
 
       - name: Build Windows Executable with PyInstaller
         run: |
-          pyinstaller Xiaomi_Router_Manager_v1.0.8.spec
+          pyinstaller Xiaomi_Router_Manager_v1.0.9.spec
 
       - name: Prepare EXE Asset
         run: |
-          Copy-Item "dist\Xiaomi_Router_Manager_v1.0.8.exe" -Destination "Xiaomi_Router_Manager_v1.0.8.exe"
-          Get-Item "Xiaomi_Router_Manager_v1.0.8.exe" | Format-List Length, Name
+          Copy-Item "dist\Xiaomi_Router_Manager_v1.0.9.exe" -Destination "Xiaomi_Router_Manager_v1.0.9.exe"
+          Get-Item "Xiaomi_Router_Manager_v1.0.9.exe" | Format-List Length, Name
 
       - name: Upload Windows EXE Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Xiaomi_Router_Manager_v1.0.8.exe
-          path: Xiaomi_Router_Manager_v1.0.8.exe
+          name: Xiaomi_Router_Manager_v1.0.9.exe
+          path: Xiaomi_Router_Manager_v1.0.9.exe
           retention-days: 14
 
   release:
@@ -109,20 +109,20 @@ jobs:
       - name: Download Android APK
         uses: actions/download-artifact@v4
         with:
-          name: Xiaomi_Router_Manager_v1.0.8.apk
+          name: Xiaomi_Router_Manager_v1.0.9.apk
 
       - name: Download Windows EXE
         uses: actions/download-artifact@v4
         with:
-          name: Xiaomi_Router_Manager_v1.0.8.exe
+          name: Xiaomi_Router_Manager_v1.0.9.exe
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            Xiaomi_Router_Manager_v1.0.8.exe
-            Xiaomi_Router_Manager_v1.0.8.apk
-          body_path: release_notes_v1.0.8.md
+            Xiaomi_Router_Manager_v1.0.9.exe
+            Xiaomi_Router_Manager_v1.0.9.apk
+          body_path: release_notes_v1.0.9.md
           draft: false
           prerelease: false
         env:

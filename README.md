@@ -1,6 +1,6 @@
 # Xiaomi Router Manager (XRM)
 
-[![Version](https://img.shields.io/badge/version-v1.0.6-blue.svg)](version.py)
+[![Version](https://img.shields.io/badge/version-v1.0.9-blue.svg)](version.py)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-blue.svg)](https://microsoft.com/windows)
 [![Android](https://img.shields.io/badge/Android-APK%20%7C%20Adaptive%20Tablet%20%26%20Phone-green.svg)](#9-adaptive-mobile--tablet-app-android-apk--offline-web-client)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
@@ -104,7 +104,7 @@ Located in `mobile/`, this client provides a unified experience across smartphon
 - **100% Offline Capability:** Works immediately with unconfigured or factory-reset routers (`192.168.31.1`) over open `Xiaomi_XXXX` Wi-Fi without internet or external dependencies.
 - **Quick DHCP Reservation:** Includes the green `+ Reserve` / `+ Rezerwuj` button for one-tap IP binding with hardware MAC lock.
 - **Setup Wizard:** Offline initial router configuration with Timezone (POSIX) and Regulatory Region selection.
-- **Available as:** Standalone `Xiaomi_Router_Manager_v1.0.6.apk` package in [Releases](https://github.com/hookmt/xiaomi-router-manager/releases).
+- **Available as:** Standalone `Xiaomi_Router_Manager_v1.0.9.apk` package in [Releases](https://github.com/hookmt/xiaomi-router-manager/releases).
 
 <p align="center">
   <img src="screenshots/13_android_tablet_dashboard.png" alt="Xiaomi Router Manager Android Tablet Dashboard" width="850">

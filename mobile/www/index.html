@@ -18,7 +18,7 @@
         <div class="logo-box">
           <span class="logo-icon">📶</span>
           <div class="logo-text">
-            <span class="logo-title">Xiaomi Router Manager <span class="version-badge">v1.0.8</span></span>
+            <span class="logo-title">Xiaomi Router Manager <span class="version-badge">v1.0.9</span></span>
             <span class="logo-subtitle" id="header-model-badge">BE7000 / BE6500 / AX3600</span>
           </div>
         </div>
@@ -162,7 +162,7 @@
             <span class="wiz-icon">🪄</span>
             <span class="wiz-text">Kreator Szybkiego Startu</span>
           </button>
-          <div class="drawer-version-footer">XRM Mobile v1.0.8</div>
+          <div class="drawer-version-footer">XRM Mobile v1.0.9</div>
         </div>
       </nav>
     </aside>
@@ -335,6 +335,7 @@
               <span>MAC: <strong id="mesh-master-mac">--</strong></span>
               <span>Klienci: <strong id="mesh-master-clients">--</strong></span>
             </div>
+            <div class="mesh-clients-list" id="mesh-master-clients-list"></div>
           </div>
           <div class="mesh-satellites" id="mesh-satellites-list">
             <div class="empty-state">Brak danych o topologii.</div>
@@ -395,7 +396,7 @@
               </div>
               <div class="info-row">
                 <span class="lbl">Rozmiar MTU:</span>
-                <span class="val bold" id="wan-stat-mtu">1472</span>
+                <span class="val bold" id="wan-stat-mtu">-</span>
               </div>
             </div>
             <div class="card-footer">
@@ -455,7 +456,7 @@
             <div class="form-group">
               <label class="form-label">Rozmiar jednostki MTU:</label>
               <div class="mtu-row">
-                <input type="number" id="wan-mtu-input" class="form-input mtu-field" value="1472">
+                <input type="number" id="wan-mtu-input" class="form-input mtu-field" placeholder="np. 1492 / 1500">
                 <div class="mtu-presets">
                   <button type="button" class="btn-preset" data-mtu="1472">1472 (Światłowód)</button>
                   <button type="button" class="btn-preset" data-mtu="1492">1492 (PPPoE)</button>
@@ -513,7 +514,7 @@
               <label class="form-label">Maska podsieci LAN:</label>
               <input type="text" id="lan-mask-input" class="form-input" value="255.255.255.0">
             </div>
-            <button class="btn-primary" id="btn-save-lan-ip">Zapisz IP Routera</button>
+            <button class="btn-danger" id="btn-save-lan-ip">Zapisz IP Routera</button>
           </div>
 
           <!-- Serwer DHCP -->
@@ -1212,7 +1213,7 @@
             <h3>Ponowne Uruchomienie Routera</h3>
           </div>
           <p class="card-desc">Restart spowoduje chwilowe przerwanie połączenia z Internetem i sieciami Wi-Fi na około 60-90 sekund.</p>
-          <button class="btn-danger" id="btn-reboot-router">🔄 Zrestartuj Xiaomi BE7000 Teraz</button>
+          <button class="btn-danger" id="btn-reboot-router">🔄 Zrestartuj Router Teraz</button>
           <p class="card-desc">Przywrócenie ustawień fabrycznych usuwa konfigurację routera i wymaga ponownego skonfigurowania sieci.</p>
           <button class="btn-danger" id="btn-factory-reset">Przywróć ustawienia fabryczne</button>
         </div>
@@ -1232,8 +1233,9 @@
           <div class="wizard-steps-indicator">
             <span class="step-num active">1. Tryb WAN</span> →
             <span class="step-num">2. Wi-Fi</span> →
-            <span class="step-num">3. Hasło Admina</span>
+            <span class="step-num">3. Hasło i Strefa</span>
           </div>
+          <div id="wiz-factory-banner" class="wifi-banner-info hidden"></div>
           <div class="form-group">
             <label class="form-label">Wybierz typ połączenia WAN dostawcy:</label>
             <select id="wiz-proto" class="form-select">
@@ -1242,9 +1244,33 @@
               <option value="static">Statyczny IP</option>
             </select>
           </div>
+          <div id="wiz-pppoe-box" class="form-section hidden">
+            <div class="form-group">
+              <label class="form-label">Login PPPoE:</label>
+              <input type="text" id="wiz-pppoe-user" class="form-input" placeholder="login@isp.pl">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hasło PPPoE:</label>
+              <input type="password" id="wiz-pppoe-pwd" class="form-input" placeholder="Hasło od dostawcy">
+            </div>
+          </div>
+          <div id="wiz-static-box" class="form-section hidden">
+            <div class="form-group">
+              <label class="form-label">Stały adres IP:</label>
+              <input type="text" id="wiz-static-ip" class="form-input" placeholder="np. 192.168.1.100">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Maska podsieci:</label>
+              <input type="text" id="wiz-static-mask" class="form-input" value="255.255.255.0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Brama domyślna:</label>
+              <input type="text" id="wiz-static-gw" class="form-input" placeholder="np. 192.168.1.1">
+            </div>
+          </div>
           <div class="form-group">
             <label class="form-label">Nazwa Twojej sieci domowej Wi-Fi (SSID):</label>
-            <input type="text" id="wiz-ssid" class="form-input" value="Xiaomi_BE7000_Home">
+            <input type="text" id="wiz-ssid" class="form-input" placeholder="np. Xiaomi_Home_WiFi">
           </div>
           <div class="form-group">
             <label class="form-label">Hasło do Wi-Fi:</label>
@@ -1255,6 +1281,10 @@
               <input type="checkbox" id="wiz-same-pwd" checked>
               <span>Użyj tego samego hasła dla panelu administratora routera</span>
             </label>
+          </div>
+          <div id="wiz-admin-pwd-box" class="form-group hidden">
+            <label class="form-label">Osobne hasło administratora routera:</label>
+            <input type="password" id="wiz-admin-pwd" class="form-input" placeholder="Minimum 8 znaków">
           </div>
           <div class="form-group">
             <label class="form-label">🌍 Strefa czasowa routera (Timezone):</label>

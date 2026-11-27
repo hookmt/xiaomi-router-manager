@@ -2,6 +2,31 @@
 
 All notable changes to **Xiaomi Router Manager (XRM)** will be documented in this file.
 
+## [1.0.9] - 2026-11-27
+
+### Added & Improved
+- **Native Factory-Reset Router Initialization Protocol (`inited == 0`, Windows & Android):**
+  - Implemented the official Xiaomi first-time setup sequence (`xqsystem/login` with `init=1`, `xqnetwork/set_wan_new`, and `misystem/set_router_normal` with AES-CBC PKCS7 + SHA-256 password encryption).
+  - Fresh or factory-reset routers (verified live on BE6500 `RN02`) can now be initialized end-to-end directly from XRM without opening the Chinese web browser interface.
+- **Official LuCI Timezone API (`POST misystem/set_sys_time`, Windows & Android):**
+  - Aligned timezone & clock updates with official MiWiFi LuCI (`POST` with `{timezone, index}` using V2 `TIMEZONEMAP` indices such as `2.54` for Poland/CET and `2.84` for China/CST-8, plus separate `POST` with `{time}`).
+  - Router timezone changes now persist cleanly and match the official Xiaomi Web UI immediately.
+- **Full Software Factory Reset (`?format=1`) & Red Safety Modal (Windows & Android):**
+  - Updated factory reset to call `xqsystem/reset?format=1` (verified live on BE6500: restores full `inited=0` factory state with default password `admin`).
+  - Added a custom red confirmation modal displaying the router's active role (`MASTER (MESH)` / `MASTER / STANDALONE` / `SATELITA / AP`), model, name, and IP before requiring `RESET` confirmation.
+  - Highlighted LAN Gateway IP Save button in red (`#dc2626`) to warn against accidental subnet changes.
+- **Mesh Topology & Multi-Router Hardening (Windows & Android):**
+  - Added Master & Satellite MAC fallbacks, per-node client mapping (showing connected devices under Master and each Satellite), and Mesh node badges on Android device cards.
+  - Fixed Mesh satellite protection (`isap > 0` instead of `isap == 1`) so satellites are protected as `[Stacja Admina / AP]` instead of showing `Blokuj Net`.
+  - Cleared stale router cache (`init_info`, `device_id`, `snapshot`, WAN inputs) on disconnect and router switching.
+
+### Fixed
+- **WAN Upload Speed Bug (Windows & Android):** Fixed Dashboard upload rate reading cumulative byte counter `wan.upload` (which showed hundreds of `MB/s`) instead of real-time `wan.upspeed`.
+- **DHCP WAN DNS Display (Windows & Android):** Added `dnsAddrs` / `dnsAddrs1` / `dnsAddrs2` extraction so routers connected via DHCP WAN show active DNS servers instead of `-`.
+- **Android Dashboard Summary Badges:** Populated `#dash-led-status` (`Diody LED`) and `#dash-net-mode` (`Tryb sieci`) on the mobile dashboard.
+- **Windows Setup Wizard Steps 4 & 5:** Fixed missing Step 4 (Timezone) frame builder, Static IP WAN fields, `set_wan` PPPoE parameter names (`pppoeName`/`pppoePwd`), `set_twt` argument signature, Smart Connect toggle handling, and removed dead MLO option and double colons (`::`).
+- **UI Polish (Windows & Android):** Cleaned Chinese `Xiaomi路由器` prefix to `Xiaomi Router `, fixed 5 GHz bandwidth label mapping in Wi-Fi confirmation dialog, widened TX/Bandwidth/Timezone comboboxes, shortened displayed POSIX timezone string, compacted device uptime (`59s`, `4m`, `6h 48m`) to prevent clipping, removed hardcoded `1472` MTU pre-fill, and updated 5 GHz scan fallback text.
+
 ## [1.0.8] - 2026-11-26
 
 ### Added & Improved

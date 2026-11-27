@@ -1728,3 +1728,43 @@ body {
   .header-left .logo-box, .header-left .logo-text { min-width:0; overflow:hidden; }
   .header-left .logo-title { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; }
 }
+.mesh-clients-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(51, 65, 85, 0.5);
+}
+.mesh-client-chip {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+.badge-node {
+  background: rgba(56, 189, 248, 0.14);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+.reset-role-banner {
+  background: #7f1d1d;
+  border: 2px solid #ef4444;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.reset-role-banner .role-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fecaca;
+}
+.reset-role-banner .role-meta {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 4px;
+}

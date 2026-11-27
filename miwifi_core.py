@@ -60,6 +60,176 @@ class MiWiFiClient:
             self.device_id = data.get("id") or data.get("routerId")
             return data
 
+    def is_factory_reset(self, info: Optional[Dict[str, Any]] = None) -> bool:
+        """Sprawdza, czy router jest w stanie fabrycznym (niezainicjalizowany: inited == 0)."""
+        data = info if info is not None else (self.init_info or self.probe())
+        if not isinstance(data, dict):
+            return False
+        if "inited" in data:
+            return str(data.get("inited")).strip() == "0"
+        if "init" in data:
+            return str(data.get("init")).strip() in ("0", "False", "false")
+        return False
+
+    def _resolve_device_mac(self) -> str:
+        """Zwraca identyfikator MAC używany do budowy nonce."""
+        device_mac = self.device_id
+        if not device_mac or "/" in str(device_mac):
+            try:
+                url_web = f"http://{self.ip}/cgi-bin/luci/web"
+                with urllib.request.urlopen(url_web, timeout=4) as r:
+                    html = r.read().decode("utf-8", errors="ignore")
+                    m = re.search(r"deviceId\s*:\s*['\"]([^'\"]+)['\"]", html)
+                    if m:
+                        device_mac = m.group(1)
+            except Exception:
+                pass
+        if not device_mac or "/" in str(device_mac):
+            return "00:00:00:00:00:00"
+        return str(device_mac)
+
+    def _build_nonce(self) -> str:
+        ts = int(time.time())
+        rand = random.randint(1000, 9999)
+        return f"0_{self._resolve_device_mac()}_{ts}_{rand}"
+
+    def _hash_old_pwd(self, password: str, nonce: str) -> str:
+        if self.new_encrypt_mode == 1:
+            inner = hashlib.sha256((password + self.PUBLIC_KEY).encode("utf-8")).hexdigest()
+            return hashlib.sha256((nonce + inner).encode("utf-8")).hexdigest()
+        inner = hashlib.sha1((password + self.PUBLIC_KEY).encode("utf-8")).hexdigest()
+        return hashlib.sha1((nonce + inner).encode("utf-8")).hexdigest()
+
+    def _encrypt_new_pwds(self, old_pwd: str, new_pwd: str) -> tuple:
+        """Zwraca (newPwd_aes_sha1, newPwd256_aes_sha256) w formacie Xiaomi LuCI AES-CBC PKCS7."""
+        if not HAVE_CRYPTO:
+            raise RuntimeError("Brak biblioteki cryptography w środowisku Python.")
+        key_str = self.PUBLIC_KEY
+        iv_bytes = bytes.fromhex("64175472480004614961023454661220")
+
+        k_sha1 = hashlib.sha1((old_pwd + key_str).encode("utf-8")).hexdigest()[:32]
+        p_sha1 = hashlib.sha1((new_pwd + key_str).encode("utf-8")).hexdigest().encode("utf-8")
+        padder1 = padding.PKCS7(128).padder()
+        padded1 = padder1.update(p_sha1) + padder1.finalize()
+        enc1 = Cipher(algorithms.AES(bytes.fromhex(k_sha1)), modes.CBC(iv_bytes)).encryptor()
+        new_pwd_aes = base64.b64encode(enc1.update(padded1) + enc1.finalize()).decode("utf-8")
+
+        k_sha256 = hashlib.sha256((old_pwd + key_str).encode("utf-8")).hexdigest()[:32]
+        p_sha256 = hashlib.sha256((new_pwd + key_str).encode("utf-8")).hexdigest().encode("utf-8")
+        padder256 = padding.PKCS7(128).padder()
+        padded256 = padder256.update(p_sha256) + padder256.finalize()
+        enc256 = Cipher(algorithms.AES(bytes.fromhex(k_sha256)), modes.CBC(iv_bytes)).encryptor()
+        new_pwd_256_aes = base64.b64encode(enc256.update(padded256) + enc256.finalize()).decode("utf-8")
+        return new_pwd_aes, new_pwd_256_aes
+
+    def login_factory_init(self, privacy: int = 0) -> bool:
+        """Logowanie inicjalizacyjne na fabrycznie czystym routerze (inited == 0).
+        Zgodnie z oficjalnym init.js Xiaomi używa domyślnego hasła 'admin' oraz flagi init=1.
+        """
+        if not self.init_info:
+            self.probe()
+
+        nonce = self._build_nonce()
+        pwd_hash = self._hash_old_pwd("admin", nonce)
+        params = {
+            "username": "admin",
+            "password": pwd_hash,
+            "logtype": "2",
+            "nonce": nonce,
+            "init": "1",
+            "privacy": str(1 if privacy else 0),
+        }
+
+        # Oficjalny init.js wysyła GET na /cgi-bin/luci/api/xqsystem/login
+        qs = urllib.parse.urlencode(params)
+        for method in ("GET", "POST"):
+            try:
+                if method == "GET":
+                    url = f"http://{self.ip}/cgi-bin/luci/api/xqsystem/login?{qs}"
+                    req = urllib.request.Request(url, headers={"User-Agent": "MiWiFi-Manager/1.0"})
+                else:
+                    url = f"http://{self.ip}/cgi-bin/luci/api/xqsystem/login"
+                    req = urllib.request.Request(
+                        url,
+                        data=qs.encode("utf-8"),
+                        headers={"User-Agent": "MiWiFi-Manager/1.0", "Content-Type": "application/x-www-form-urlencoded"},
+                    )
+                with urllib.request.urlopen(req, timeout=6) as resp:
+                    data = json.loads(resp.read().decode("utf-8", errors="ignore"))
+                    if data.get("code") == 0 and "token" in data:
+                        self.stok = data["token"]
+                        self.connected = True
+                        return True
+                    if data.get("code") == 0 and "url" in data:
+                        token = self.extract_stok(data["url"])
+                        if token:
+                            self.stok = token
+                            self.connected = True
+                            return True
+            except Exception:
+                continue
+
+        self.connected = False
+        return False
+
+    def initialize_factory_router(
+        self,
+        admin_pwd: str,
+        ssid: str,
+        wifi_pwd: str,
+        bsd: int = 1,
+        wan_type: str = "dhcp",
+        ssid_5g: Optional[str] = None,
+        wifi_pwd_5g: Optional[str] = None,
+        bw160: int = 1,
+        auto_update: int = 0,
+        router_name: Optional[str] = None,
+        locale: str = "Home",
+    ) -> Dict[str, Any]:
+        """Przeprowadza fabryczną inicjalizację routera (set_router_normal) po login_factory_init().
+        Ustawia hasło administratora, sieć Wi-Fi i przełącza router ze stanu inited=0 na inited=1.
+        """
+        if not self.stok:
+            raise RuntimeError("Brak tokena inicjalizacyjnego (wywołaj najpierw login_factory_init).")
+
+        # Opcjonalny wstępny krok WAN dla DHCP (zgodnie z init.js /dhcp)
+        if wan_type == "dhcp":
+            try:
+                self.api_request(
+                    "api/xqnetwork/set_wan_new",
+                    method="POST",
+                    data={"wanType": "dhcp", "autoset": "1"},
+                    timeout=10,
+                )
+            except Exception:
+                pass
+
+        nonce = self._build_nonce()
+        old_pwd_val = self._hash_old_pwd("admin", nonce)
+        new_pwd_aes, new_pwd_256_aes = self._encrypt_new_pwds("admin", admin_pwd)
+
+        payload: Dict[str, Any] = {
+            "locale": locale,
+            "name": router_name or ssid or "Xiaomi_Router",
+            "encryption": "mixed-psk" if wifi_pwd else "none",
+            "txpwr": "1",
+            "update": str(1 if auto_update else 0),
+            "bw160": str(1 if bw160 else 0),
+            "bsd": str(1 if bsd else 0),
+            "ssid": ssid,
+            "password": wifi_pwd,
+            "nonce": nonce,
+            "oldPwd": old_pwd_val,
+            "newPwd": new_pwd_aes,
+            "newPwd256": new_pwd_256_aes,
+            "routerPwd": admin_pwd,
+        }
+        if not bsd:
+            payload["ssid5g"] = ssid_5g or f"{ssid}_5G"
+            payload["password5g"] = wifi_pwd_5g if wifi_pwd_5g is not None else wifi_pwd
+
+        return self.api_request("api/misystem/set_router_normal", method="POST", data=payload, timeout=45)
+
     def extract_stok(self, text: str) -> Optional[str]:
         """Wyciąga token stok z czystego tokena lub pełnego linku wklejonego z przeglądarki."""
         text = text.strip()
@@ -75,12 +245,18 @@ class MiWiFiClient:
         token = self.extract_stok(stok_or_url)
         if not token:
             return False
+        self.init_info = {}
+        self.device_id = None
         self.stok = token
         # Test czy token jest ważny
         try:
             res = self.get_status()
             if res.get("code") == 0:
                 self.connected = True
+                try:
+                    self.probe()
+                except Exception:
+                    pass
                 return True
         except Exception:
             pass
@@ -90,8 +266,10 @@ class MiWiFiClient:
 
     def login_with_password(self, password: str, username: str = "admin") -> bool:
         """Autologowanie hasłem z wyliczeniem SHA-256 (dla newEncryptMode=1) lub SHA-1."""
-        if not self.init_info:
-            self.probe()
+        # Zawsze pobierz świeże init_info (zapobiega używaniu cache z innego routera na tym samym IP)
+        self.init_info = {}
+        self.device_id = None
+        self.probe()
 
         # Wyciągnięcie deviceId jeśli nie ma w init_info
         device_mac = self.device_id
@@ -534,9 +712,12 @@ class MiWiFiClient:
         """Wykonuje ponowne uruchomienie routera."""
         return self.api_request("api/xqsystem/reboot", method="GET")
 
-    def factory_reset(self) -> Dict[str, Any]:
-        """Wykonuje przywrócenie do ustawień fabrycznych (wymaga potwierdzeń w UI!)."""
-        return self.api_request("api/xqsystem/reset", method="GET")
+    def factory_reset(self, format_data: int = 1) -> Dict[str, Any]:
+        """Wykonuje przywrócenie do ustawień fabrycznych (wymaga potwierdzeń w UI!).
+        Wysyła format=1 (lub 0) zgodnie z oficjalnym reset_window(format) w LuCI Xiaomi.
+        """
+        fmt = "1" if format_data else "0"
+        return self.api_request(f"api/xqsystem/reset?format={fmt}", method="GET")
 
     def set_router_password(self, old_pwd: str, new_pwd: str) -> Dict[str, Any]:
         """Zmienia hasło administratora routera z użyciem natywnego szyfrowania AES-CBC."""
@@ -1148,20 +1329,26 @@ class MiWiFiClient:
         except Exception as e:
             return {"error": str(e)}
 
-    def set_sys_time(self, time_str: Optional[str] = None, timezone_str: Optional[str] = None) -> Dict[str, Any]:
-        """Ustawia czas systemowy i strefę czasową na routerze."""
-        import datetime
-        params = {}
-        if time_str:
-            params["time"] = time_str
-        else:
-            params["time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    def set_sys_time(self, time_str: Optional[str] = None, timezone_str: Optional[str] = None, tz_index: Optional[str] = None) -> Dict[str, Any]:
+        """Ustawia strefę czasową i/lub czas systemowy na routerze zgodnie z oficjalnym LuCI Xiaomi:
+        - strefa czasowa: POST api/misystem/set_sys_time z {timezone, index}
+        - czas: osobny POST api/misystem/set_sys_time z {time}
+        """
+        last_res: Dict[str, Any] = {"code": 0}
+
         if timezone_str:
-            params["timezone"] = timezone_str
-        else:
-            params["timezone"] = "CET-1CEST"
-        qs = urllib.parse.urlencode(params)
-        return self.api_request(f"api/misystem/set_sys_time?{qs}")
+            tz_payload: Dict[str, Any] = {"timezone": timezone_str}
+            if tz_index:
+                tz_payload["index"] = str(tz_index)
+            last_res = self.api_request("api/misystem/set_sys_time", method="POST", data=tz_payload)
+            if isinstance(last_res, dict) and last_res.get("code") not in (0, None):
+                return last_res
+
+        if time_str:
+            res_time = self.api_request("api/misystem/set_sys_time", method="POST", data={"time": time_str})
+            return res_time if isinstance(res_time, dict) else last_res
+
+        return last_res
 
     def set_nfc_status(self, enabled: bool = True) -> Dict[str, Any]:
         """Włącza lub wyłącza fizyczny tag NFC (jeśli wspierany sprzętowo)."""
@@ -1182,11 +1369,15 @@ class MiWiFiClient:
 
     def fetch_full_snapshot(self) -> Dict[str, Any]:
         """Zbiera kompletny zrzut konfiguracji i parametrów ze wszystkich modułów routera."""
+        try:
+            fresh_init = self.probe()
+        except Exception:
+            fresh_init = self.init_info
         snapshot = {
             "fetch_timestamp": int(time.time()),
             "fetch_date": time.strftime("%Y-%m-%d %H:%M:%S"),
             "router_ip": self.ip,
-            "init_info": self.init_info or self.probe(),
+            "init_info": fresh_init,
             "status": {},
             "wan_info": {},
             "lan_info": {},

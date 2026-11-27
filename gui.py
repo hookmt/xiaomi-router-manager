@@ -17,7 +17,7 @@ sys.path.insert(0, APP_DIR)
 from miwifi_core import MiWiFiClient
 from exporter_md import export_snapshot_to_markdown, format_bytes, format_speed, format_uptime
 from i18n import t, load_settings, save_settings
-from setup_wizard import SetupWizardDialog, TZ_POSIX_MAP, TZ_DISPLAY_LIST
+from setup_wizard import SetupWizardDialog, TZ_POSIX_MAP, TZ_INDEX_MAP, TZ_DISPLAY_LIST
 from version import APP_VERSION, APP_NAME
 
 ctk.set_appearance_mode("dark")
@@ -36,6 +36,26 @@ def safe_float(val, default=0.0):
         return float(val)
     except (ValueError, TypeError):
         return default
+
+
+def clean_model_name(raw_model) -> str:
+    return str(raw_model or "Xiaomi").replace("Xiaomi路由器", "Xiaomi Router ").strip()
+
+
+def format_uptime_compact(seconds: int) -> str:
+    s = safe_int(seconds, 0)
+    if s <= 0:
+        return "<1m"
+    d = s // 86400
+    h = (s % 86400) // 3600
+    m = (s % 3600) // 60
+    if d > 0:
+        return f"{d}d {h}h"
+    if h > 0:
+        return f"{h}h {m}m"
+    if m > 0:
+        return f"{m}m"
+    return f"{s}s"
 
 
 def parse_mem_total_bytes(val) -> float:
@@ -698,14 +718,22 @@ class MiWiFiManagerApp(ctk.CTk):
         graph = topo.get("graph", {})
         ap_map = {}
         main_name = graph.get("name") or ("Main Router" if lg == "en" else "Router Główny")
-        main_hw = "BE7000" if graph.get("hardware") == "RC06" else (graph.get("hardware") or "")
-        ap_map[graph.get("ip")] = f"{main_name} ({main_hw})"
+        main_hw = "BE7000" if graph.get("hardware") == "RC06" else ("BE6500" if graph.get("hardware") == "RN02" else (graph.get("hardware") or ""))
+        ap_map[graph.get("ip")] = f"{main_name} ({main_hw})" if main_hw else main_name
+        if graph.get("mac"):
+            ap_map[str(graph.get("mac")).upper().strip()] = ap_map[graph.get("ip")]
 
         for leaf in graph.get("leafs", []):
             l_ip = leaf.get("ip")
             l_name = leaf.get("name") or leaf.get("hardware") or ("Satellite" if lg == "en" else "Satelita")
-            l_hw = "BE6500" if leaf.get("hardware") == "RN02" else (leaf.get("hardware") or "")
-            ap_map[l_ip] = f"{l_name} ({l_hw})"
+            l_hw = "BE6500" if leaf.get("hardware") == "RN02" else ("BE7000" if leaf.get("hardware") == "RC06" else (leaf.get("hardware") or ""))
+            label_leaf = f"{l_hw}" if l_hw and (not l_name or l_name.startswith("rn02_") or l_name == leaf.get("hardware")) else (f"{l_name} ({l_hw})" if l_hw else l_name)
+            if l_ip:
+                ap_map[l_ip] = label_leaf
+            for mk in ("mac", "id"):
+                mv = str(leaf.get(mk) or "").upper().strip()
+                if mv and ":" in mv:
+                    ap_map[mv] = label_leaf
 
         for d in raw_devs:
             d_ip = d.get("ip")
@@ -777,14 +805,14 @@ class MiWiFiManagerApp(ctk.CTk):
             d_online_sec = safe_int(stat.get("online", 0))
             if d_online_sec == 0:
                 d_online_sec = safe_int(d.get("uptime", 0))
-            d_uptime_str = f"{('Time:' if lg == 'en' else 'Czas:')} {format_uptime(d_online_sec, lang=lg)}" if d_online_sec > 0 else ("Time: <1m" if lg == "en" else "Czas: <1m")
+            d_uptime_str = format_uptime_compact(d_online_sec)
 
             auth = d.get("authority", {})
             wan_allowed = auth.get("wan", 1) == 1
-            is_admin = (auth.get("admin", 0) == 1) or (d.get("is_cur", 0) == 1) or (d.get("isap", 0) == 1)
+            is_ap = safe_int(d.get("isap", 0)) > 0
+            is_admin = (auth.get("admin", 0) == 1) or (d.get("is_cur", 0) == 1) or is_ap
 
             parent_mac = (d.get("parent") or "").upper().strip()
-            is_ap = safe_int(d.get("isap", 0)) > 0
             if is_ap:
                 ap_point = t("mesh_satellite_badge", lg)
             elif parent_mac and parent_mac in ap_map:
@@ -946,44 +974,44 @@ class MiWiFiManagerApp(ctk.CTk):
 
                     lbl_bound = ctk.CTkLabel(
                         row_f,
-                        text=("● Reserved" if lg == "en" else "● Zarezerwowany"),
+                        text=("● Reserved" if lg == "en" else "● Stałe IP"),
                         text_color="#22c55e",
                         font=ctk.CTkFont(size=11, weight="bold"),
-                        width=100,
+                        width=76,
                         anchor="e"
                     )
-                    lbl_bound.pack(side="right", padx=(3, 5))
+                    lbl_bound.pack(side="right", padx=(2, 4))
                 else:
                     btn_bind = ctk.CTkButton(
                         row_f,
                         text=t("dev_btn_quick_bind", lg),
-                        width=95,
+                        width=88,
                         height=26,
                         fg_color="#16a34a",
                         hover_color="#15803d",
                         command=lambda m=it["mac"], ip=it["ip"], n=it["name"]: self._dialog_add_mac_bind(prefill_mac=m, prefill_ip=ip, prefill_name=n)
                     )
-                    btn_bind.pack(side="right", padx=(3, 5))
+                    btn_bind.pack(side="right", padx=(2, 4))
 
             # LEWA STRONA
-            ctk.CTkLabel(row_f, text=it["name"], font=ctk.CTkFont(weight="bold"), width=180, anchor="w").pack(side="left", padx=6)
-            ctk.CTkLabel(row_f, text=f"IP: {it['ip']}", width=120, anchor="w", text_color="#38bdf8" if it["is_offline"] else None).pack(side="left", padx=4)
-            ctk.CTkLabel(row_f, text=f"MAC: {it['mac']}", width=140, anchor="w").pack(side="left", padx=4)
+            ctk.CTkLabel(row_f, text=it["name"], font=ctk.CTkFont(weight="bold"), width=155, anchor="w").pack(side="left", padx=(6, 3))
+            ctk.CTkLabel(row_f, text=f"{it['ip']}", width=102, anchor="w", text_color="#38bdf8" if it["is_offline"] else None).pack(side="left", padx=3)
+            ctk.CTkLabel(row_f, text=f"{it['mac']}", width=124, anchor="w").pack(side="left", padx=3)
 
-            lbl_badge = ctk.CTkLabel(row_f, text=it["conn_type"], text_color=it["badge_color"], font=ctk.CTkFont(weight="bold"), width=90, anchor="w")
-            lbl_badge.pack(side="left", padx=4)
+            lbl_badge = ctk.CTkLabel(row_f, text=it["conn_type"], text_color=it["badge_color"], font=ctk.CTkFont(weight="bold"), width=82, anchor="w")
+            lbl_badge.pack(side="left", padx=3)
 
-            lbl_ap = ctk.CTkLabel(row_f, text=it.get("ap_point", "-"), text_color="#94a3b8", font=ctk.CTkFont(size=11), width=110, anchor="w")
-            lbl_ap.pack(side="left", padx=4)
+            lbl_ap = ctk.CTkLabel(row_f, text=it.get("ap_point", "-"), text_color="#94a3b8", font=ctk.CTkFont(size=11), width=115, anchor="w")
+            lbl_ap.pack(side="left", padx=3)
 
             if it["is_offline"]:
-                ctk.CTkLabel(row_f, text="-", width=75, anchor="w", text_color="#64748b").pack(side="left", padx=4)
-                ctk.CTkLabel(row_f, text="-", width=75, anchor="w", text_color="#64748b").pack(side="left", padx=4)
-                ctk.CTkLabel(row_f, text="Not connected" if lg == "en" else "Brak w sieci", width=100, anchor="w", text_color="#64748b").pack(side="left", padx=4)
+                ctk.CTkLabel(row_f, text="-", width=64, anchor="w", text_color="#64748b").pack(side="left", padx=2)
+                ctk.CTkLabel(row_f, text="-", width=64, anchor="w", text_color="#64748b").pack(side="left", padx=2)
+                ctk.CTkLabel(row_f, text="Offline", width=64, anchor="w", text_color="#64748b").pack(side="left", padx=2)
             else:
-                ctk.CTkLabel(row_f, text=f"↓ {format_speed(it['downspeed'])}", text_color="#33a02c", width=75, anchor="w").pack(side="left", padx=4)
-                ctk.CTkLabel(row_f, text=f"↑ {format_speed(it['upspeed'])}", text_color="#1f78b4", width=75, anchor="w").pack(side="left", padx=4)
-                ctk.CTkLabel(row_f, text=it["uptime_str"], width=100, anchor="w", text_color="#94a3b8").pack(side="left", padx=4)
+                ctk.CTkLabel(row_f, text=f"↓ {format_speed(it['downspeed'])}", text_color="#33a02c", width=68, anchor="w").pack(side="left", padx=2)
+                ctk.CTkLabel(row_f, text=f"↑ {format_speed(it['upspeed'])}", text_color="#1f78b4", width=68, anchor="w").pack(side="left", padx=2)
+                ctk.CTkLabel(row_f, text=it["uptime_str"], width=68, anchor="w", text_color="#94a3b8").pack(side="left", padx=2)
 
     # --- TOPOLOGIA I WĘZŁY MESH ---
     def _build_mesh_tab(self):
@@ -1038,13 +1066,35 @@ class MiWiFiManagerApp(ctk.CTk):
         ctk.CTkLabel(r_hdr, text=f" {r_hw_name} - {r_name} ", font=ctk.CTkFont(size=15, weight="bold")).pack(side="left", padx=10)
 
         r_body = ctk.CTkFrame(root_card, fg_color="transparent")
-        r_body.pack(fill="x", padx=15, pady=(0, 12))
+        r_body.pack(fill="x", padx=15, pady=(0, 8))
 
         ch_val = graph.get('channel', 'release')
-        ctk.CTkLabel(r_body, text=f"IP: {graph.get('ip', self.client.ip)}  |  SSID: {graph.get('ssid', '-')}  |  {t('mesh_channel', lg).format(channel=ch_val)}", text_color="#94a3b8").pack(side="left")
-        
-        onlines_count = graph.get("onlines") or len(raw_devs)
+        st_hw = self.snapshot.get("status", {}).get("hardware", {})
+        wan_inf = self.snapshot.get("wan_info", {}).get("info", {}) if isinstance(self.snapshot.get("wan_info", {}).get("info"), dict) else self.snapshot.get("wan_info", {})
+        r_mac = graph.get("mac") or (st_hw.get("mac") if isinstance(st_hw, dict) else None) or (wan_inf.get("mac") if isinstance(wan_inf, dict) else None) or "-"
+        ctk.CTkLabel(r_body, text=f"IP: {graph.get('ip', self.client.ip)}  |  MAC: {r_mac}  |  SSID: {graph.get('ssid', '-')}  |  {t('mesh_channel', lg).format(channel=ch_val)}", text_color="#94a3b8").pack(side="left")
+
+        # Podział aktywnych klientów (bez samych węzłów isap>0) na Master vs Satelity
+        root_clients = []
+        sat_clients_by_mac = {}
+        for d in raw_devs:
+            if safe_int(d.get("isap", 0)) > 0:
+                continue
+            d_name = d.get("name") or d.get("oname") or d.get("mac") or "?"
+            p_mac = (d.get("parent") or "").upper().strip()
+            if p_mac:
+                sat_clients_by_mac.setdefault(p_mac, []).append(d_name)
+            else:
+                root_clients.append(d_name)
+
+        onlines_count = max(safe_int(graph.get("onlines"), 0), len(root_clients))
         ctk.CTkLabel(r_body, text=t('mesh_net_devs', lg).format(count=onlines_count), text_color="#38bdf8", font=ctk.CTkFont(weight="bold")).pack(side="right")
+
+        if root_clients:
+            r_cli_lbl = ("Connected clients: " if lg == "en" else "Podłączeni klienci: ") + ", ".join(root_clients[:14])
+            if len(root_clients) > 14:
+                r_cli_lbl += f" (+{len(root_clients) - 14})"
+            ctk.CTkLabel(root_card, text=r_cli_lbl, text_color="#cbd5e1", font=ctk.CTkFont(size=11), justify="left", anchor="w", wraplength=980).pack(fill="x", padx=15, pady=(0, 10))
 
         # Satelity Mesh (z leafs)
         leafs = graph.get("leafs", [])
@@ -1122,6 +1172,17 @@ class MiWiFiManagerApp(ctk.CTk):
             ctk.CTkLabel(s_bot, text=f"IP: {s_ip}  |  MAC: {s_mac}  |  ", text_color="#94a3b8").pack(side="left")
             ctk.CTkLabel(s_bot, text=bh_text, text_color=bh_color, font=ctk.CTkFont(weight="bold")).pack(side="left")
             ctk.CTkLabel(s_bot, text=f"  |  {t('mesh_connected_clients', lg).format(count=s_onlines)}", text_color="#38bdf8", font=ctk.CTkFont(weight="bold")).pack(side="left")
+
+            sat_keys = {str(s_mac).upper().strip(), str(sat.get("mac") or "").upper().strip(), str(sat.get("id") or "").upper().strip()}
+            sat_clients = []
+            for sk in sat_keys:
+                if sk and sk in sat_clients_by_mac:
+                    sat_clients.extend(sat_clients_by_mac[sk])
+            if sat_clients:
+                s_cli_txt = ("Connected clients: " if lg == "en" else "Podłączeni klienci: ") + ", ".join(sat_clients[:14])
+                if len(sat_clients) > 14:
+                    s_cli_txt += f" (+{len(sat_clients) - 14})"
+                ctk.CTkLabel(sat_card, text=s_cli_txt, text_color="#cbd5e1", font=ctk.CTkFont(size=11), justify="left", anchor="w", wraplength=980).pack(fill="x", padx=15, pady=(0, 10))
 
     def _reboot_mesh_satellite(self, node_ip: str):
         if not node_ip or node_ip == "-":
@@ -1242,8 +1303,7 @@ class MiWiFiManagerApp(ctk.CTk):
         f_mtu_row = ctk.CTkFrame(f_common, fg_color="transparent")
         f_mtu_row.pack(fill="x", padx=5, pady=(0, 6))
 
-        self.entry_wan_mtu = ctk.CTkEntry(f_mtu_row, width=130, placeholder_text="np. 1472")
-        self.entry_wan_mtu.insert(0, "1472")
+        self.entry_wan_mtu = ctk.CTkEntry(f_mtu_row, width=130, placeholder_text="np. 1500")
         self.entry_wan_mtu.pack(side="left", padx=(0, 8))
 
         ctk.CTkButton(
@@ -1334,7 +1394,7 @@ class MiWiFiManagerApp(ctk.CTk):
         self.entry_lan_mask.insert(0, "255.255.255.0")
         self.entry_lan_mask.pack(side="right")
 
-        btn_save_lan_ip = ctk.CTkButton(card_lan_ip, text=("Apply Gateway IP" if lg == "en" else "Zastosuj Adres IP Bramy LAN"), fg_color="#475569", hover_color="#334155", command=self._action_save_lan_ip)
+        btn_save_lan_ip = ctk.CTkButton(card_lan_ip, text=("Apply Gateway IP" if lg == "en" else "Zastosuj Adres IP Bramy LAN"), fg_color="#dc2626", hover_color="#991b1b", font=ctk.CTkFont(weight="bold"), command=self._action_save_lan_ip)
         btn_save_lan_ip.pack(fill="x", padx=15, pady=(8, 10))
 
         # 2. Karta prawa: Serwer DHCP
@@ -1772,7 +1832,7 @@ class MiWiFiManagerApp(ctk.CTk):
         self.f_tx_2g = ctk.CTkFrame(self.card_2g, fg_color="transparent")
         self.f_tx_2g.pack(fill="x", padx=15, pady=4)
         ctk.CTkLabel(self.f_tx_2g, text=t("wifi_txpwr", lg)).pack(side="left")
-        self.combo_wifi_tx_2g = ctk.CTkComboBox(self.f_tx_2g, values=get_wifi_tx_options(lg), width=200)
+        self.combo_wifi_tx_2g = ctk.CTkComboBox(self.f_tx_2g, values=get_wifi_tx_options(lg), width=235)
         self.combo_wifi_tx_2g.set(code_to_tx("max", lg))
         self.combo_wifi_tx_2g.pack(side="right")
 
@@ -1854,7 +1914,7 @@ class MiWiFiManagerApp(ctk.CTk):
         self.f_tx_5g = ctk.CTkFrame(self.card_5g, fg_color="transparent")
         self.f_tx_5g.pack(fill="x", padx=15, pady=4)
         ctk.CTkLabel(self.f_tx_5g, text=t("wifi_txpwr", lg)).pack(side="left")
-        self.combo_wifi_tx_5g = ctk.CTkComboBox(self.f_tx_5g, values=get_wifi_tx_options(lg), width=200)
+        self.combo_wifi_tx_5g = ctk.CTkComboBox(self.f_tx_5g, values=get_wifi_tx_options(lg), width=235)
         self.combo_wifi_tx_5g.set(code_to_tx("max", lg))
         self.combo_wifi_tx_5g.pack(side="right")
 
@@ -1868,7 +1928,7 @@ class MiWiFiManagerApp(ctk.CTk):
         f_bw_5g = ctk.CTkFrame(self.card_5g, fg_color="transparent")
         f_bw_5g.pack(fill="x", padx=15, pady=4)
         ctk.CTkLabel(f_bw_5g, text=t("wifi_bandwidth", lg)).pack(side="left")
-        self.combo_wifi_bw_5g = ctk.CTkComboBox(f_bw_5g, values=WIFI_5G_BANDWIDTHS, width=200)
+        self.combo_wifi_bw_5g = ctk.CTkComboBox(f_bw_5g, values=WIFI_5G_BANDWIDTHS, width=250)
         self.combo_wifi_bw_5g.set("Auto")
         self.combo_wifi_bw_5g.pack(side="right")
 
@@ -2145,7 +2205,7 @@ class MiWiFiManagerApp(ctk.CTk):
         enc_code = enc_to_code(enc_display)
         tx_code = WIFI_TX_MAP_CODE.get(tx_display, "max")
         lg = self.current_lang
-        if enc_code == "sae":
+        if enc_code in ("ccmp", "sae"):
             if not messagebox.askyesno(t("warn_title", lg), t("wifi_enc_warn_wpa3", lg)):
                 return
 
@@ -2157,12 +2217,13 @@ class MiWiFiManagerApp(ctk.CTk):
             messagebox.showerror("Błąd hasła", "Dla zabezpieczeń WPA2 / WPA3 hasło musi mieć co najmniej 8 znaków.")
             return
 
+        bw_band = "5g" if wifi_idx == 2 else "2g"
         msg_confirm = (
             f"Czy na pewno chcesz zapisać nowe parametry dla pasma {band_name}?\n\n"
             f"- SSID: {ssid}\n"
             f"- Szyfrowanie: {enc_display}\n"
             f"- Kanał: {code_to_channel(channel)}\n"
-            f"- Szerokość: {code_to_bandwidth(bandwidth)}\n"
+            f"- Szerokość: {code_to_bandwidth(bandwidth, bw_band)}\n"
             f"- Moc nadawania: {tx_display}\n"
             f"- Ukryte SSID: {'Tak' if hidden else 'Nie'}\n\n"
             f"UWAGA: Zmiana parametrów rozłączy urządzenia bezprzewodowe na około 10-15 sekund!"
@@ -2257,8 +2318,8 @@ class MiWiFiManagerApp(ctk.CTk):
         msg_confirm = (
             f"Czy na pewno chcesz zapisać globalną konfigurację Wi-Fi?\n\n"
             f"- Smart Connect (BSD): {'WŁĄCZONY (Wspólne SSID)' if bsd else 'WYŁĄCZONY (Osobne pasma)'}\n"
-            f"- 2.4 GHz: '{ssid_2g}' (Kanał: {code_to_channel(ch_2g)}, Szerokość: {code_to_bandwidth(bw_2g)})\n"
-            f"- 5 GHz: '{ssid_5g}' (Kanał: {code_to_channel(ch_5g)}, Szerokość: {code_to_bandwidth(bw_5g)})\n\n"
+            f"- 2.4 GHz: '{ssid_2g}' (Kanał: {code_to_channel(ch_2g)}, Szerokość: {code_to_bandwidth(bw_2g, '2g')})\n"
+            f"- 5 GHz: '{ssid_5g}' (Kanał: {code_to_channel(ch_5g)}, Szerokość: {code_to_bandwidth(bw_5g, '5g')})\n\n"
             f"UWAGA: Zmiana parametrów rozłączy urządzenia bezprzewodowe na około 10-15 sekund!"
         )
 
@@ -4313,7 +4374,7 @@ class MiWiFiManagerApp(ctk.CTk):
         self.btn_save_tools_tz = ctk.CTkButton(tz_row, text=("Save" if lg == "en" else "Zapisz"), width=80, height=26, fg_color="#0284c7", hover_color="#0369a1", command=self._action_save_tools_timezone)
         self.btn_save_tools_tz.pack(side="right", padx=(6, 0))
         tz_labels = [lbl for _, lbl in TZ_DISPLAY_LIST]
-        self.combo_tools_tz = ctk.CTkComboBox(tz_row, values=tz_labels, width=220, height=26)
+        self.combo_tools_tz = ctk.CTkComboBox(tz_row, values=tz_labels, width=250, height=26)
         self.combo_tools_tz.set(tz_labels[0])
         self.combo_tools_tz.pack(side="right")
 
@@ -4340,16 +4401,16 @@ class MiWiFiManagerApp(ctk.CTk):
         sel_label = self.combo_tools_tz.get() if hasattr(self, "combo_tools_tz") else ""
         for iana, lbl in TZ_DISPLAY_LIST:
             if lbl == sel_label:
-                return iana, TZ_POSIX_MAP.get(iana, "CET-1CEST,M3.5.0,M10.5.0/3")
-        return "Europe/Warsaw", TZ_POSIX_MAP.get("Europe/Warsaw", "CET-1CEST,M3.5.0,M10.5.0/3")
+                return iana, TZ_POSIX_MAP.get(iana, "CET-1CEST,M3.5.0,M10.5.0/3"), TZ_INDEX_MAP.get(iana, "2.54")
+        return "Europe/Warsaw", TZ_POSIX_MAP.get("Europe/Warsaw", "CET-1CEST,M3.5.0,M10.5.0/3"), TZ_INDEX_MAP.get("Europe/Warsaw", "2.54")
 
     def _action_sync_time(self):
         import datetime
         lg = self.current_lang
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        iana_tz, posix_tz = self._get_selected_tools_tz()
+        iana_tz, posix_tz, tz_idx = self._get_selected_tools_tz()
         def run():
-            res = self.client.set_sys_time(time_str=now_str, timezone_str=posix_tz)
+            res = self.client.set_sys_time(time_str=now_str, timezone_str=posix_tz, tz_index=tz_idx)
             if res.get("code") == 0:
                 msg = (
                     f"Synchronized router time with PC ({now_str}) and timezone {iana_tz} ({posix_tz})."
@@ -4364,9 +4425,8 @@ class MiWiFiManagerApp(ctk.CTk):
         threading.Thread(target=run, daemon=True).start()
 
     def _action_save_tools_timezone(self):
-        import datetime
         lg = self.current_lang
-        iana_tz, posix_tz = self._get_selected_tools_tz()
+        iana_tz, posix_tz, tz_idx = self._get_selected_tools_tz()
         prompt = (
             f"Set router timezone to {iana_tz} ({posix_tz})?"
             if lg == "en"
@@ -4374,9 +4434,8 @@ class MiWiFiManagerApp(ctk.CTk):
         )
         if not messagebox.askyesno(t("info_title", lg), prompt):
             return
-        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         def run():
-            res = self.client.set_sys_time(time_str=now_str, timezone_str=posix_tz)
+            res = self.client.set_sys_time(timezone_str=posix_tz, tz_index=tz_idx)
             if res.get("code") == 0:
                 msg = (
                     f"Router timezone updated to {iana_tz} ({posix_tz})."
@@ -4554,7 +4613,7 @@ class MiWiFiManagerApp(ctk.CTk):
             return
 
         r_name = snap.get("init_info", {}).get("routername") or ("Unknown" if lg == "en" else "Nieznany")
-        r_model = snap.get("init_info", {}).get("displayName") or "Xiaomi"
+        r_model = clean_model_name(snap.get("init_info", {}).get("displayName") or "Xiaomi")
         r_date = snap.get("fetch_date") or ("no date" if lg == "en" else "brak daty")
 
         bind_cnt = len(snap.get("mac_bind", {}).get("list", []))
@@ -4903,7 +4962,7 @@ class MiWiFiManagerApp(ctk.CTk):
             try:
                 gw = self.client.discover_gateway()
                 info = self.client.probe()
-                model = info.get("displayName") or info.get("hardware") or "Xiaomi"
+                model = clean_model_name(info.get("displayName") or info.get("hardware") or "Xiaomi")
                 rname = info.get("routername") or ""
                 def update_gw():
                     try:
@@ -4926,17 +4985,53 @@ class MiWiFiManagerApp(ctk.CTk):
                     pass
         threading.Thread(target=run, daemon=True).start()
 
+    def _reset_disconnected_state(self, clear_password: bool = False):
+        lg = self.current_lang
+        self.client.connected = False
+        self.client.stok = None
+        self.client.init_info = {}
+        self.client.device_id = None
+        self.snapshot = {}
+        self.raw_devices = []
+        self.raw_binds = []
+        if clear_password and hasattr(self, "auth_entry"):
+            self.auth_entry.delete(0, "end")
+        self.status_indicator.configure(text=t("status_disconnected", lg), text_color="#ff5555")
+        self.btn_connect.configure(text=t("connect", lg))
+        if hasattr(self, "lbl_router_title"):
+            self.lbl_router_title.configure(text=t("waiting_connection", lg))
+        if hasattr(self, "lbl_model"):
+            self.lbl_model.configure(text=f"{t('lbl_model', lg)} -")
+        if hasattr(self, "lbl_rom"):
+            self.lbl_rom.configure(text=f"{t('lbl_rom', lg)} -")
+        if hasattr(self, "lbl_uptime"):
+            self.lbl_uptime.configure(text=f"{t('lbl_uptime', lg)} -")
+        if hasattr(self, "lbl_router_id"):
+            self.lbl_router_id.configure(text=f"{t('lbl_router_id', lg)} -")
+        if hasattr(self, "lbl_wan_ip"):
+            self.lbl_wan_ip.configure(text=f"{t('lbl_wan_ip', lg)} -")
+        if hasattr(self, "lbl_wan_dns"):
+            self.lbl_wan_dns.configure(text=f"{t('lbl_wan_dns', lg)} -")
+        for attr in ("entry_wan_mtu", "entry_wan_user", "entry_wan_pwd", "entry_wan_dns1", "entry_wan_dns2", "entry_clone_mac"):
+            w = getattr(self, attr, None)
+            if w is not None:
+                try:
+                    w.configure(state="normal")
+                    w.delete(0, "end")
+                except Exception:
+                    pass
+
     def _toggle_connect(self):
         lg = self.current_lang
         if self.client.connected:
-            self.client.connected = False
-            self.client.stok = None
-            self.status_indicator.configure(text=t("status_disconnected", lg), text_color="#ff5555")
-            self.btn_connect.configure(text=t("connect", lg))
+            self._reset_disconnected_state(clear_password=False)
             return
 
         ip = self.ip_entry.get().strip()
         self.client.ip = ip
+        self.client.init_info = {}
+        self.client.device_id = None
+        self.snapshot = {}
         auth_val = self.auth_entry.get().strip()
         mode = self.auth_mode.get()
 
@@ -5000,7 +5095,8 @@ class MiWiFiManagerApp(ctk.CTk):
 
         # 1. Informacje ogólne
         try:
-            model = init.get("displayName") or init.get("hardware") or "Xiaomi"
+            raw_model = init.get("displayName") or init.get("hardware") or "Xiaomi"
+            model = str(raw_model).replace("Xiaomi路由器", "Xiaomi Router ").strip()
             rname = init.get("routername") or ""
             self.lbl_router_title.configure(text=f"Router: {model} - '{rname}' ({self.client.ip})")
             self.lbl_model.configure(text=f"{t('lbl_model', lg)} {model} (kod {init.get('hardware', '-')})")
@@ -5051,22 +5147,46 @@ class MiWiFiManagerApp(ctk.CTk):
         try:
             wan_speed = status.get("wan", {})
             self.lbl_down.configure(text=f"{t('lbl_down', lg)} {format_speed(safe_float(wan_speed.get('downspeed', 0)))}")
-            self.lbl_up.configure(text=f"{t('lbl_up', lg)} {format_speed(safe_float(wan_speed.get('upload', 0)))}")
+            self.lbl_up.configure(text=f"{t('lbl_up', lg)} {format_speed(safe_float(wan_speed.get('upspeed', 0)))}")
 
             wan_details = wan.get("info", {}) if isinstance(wan.get("info"), dict) else wan
             if wan_details:
                 ipv4 = wan_details.get("ipv4", [{}])
-                w_ip = ipv4[0].get("ip") if isinstance(ipv4, list) and ipv4 else wan_details.get("ip", "-")
-                w_mask = ipv4[0].get("mask") if isinstance(ipv4, list) and ipv4 else "255.255.255.0"
-                w_gw = wan_details.get("gateWay", "-")
-                dns = wan_details.get("dnsServer") or wan_details.get("details", {}).get("dns") or []
-                dns_str = ", ".join(dns) if isinstance(dns, list) else str(dns)
-                w_mac = wan_details.get("mac", "-")
+                w_ip = (ipv4[0].get("ip") if isinstance(ipv4, list) and ipv4 else wan_details.get("ip")) or "-"
+                w_mask = (ipv4[0].get("mask") if isinstance(ipv4, list) and ipv4 else "") or "-"
+                w_gw = wan_details.get("gateWay") or "-"
+                dns_list = []
+                raw_dns = wan_details.get("dnsServer") or wan_details.get("details", {}).get("dns") or []
+                if isinstance(raw_dns, list):
+                    for d_item in raw_dns:
+                        s_item = str(d_item).strip()
+                        if s_item and s_item not in dns_list:
+                            dns_list.append(s_item)
+                elif isinstance(raw_dns, str) and raw_dns.strip():
+                    for part in raw_dns.replace(";", ",").split(","):
+                        s_item = part.strip()
+                        if s_item and s_item not in dns_list:
+                            dns_list.append(s_item)
+                for dk in ("dnsAddrs", "dnsAddrs1", "dnsAddrs2"):
+                    dv = wan_details.get(dk)
+                    if isinstance(dv, list):
+                        for d_item in dv:
+                            s_item = str(d_item).strip()
+                            if s_item and s_item not in dns_list:
+                                dns_list.append(s_item)
+                    elif isinstance(dv, str) and dv.strip():
+                        for part in dv.replace(";", ",").split(","):
+                            s_item = part.strip()
+                            if s_item and s_item not in dns_list:
+                                dns_list.append(s_item)
+                dns = dns_list
+                dns_str = ", ".join(dns_list)
+                w_mac = wan_details.get("mac") or "-"
                 w_uptime = format_uptime(safe_int(wan_details.get("uptime", 0)), lang=lg)
                 link_status = ("● Connected (Link UP)" if lg == "en" else "● Połączony (Link UP)") if str(wan_details.get("link")) == "1" else ("○ Disconnected / No cable" if lg == "en" else "○ Rozłączony / Brak kabla")
 
                 self.lbl_wan_ip.configure(text=f"{t('lbl_wan_ip', lg)} {w_ip}")
-                self.lbl_wan_dns.configure(text=f"{t('lbl_wan_dns', lg)} {dns_str}")
+                self.lbl_wan_dns.configure(text=f"{t('lbl_wan_dns', lg)} {dns_str or '-'}")
 
                 # Karta Ustawienia WAN
                 self.lbl_wan_link.configure(text=f"{('Link status:' if lg == 'en' else 'Stan łącza:')} {link_status}", text_color="#22c55e" if "Połączony" in link_status or "Connected" in link_status else "#ef4444")
@@ -5096,8 +5216,12 @@ class MiWiFiManagerApp(ctk.CTk):
                         self._on_wan_mode_change(target_val)
 
                 ipv6_info = wan_details.get("ipv6_info", {})
-                ipv6_mode = ipv6_info.get("ipv6_mode") or ipv6_info.get("wanType") or ("Disabled" if lg == "en" else "Wyłączony")
-                self.lbl_wan_ipv6_val.configure(text=f"{('IPv6 Protocol:' if lg == 'en' else 'Protokół IPv6:')} {ipv6_mode.capitalize()} ({'enabled' if lg == 'en' else 'obsługa włączona'})")
+                ipv6_mode = str(ipv6_info.get("ipv6_mode") or ipv6_info.get("wanType") or "").strip()
+                if not ipv6_mode or ipv6_mode.lower() in ("off", "disabled", "none", "0"):
+                    ipv6_txt = "Disabled" if lg == "en" else "Wyłączony"
+                else:
+                    ipv6_txt = f"{ipv6_mode.capitalize()} ({'enabled' if lg == 'en' else 'aktywny'})"
+                self.lbl_wan_ipv6_val.configure(text=f"{('IPv6 Protocol:' if lg == 'en' else 'Protokół IPv6:')} {ipv6_txt}")
 
                 # Pre-fill pól formularza WAN jeśli nie były jeszcze wypełnione
                 if not self.entry_wan_user.get() and det.get("username"):
@@ -5105,7 +5229,6 @@ class MiWiFiManagerApp(ctk.CTk):
                 if not self.entry_wan_pwd.get() and det.get("password"):
                     self.entry_wan_pwd.insert(0, det.get("password"))
                 if w_mtu and w_mtu != "-":
-                    # Pre-fill MTU jeśli pole formularza jest puste
                     if not self.entry_wan_mtu.get().strip():
                         self.entry_wan_mtu.delete(0, "end")
                         self.entry_wan_mtu.insert(0, w_mtu)
@@ -5417,14 +5540,24 @@ class MiWiFiManagerApp(ctk.CTk):
             st = snap.get("sys_time", {}).get("time", {})
             if st and "hour" in st:
                 t_str = f"{st.get('year')}-{safe_int(st.get('month')):02d}-{safe_int(st.get('day')):02d} {safe_int(st.get('hour')):02d}:{safe_int(st.get('min')):02d}:{safe_int(st.get('sec')):02d}"
-                tz_str = st.get('timezone', 'CST-8')
-                self.lbl_sys_time.configure(text=f"{t('tools_time_label', self.current_lang)} {t_str} ({tz_str})")
-                if hasattr(self, "combo_tools_tz") and tz_str:
-                    for iana, lbl in TZ_DISPLAY_LIST:
-                        posix = TZ_POSIX_MAP.get(iana, "")
-                        if posix == tz_str or (tz_str and posix.startswith(tz_str)):
-                            self.combo_tools_tz.set(lbl)
-                            break
+                tz_str = str(st.get('timezone', 'CST-8') or 'CST-8')
+                tz_idx_cur = str(st.get('index', '') or '')
+                tz_short = tz_str.split(",")[0]
+                self.lbl_sys_time.configure(text=f"{t('tools_time_label', self.current_lang)} {t_str} ({tz_short})")
+                if hasattr(self, "combo_tools_tz") and (tz_str or tz_idx_cur):
+                    matched = False
+                    if tz_idx_cur:
+                        for iana, lbl in TZ_DISPLAY_LIST:
+                            if TZ_INDEX_MAP.get(iana) == tz_idx_cur:
+                                self.combo_tools_tz.set(lbl)
+                                matched = True
+                                break
+                    if not matched:
+                        for iana, lbl in TZ_DISPLAY_LIST:
+                            posix = TZ_POSIX_MAP.get(iana, "")
+                            if posix == tz_str or (tz_str and posix.startswith(tz_str)):
+                                self.combo_tools_tz.set(lbl)
+                                break
         except Exception as e:
             print("Błąd aktualizacji czasu systemowego:", e)
 
@@ -5515,9 +5648,9 @@ class MiWiFiManagerApp(ctk.CTk):
                                 )
                 if "5G" not in res:
                     bands.append(
-                        "- 5 GHz: managed automatically by router (Auto / DFS)"
+                        "- 5 GHz: router API does not provide 5 GHz spectrum scan (unchanged)"
                         if lg == "en"
-                        else "- 5 GHz: zarządzane automatycznie przez router (Auto / DFS)"
+                        else "- 5 GHz: brak skanu tego pasma w API routera (bez zmian)"
                     )
 
                 def on_done():
@@ -5626,27 +5759,96 @@ class MiWiFiManagerApp(ctk.CTk):
                     messagebox.showerror(t("err_title", lg), t("reboot_err", lg).format(err=e))
             threading.Thread(target=run, daemon=True).start()
 
+    def _get_router_role_info(self):
+        init = self.snapshot.get("init_info", {}) if isinstance(self.snapshot, dict) else {}
+        topo = self.snapshot.get("topo_graph", {}) if isinstance(self.snapshot, dict) else {}
+        graph = topo.get("graph", {}) if isinstance(topo, dict) else {}
+        leafs = graph.get("leafs") or graph.get("re") or []
+        has_satellites = bool(leafs) or any(safe_int(d.get("isap", 0)) > 0 for d in getattr(self, "raw_devices", []))
+        netmode = safe_int(init.get("netmode", graph.get("mode", 0)), 0)
+        if netmode in (1, 2, 3, 4):
+            role = "SATELITA / AP"
+        elif has_satellites:
+            role = "MASTER (MESH)"
+        else:
+            role = "MASTER / STANDALONE"
+        model = clean_model_name(init.get("displayName") or init.get("hardware") or "Xiaomi Router")
+        rname = init.get("routername") or graph.get("name") or "-"
+        return role, model, rname, self.client.ip
+
     def _prompt_factory_reset(self):
         if not self.client.connected:
             return
 
         lg = self.current_lang
-        if not messagebox.askyesno(t("reset_warn_title", lg), t("reset_warn_body", lg)):
-            return
+        is_en = (lg == "en")
+        role, model, rname, ip = self._get_router_role_info()
 
-        dialog = ctk.CTkInputDialog(text=t("reset_input_body", lg), title=t("reset_input_title", lg))
-        answer = dialog.get_input()
+        dlg = ctk.CTkToplevel(self)
+        dlg.title(t("reset_warn_title", lg))
+        dlg.geometry("500x360")
+        dlg.resizable(False, False)
+        dlg.grab_set()
 
-        if answer == "RESET":
+        banner = ctk.CTkFrame(dlg, fg_color="#7f1d1d", corner_radius=8, border_width=2, border_color="#ef4444")
+        banner.pack(fill="x", padx=20, pady=(18, 12))
+        ctk.CTkLabel(
+            banner,
+            text=f"⚠  {role}",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#fecaca"
+        ).pack(pady=(10, 2))
+        ctk.CTkLabel(
+            banner,
+            text=f"{model}  |  '{rname}'  |  IP: {ip}",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color="#ffffff"
+        ).pack(pady=(0, 10))
+
+        warn_txt = (
+            "WARNING: This will erase all router settings, Wi-Fi networks and DHCP leases!\n"
+            "Make sure you are NOT wiping your main production router by mistake."
+            if is_en else
+            "UWAGA: Ta operacja usunie wszystkie ustawienia, sieci Wi-Fi i konfigurację tego routera!\n"
+            "Upewnij się, że NIE resetujesz przypadkiem głównego routera produkcyjnego."
+        )
+        ctk.CTkLabel(dlg, text=warn_txt, justify="left", wraplength=455, text_color="#fca5a5").pack(anchor="w", padx=20, pady=(0, 10))
+
+        ctk.CTkLabel(dlg, text=t("reset_input_body", lg), justify="left", font=ctk.CTkFont(weight="bold")).pack(anchor="w", padx=20, pady=(4, 4))
+        e_conf = ctk.CTkEntry(dlg, placeholder_text="RESET", width=460)
+        e_conf.pack(padx=20, pady=(0, 14))
+        e_conf.focus_set()
+
+        btn_row = ctk.CTkFrame(dlg, fg_color="transparent")
+        btn_row.pack(fill="x", padx=20, pady=(0, 15))
+
+        def do_confirm():
+            if e_conf.get().strip() != "RESET":
+                messagebox.showinfo(t("info_title", lg), t("reset_cancelled", lg), parent=dlg)
+                return
+            dlg.destroy()
+
             def run():
                 try:
-                    self.client.factory_reset()
-                    messagebox.showinfo(t("info_title", lg), t("reset_in_progress", lg))
+                    res = self.client.factory_reset(format_data=1)
+                    if isinstance(res, dict) and res.get("code") not in (0, None):
+                        self.after(0, lambda r=res: messagebox.showerror(t("err_title", lg), f"Router rejected reset: {r}"))
+                        return
+                    note = (
+                        "\n\nFull factory reset (?format=1) sent. After ~60-90s the router will boot in factory state "
+                        "(default password: admin). You can then run the First-Time Setup Wizard."
+                        if is_en else
+                        "\n\nWysłano pełny reset fabryczny (?format=1). Po ok. 60-90 s router uruchomi się w stanie fabrycznym "
+                        "(domyślne hasło: admin). Możesz wtedy użyć Kreatora Pierwszej Konfiguracji."
+                    )
+                    self.after(0, lambda: self._reset_disconnected_state(clear_password=True))
+                    self.after(0, lambda: messagebox.showinfo(t("info_title", lg), t("reset_in_progress", lg) + note))
                 except Exception as e:
-                    messagebox.showerror(t("err_title", lg), f"{e}")
+                    self.after(0, lambda err=e: messagebox.showerror(t("err_title", lg), f"{err}"))
             threading.Thread(target=run, daemon=True).start()
-        else:
-            messagebox.showinfo(t("info_title", lg), t("reset_cancelled", lg))
+
+        ctk.CTkButton(btn_row, text=t("btn_cancel", lg), fg_color="#475569", hover_color="#334155", width=130, command=dlg.destroy).pack(side="left")
+        ctk.CTkButton(btn_row, text=("Confirm RESET" if is_en else "Potwierdź RESET"), fg_color="#dc2626", hover_color="#991b1b", font=ctk.CTkFont(weight="bold"), width=180, command=do_confirm).pack(side="right")
 
     def _action_restart_pppoe(self):
         if not self.client.connected:

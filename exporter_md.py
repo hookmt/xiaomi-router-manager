@@ -119,7 +119,7 @@ def export_snapshot_to_markdown(snapshot: Dict[str, Any], output_path: str, mask
 
     wan_speed = status.get("wan", {})
     try:
-        up_speed = format_speed(float(wan_speed.get("upload", 0)))
+        up_speed = format_speed(float(wan_speed.get("upspeed", 0)))
     except Exception:
         up_speed = "0 KB/s"
     try:
