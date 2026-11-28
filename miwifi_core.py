@@ -60,6 +60,12 @@ class MiWiFiClient:
             self.device_id = data.get("id") or data.get("routerId")
             return data
 
+    def get_feature(self, category: str, key: str, default: Any = None) -> Any:
+        """Zwraca flagę sprzętową/funkcjonalną z init_info.features (np. apps.nfc, wifi.mlo, wifi.split5g)."""
+        feats = self.init_info.get("features", {}) if isinstance(self.init_info, dict) else {}
+        cat = feats.get(category, {}) if isinstance(feats, dict) else {}
+        return cat.get(key, default) if isinstance(cat, dict) else default
+
     def is_factory_reset(self, info: Optional[Dict[str, Any]] = None) -> bool:
         """Sprawdza, czy router jest w stanie fabrycznym (niezainicjalizowany: inited == 0)."""
         data = info if info is not None else (self.init_info or self.probe())
@@ -538,14 +544,38 @@ class MiWiFiClient:
         return self.api_request(f"api/misystem/qos_mode?mode={mode}")
 
     def set_qos_band(self, upload: int, download: int) -> Dict[str, Any]:
-        """Ustawia deklarowane pasmo łącza WAN (w Mbps)."""
-        return self.api_request(f"api/misystem/set_band?upload={upload}&download={download}")
+        """Ustawia deklarowane pasmo łącza WAN (w Mbps) - oficjalny POST z manual=1."""
+        return self.api_request(
+            "api/misystem/set_band",
+            method="POST",
+            data={"upload": str(upload), "download": str(download), "manual": "1"},
+        )
+
+    def set_qos_limits(self, limits: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Ustawia limity prędkości QoS dla urządzeń (oficjalny POST api/misystem/qos_limits)."""
+        return self.api_request(
+            "api/misystem/qos_limits",
+            method="POST",
+            data={"data": json.dumps(limits)},
+        )
 
     def set_qos_limit(self, mac: str, up: int, down: int) -> Dict[str, Any]:
-        """Ustawia limit prędkości dla danego urządzenia (w KB/s)."""
-        return self.api_request(f"api/misystem/qos_limit?mac={mac}&up={up}&down={down}")
+        """Kompatybilny wrapper ustawiający limit prędkości dla jednego urządzenia (KB/s -> qos_limits)."""
+        return self.set_qos_limits([{"mac": mac, "maxup": up, "maxdown": down}])
 
     # --- DDNS (Dynamiczny DNS) ---
+
+    DDNS_PROVIDER_IDS = {
+        "oray.com": 1, "oray": 1,
+        "no-ip.com": 2, "no-ip": 2, "noip": 2,
+        "3322.org": 3, "pubyun.com": 3, "pubyun": 3,
+        "alidns.com": 4, "alidns": 4,
+        "dnspod": 5, "dnspod.cn": 5,
+        "huawei": 6, "huaweicloud": 6,
+        "baidu": 7,
+        "cloudflare.com": 8, "cloudflare": 8,
+        "dyndns.com": 9, "dyndns": 9,
+    }
 
     def get_ddns(self) -> Dict[str, Any]:
         """Pobiera listę skonfigurowanych usług DDNS."""
@@ -558,17 +588,60 @@ class MiWiFiClient:
         """Włącza (1) lub wyłącza (0) daną usługę DDNS."""
         return self.api_request(f"api/xqnetwork/ddns_switch?id={service_id}&on={on}")
 
-    def reload_ddns(self, service_id: int) -> Dict[str, Any]:
-        """Wymusza natychmiastowe odświeżenie adresu IP dla danej usługi DDNS."""
-        return self.api_request(f"api/xqnetwork/ddns_reload?id={service_id}")
+    def reload_ddns(self, service_id: Optional[int] = None) -> Dict[str, Any]:
+        """Wymusza natychmiastowe odświeżenie adresu IP dla aktywnych usług DDNS."""
+        return self.api_request("api/xqnetwork/ddns_reload")
 
     def delete_ddns(self, service_id: int) -> Dict[str, Any]:
         """Usuwa usługę DDNS."""
         return self.api_request(f"api/xqnetwork/ddns_del?id={service_id}")
 
-    def add_ddns(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Dodaje nową usługę DDNS."""
-        return self.api_request("api/xqnetwork/ddns_add", method="POST", data=data)
+    def add_ddns(
+        self,
+        data: Optional[Dict[str, Any]] = None,
+        *,
+        service: Optional[str] = None,
+        domain: Optional[str] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+        checkinterval: int = 10,
+        forceinterval: int = 12,
+        wanindex: int = 1,
+        iptype: int = 0,
+    ) -> Dict[str, Any]:
+        """Dodaje nową usługę DDNS zgodnie z oficjalnym LuCI (numeryczne id dostawcy 1..9)."""
+        src = dict(data) if isinstance(data, dict) else {}
+        if service is not None:
+            src["service"] = service
+        if domain is not None:
+            src["domain"] = domain
+        if username is not None:
+            src["username"] = username
+        if password is not None:
+            src["password"] = password
+
+        prov_raw = str(src.get("id") or src.get("service") or src.get("servicename") or "2").strip().lower()
+        if prov_raw.isdigit():
+            prov_id = int(prov_raw)
+        else:
+            prov_id = self.DDNS_PROVIDER_IDS.get(prov_raw, 2)
+
+        uname = str(src.get("username") or "").strip()
+        if prov_id == 8 and not uname:
+            uname = "Bearer"
+
+        payload = {
+            "id": str(prov_id),
+            "username": uname,
+            "password": str(src.get("password") or ""),
+            "domain": str(src.get("domain") or ""),
+            "wanindex": str(src.get("wanindex", wanindex)),
+            "iptype": str(src.get("iptype", iptype)),
+            "checkinterval": str(src.get("checkinterval", checkinterval)),
+            "forceinterval": str(src.get("forceinterval", forceinterval)),
+            "enable": str(src.get("enable", 1)),
+        }
+        return self.api_request("api/xqnetwork/ddns_add", method="POST", data=payload)
 
     def edit_ddns(self, service_id: int, data: Dict[str, Any]) -> Dict[str, Any]:
         """Modyfikuje istniejącą usługę DDNS."""
@@ -586,36 +659,61 @@ class MiWiFiClient:
             return {"error": str(e), "list": []}
 
     def get_vpn_status(self) -> Dict[str, Any]:
-        """Pobiera bieżący stan połączenia VPN (0=rozłączony, 1=łączenie, 2=połączony)."""
+        """Pobiera bieżący stan połączenia VPN (0=połączony, 1=łączenie, 2=błąd, 3=rozłączony)."""
         try:
             return self.api_request("api/xqsystem/vpn_status")
         except Exception as e:
             return {"error": str(e)}
 
-    def connect_vpn(self, vpn_id: int) -> Dict[str, Any]:
-        """Nawiązuje połączenie z profilem VPN."""
-        return self.api_request(f"api/xqsystem/vpn_connect?id={vpn_id}")
+    def connect_vpn(self, vpn_id: Any) -> Dict[str, Any]:
+        """Nawiązuje połączenie z profilem VPN (oficjalny xqsystem/vpn_switch?conn=1&id=...)."""
+        q = urllib.parse.urlencode({"conn": "1", "id": str(vpn_id)})
+        return self.api_request(f"api/xqsystem/vpn_switch?{q}")
 
-    def disconnect_vpn(self) -> Dict[str, Any]:
-        """Rozłącza aktywne połączenie VPN."""
-        return self.api_request("api/xqsystem/vpn_disconnect")
+    def disconnect_vpn(self, vpn_id: Optional[Any] = None) -> Dict[str, Any]:
+        """Rozłącza aktywne połączenie VPN (oficjalny xqsystem/vpn_switch?conn=0)."""
+        params = {"conn": "0"}
+        if vpn_id is not None and str(vpn_id) != "":
+            params["id"] = str(vpn_id)
+        q = urllib.parse.urlencode(params)
+        return self.api_request(f"api/xqsystem/vpn_switch?{q}")
 
-    def set_vpn(self, proto: str, server: str, username: str, password: str, auto: int = 0, vpn_id: Optional[int] = None) -> Dict[str, Any]:
-        """Dodaje lub edytuje profil VPN (proto: pptp lub l2tp)."""
+    def set_vpn_auto(self, auto: int) -> Dict[str, Any]:
+        """Ustawia automatyczne łączenie VPN po starcie routera (xqsystem/set_vpnauto)."""
+        return self.api_request(f"api/xqsystem/set_vpnauto?auto={1 if int(auto) else 0}")
+
+    def set_vpn(
+        self,
+        proto: str,
+        server: str,
+        username: str,
+        password: str,
+        auto: int = 0,
+        vpn_id: Optional[Any] = None,
+        oname: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Dodaje lub edytuje profil VPN (proto: pptp lub l2tp) zgodnie z oficjalnym LuCI (z polem oname)."""
         data = {
+            "oname": (oname or server or "VPN").strip(),
             "proto": proto,
             "server": server,
             "username": username,
             "password": password,
-            "auto": str(auto)
         }
-        if vpn_id is not None:
+        if vpn_id is not None and str(vpn_id) != "":
             data["id"] = str(vpn_id)
-        return self.api_request("api/xqsystem/set_vpn", method="POST", data=data)
+        res = self.api_request("api/xqsystem/set_vpn", method="POST", data=data)
+        if isinstance(res, dict) and res.get("code") == 0:
+            try:
+                self.set_vpn_auto(1 if auto else 0)
+            except Exception:
+                pass
+        return res
 
-    def delete_vpn(self, vpn_id: int) -> Dict[str, Any]:
+    def delete_vpn(self, vpn_id: Any) -> Dict[str, Any]:
         """Usuwa profil VPN."""
-        return self.api_request(f"api/xqsystem/del_vpn?id={vpn_id}")
+        q = urllib.parse.urlencode({"id": str(vpn_id)})
+        return self.api_request(f"api/xqsystem/del_vpn?{q}")
 
     def get_smartvpn_info(self) -> Dict[str, Any]:
         """Pobiera stan inteligentnego dzielenia tunelu VPN (Smart VPN)."""
@@ -675,21 +773,64 @@ class MiWiFiClient:
         return self.api_request("api/misystem/set_ps_service", method="POST", data=data, timeout=15)
 
     def get_router_name(self) -> Dict[str, Any]:
-        """Pobiera nazwę routera."""
+        """Pobiera nazwę i lokalizację routera."""
         try:
             return self.api_request("api/misystem/router_name")
         except Exception:
             return {}
 
+    def set_router_name(self, name: str, locale: str = "") -> Dict[str, Any]:
+        """Zmienia nazwę i opcjonalną lokalizację routera (misystem/set_router_name)."""
+        params = {"name": name.strip()}
+        if locale is not None:
+            params["locale"] = str(locale).strip()
+        q = urllib.parse.urlencode(params)
+        return self.api_request(f"api/misystem/set_router_name?{q}", method="GET")
+
     def get_led_status(self) -> Dict[str, Any]:
-        """Pobiera stan diod LED."""
+        """Pobiera stan diody statusu LED."""
         try:
             return self.api_request("api/misystem/led")
         except Exception:
             return {}
 
+    def get_all_led(self) -> Dict[str, Any]:
+        """Pobiera zbiorczy stan wszystkich diod LED (misystem/allled)."""
+        try:
+            return self.api_request("api/misystem/allled")
+        except Exception:
+            return {}
+
+    def set_all_led(self, state: int) -> Dict[str, Any]:
+        """Włącza (1) lub wyłącza (0) wszystkie diody LED routera (POST on)."""
+        return self.api_request("api/misystem/allled", method="POST", data={"on": str(1 if state else 0)})
+
+    def get_eth_led(self) -> Dict[str, Any]:
+        """Pobiera stan diod portów Ethernet (misystem/ethled)."""
+        try:
+            return self.api_request("api/misystem/ethled")
+        except Exception:
+            return {}
+
+    def set_eth_led(self, state: int) -> Dict[str, Any]:
+        """Włącza (1) lub wyłącza (0) diody portów Ethernet (POST on)."""
+        return self.api_request("api/misystem/ethled", method="POST", data={"on": str(1 if state else 0)})
+
+    def get_effect_light(self) -> Dict[str, Any]:
+        """Pobiera stan podświetlenia ambient obudowy (misystem/effect_light)."""
+        try:
+            return self.api_request("api/misystem/effect_light")
+        except Exception:
+            return {}
+
+    def set_effect_light(self, enabled: bool) -> Dict[str, Any]:
+        """Włącza lub wyłącza podświetlenie ambient obudowy (POST func=on|off)."""
+        return self.api_request("api/misystem/effect_light", method="POST", data={"func": "on" if enabled else "off"})
+
     def get_reboot_task(self) -> Dict[str, Any]:
-        """Pobiera harmonogram ponownego uruchamiania."""
+        """Pobiera harmonogram ponownego uruchamiania (jeśli wspierany przez firmware)."""
+        if str(self.get_feature("system", "task", "0")) == "0":
+            return {}
         try:
             return self.api_request("api/xqsystem/reboot_task")
         except Exception:
@@ -705,8 +846,9 @@ class MiWiFiClient:
     # --- Metody sterowania i akcji ---
 
     def set_led(self, state: int) -> Dict[str, Any]:
-        """Włącza (1) lub wyłącza (0) diody LED routera."""
-        return self.api_request("api/misystem/led", method="POST", data={"state": str(state)})
+        """Włącza (1) lub wyłącza (0) diodę statusu LED routera (oficjalny POST on=0|1)."""
+        val = "1" if state else "0"
+        return self.api_request("api/misystem/led", method="POST", data={"on": val})
 
     def reboot(self) -> Dict[str, Any]:
         """Wykonuje ponowne uruchomienie routera."""
@@ -765,32 +907,137 @@ class MiWiFiClient:
         return self.api_request("api/xqsystem/set_name_password", method="POST", data=data)
 
     def create_official_backup(self, keys: str = "mi_wifi_info,mi_network_info,mi_lan_info,mi_basic_info") -> Dict[str, Any]:
-        """Zleca routerowi wygenerowanie oficjalnej binarnej kopii konfiguracji (.tar.gz)."""
-        return self.api_request("api/misystem/c_backup", method="GET", data={"keys": keys})
+        """Zleca routerowi wygenerowanie oficjalnej binarnej kopii konfiguracji (.tar.gz) przez GET query."""
+        q = urllib.parse.urlencode({"keys": keys})
+        return self.api_request(f"api/misystem/c_backup?{q}", method="GET", timeout=20)
 
     def download_official_backup(self, filename: str, output_path: str) -> bool:
         """Pobiera wygenerowany plik kopii zapasowej z routera i zapisuje go na dysku."""
-        if not self.stok:
+        if not self.stok or not filename:
             return False
-        url = f"http://{self.ip}/cgi-bin/luci/;stok={self.stok}/api/misystem/c_download/{filename}"
+        clean_file = str(filename).lstrip("/")
+        url = f"http://{self.ip}/cgi-bin/luci/;stok={self.stok}/api/misystem/c_download/{clean_file}"
         req = urllib.request.Request(url, headers={"User-Agent": "MiWiFi-Manager/1.0"})
-        with urllib.request.urlopen(req, timeout=10) as r:
+        with urllib.request.urlopen(req, timeout=20) as r:
             with open(output_path, "wb") as f:
                 f.write(r.read())
         return True
 
+    def upload_official_backup(self, file_path: str) -> Dict[str, Any]:
+        """Wysyła plik oficjalnej kopii Xiaomi (.tar.gz) na router (POST multipart api/misystem/c_upload, pole image)."""
+        if not self.stok:
+            raise RuntimeError("Brak aktywnego tokena autoryzacji (stok).")
+        import os
+        boundary = f"----XRMFormBoundary{int(time.time())}{random.randint(1000,9999)}"
+        fname = os.path.basename(file_path)
+        with open(file_path, "rb") as f:
+            raw_bytes = f.read()
+        body = (
+            f"--{boundary}\r\n"
+            f'Content-Disposition: form-data; name="image"; filename="{fname}"\r\n'
+            f"Content-Type: application/gzip\r\n\r\n"
+        ).encode("utf-8") + raw_bytes + f"\r\n--{boundary}--\r\n".encode("utf-8")
+
+        url = f"http://{self.ip}/cgi-bin/luci/;stok={self.stok}/api/misystem/c_upload"
+        req = urllib.request.Request(
+            url,
+            data=body,
+            headers={
+                "User-Agent": "MiWiFi-Manager/1.0",
+                "Content-Type": f"multipart/form-data; boundary={boundary}",
+                "Content-Length": str(len(body)),
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode("utf-8", errors="ignore"))
+
+    def restore_official_backup(self, keys: str) -> Dict[str, Any]:
+        """Przywraca wybrane sekcje z wcześniej wgranego archiwum Xiaomi (GET api/misystem/c_restore?keys=...)."""
+        q = urllib.parse.urlencode({"keys": keys})
+        return self.api_request(f"api/misystem/c_restore?{q}", method="GET", timeout=30)
+
     def restore_selective_snapshot(self, snapshot_data: Dict[str, Any], sections: Dict[str, bool]) -> Dict[str, Any]:
         """
-        Selektywnie przywraca wybrane elementy konfiguracji ze snapshotu JSON:
-        - mac_bind: statyczne rezerwacje adresów IP
-        - port_forward: przekierowania pojedynczych portów i zakresów
-        - wifi: ustawienia sieci Wi-Fi (SSID, hasła, kanały)
-        - ps_services: usługi portów fizycznych (Dual WAN, LAG, IPTV, Gaming)
-        - qos: reguły QoS i limity pasma
+        Selektywnie przywraca wybrane sekcje konfiguracji z kopii JSON w bezpiecznej kolejności
+        (usługi i reguły najpierw, WAN / Wi-Fi / LAN IP na końcu):
+        - router_name, sys_time, led_nfc, mac_bind, port_forward, dmz_upnp,
+          ps_services, qos, ddns, vpn, lan_dhcp, wan, wifi, lan_ip.
         """
         results = {"success": [], "errors": []}
 
-        # 1. Rezerwacje DHCP (mac_bind)
+        # 1. Nazwa i lokalizacja routera
+        if sections.get("router_name"):
+            rn = snapshot_data.get("router_name", {})
+            init = snapshot_data.get("init_info", {})
+            r_name = (rn.get("name") if isinstance(rn, dict) else None) or (init.get("routername") if isinstance(init, dict) else None)
+            r_loc = (rn.get("locale") if isinstance(rn, dict) else "") or ""
+            if r_name:
+                try:
+                    res = self.set_router_name(str(r_name), str(r_loc))
+                    if res.get("code") == 0:
+                        results["success"].append(f"Nazwa routera: {r_name}")
+                    else:
+                        results["errors"].append(f"Nazwa routera: kod {res.get('code')}")
+                except Exception as e:
+                    results["errors"].append(f"Nazwa routera: {e}")
+
+        # 2. Strefa czasowa
+        if sections.get("sys_time"):
+            st = snapshot_data.get("sys_time", {}).get("time", {}) if isinstance(snapshot_data.get("sys_time"), dict) else {}
+            tz_str = st.get("timezone")
+            tz_idx = st.get("index")
+            if tz_str:
+                try:
+                    res = self.set_sys_time(timezone_str=str(tz_str), tz_index=str(tz_idx) if tz_idx else None)
+                    if res.get("code") == 0:
+                        results["success"].append(f"Strefa czasowa: {tz_str}")
+                    else:
+                        results["errors"].append(f"Strefa czasowa: kod {res.get('code')}")
+                except Exception as e:
+                    results["errors"].append(f"Strefa czasowa: {e}")
+
+        # 3. Diody LED i NFC
+        if sections.get("led_nfc"):
+            led_ok = []
+            led_d = snapshot_data.get("led_status", {})
+            if isinstance(led_d, dict) and "status" in led_d:
+                try:
+                    r = self.set_led(int(led_d["status"]))
+                    if r.get("code") == 0:
+                        led_ok.append("LED status")
+                except Exception as e:
+                    results["errors"].append(f"LED status: {e}")
+            eth_d = snapshot_data.get("eth_led", {})
+            if isinstance(eth_d, dict) and "status" in eth_d:
+                try:
+                    r = self.set_eth_led(int(eth_d["status"]))
+                    if r.get("code") == 0:
+                        led_ok.append("LED Ethernet")
+                except Exception:
+                    pass
+            eff_d = snapshot_data.get("effect_light", {})
+            if isinstance(eff_d, dict) and "status" in eff_d:
+                try:
+                    r = self.set_effect_light(int(eff_d["status"]) == 1)
+                    if r.get("code") == 0:
+                        led_ok.append("LED Ambient")
+                except Exception:
+                    pass
+            nfc_d = snapshot_data.get("nfc", {})
+            if isinstance(nfc_d, dict) and str(self.get_feature("apps", "nfc", "0")) == "1":
+                nfc_val = nfc_d.get("nfc_enable", nfc_d.get("status"))
+                if nfc_val is not None:
+                    try:
+                        r = self.set_nfc_status(int(nfc_val) == 1)
+                        if r.get("code") == 0:
+                            led_ok.append("NFC")
+                    except Exception as e:
+                        results["errors"].append(f"NFC: {e}")
+            if led_ok:
+                results["success"].append(f"LED / NFC: {', '.join(led_ok)}")
+
+        # 4. Rezerwacje DHCP (mac_bind)
         if sections.get("mac_bind"):
             bind_list = snapshot_data.get("mac_bind", {}).get("list", [])
             restored_count = 0
@@ -807,9 +1054,9 @@ class MiWiFiClient:
                             results["errors"].append(f"Rezerwacja {name} ({ip}): kod {res.get('code')}")
                     except Exception as e:
                         results["errors"].append(f"Rezerwacja {name} ({ip}): {e}")
-            results["success"].append(f"Przywrócono rezerwacji DHCP: {restored_count} z {len(bind_list)}")
+            results["success"].append(f"Rezerwacje DHCP: {restored_count} z {len(bind_list)}")
 
-        # 2. Przekierowania portów i zakresów (port_forward)
+        # 5. Przekierowania portów i zakresów (port_forward)
         if sections.get("port_forward"):
             pf_data = snapshot_data.get("port_forward", {})
             single_list = pf_data.get("single", [])
@@ -850,62 +1097,70 @@ class MiWiFiClient:
                     except Exception as e:
                         results["errors"].append(f"Zakres {name} ({fport}-{tport}): {e}")
 
-            results["success"].append(f"Przywrócono przekierowań portów: {restored_single} pojedynczych, {restored_range} zakresów")
+            results["success"].append(f"Przekierowania portów: {restored_single} pojedynczych, {restored_range} zakresów")
 
-        # 3. Wi-Fi
-        if sections.get("wifi"):
-            wifi_info = snapshot_data.get("wifi_detail", {}).get("info", [])
-            bsd = snapshot_data.get("wifi_detail", {}).get("bsd", 0)
-            if len(wifi_info) >= 2:
-                w1 = wifi_info[0]
-                w2 = wifi_info[1]
+        # 6. DMZ i UPnP
+        if sections.get("dmz_upnp"):
+            pf_data = snapshot_data.get("port_forward", {})
+            dmz_d = snapshot_data.get("dmz") or pf_data.get("dmz") or {}
+            upnp_d = snapshot_data.get("upnp") or pf_data.get("upnp") or {}
+            if isinstance(dmz_d, dict) and "status" in dmz_d:
                 try:
-                    res = self.set_all_wifi(
-                        bsd=int(bsd),
-                        wifi1={
-                            "ssid": w1.get("ssid"),
-                            "password": w1.get("password", ""),
-                            "encryption": w1.get("encryption", "psk2"),
-                            "channel": int(w1.get("channelInfo", {}).get("channel", 0)),
-                            "bandwidth": int(w1.get("channelInfo", {}).get("bandwidth", 0)),
-                            "txpwr": w1.get("txpwr", "max"),
-                            "hidden": int(w1.get("hidden", 0)),
-                            "on": int(w1.get("status", 1))
-                        },
-                        wifi2={
-                            "ssid": w2.get("ssid"),
-                            "password": w2.get("password", ""),
-                            "encryption": w2.get("encryption", "psk2"),
-                            "channel": int(w2.get("channelInfo", {}).get("channel", 0)),
-                            "bandwidth": int(w2.get("channelInfo", {}).get("bandwidth", 0)),
-                            "txpwr": w2.get("txpwr", "max"),
-                            "hidden": int(w2.get("hidden", 0)),
-                            "on": int(w2.get("status", 1))
-                        }
-                    )
-                    if res.get("code") == 0:
-                        results["success"].append("Przywrócono konfigurację sieci Wi-Fi (2.4G i 5G)")
+                    if int(dmz_d.get("status", 0)) == 1 and (dmz_d.get("ip") or dmz_d.get("lanip")):
+                        r = self.set_dmz(str(dmz_d.get("ip") or dmz_d.get("lanip")))
+                        if r.get("code") == 0:
+                            results["success"].append(f"DMZ: włączone ({dmz_d.get('ip') or dmz_d.get('lanip')})")
+                        else:
+                            results["errors"].append(f"DMZ: kod {r.get('code')} (uwaga: kolizja z przekierowaniami portów)")
                     else:
-                        results["errors"].append(f"Wi-Fi: kod {res.get('code')}")
+                        r = self.disable_dmz()
+                        if r.get("code") == 0:
+                            results["success"].append("DMZ: wyłączone")
                 except Exception as e:
-                    results["errors"].append(f"Wi-Fi: {e}")
+                    results["errors"].append(f"DMZ: {e}")
+            if isinstance(upnp_d, dict) and "status" in upnp_d:
+                try:
+                    r = self.set_upnp(int(upnp_d.get("status", 0)))
+                    if r.get("code") == 0:
+                        results["success"].append(f"UPnP: {'włączone' if int(upnp_d.get('status', 0)) == 1 else 'wyłączone'}")
+                    else:
+                        results["errors"].append(f"UPnP: kod {r.get('code')}")
+                except Exception as e:
+                    results["errors"].append(f"UPnP: {e}")
 
-        # 4. Usługi portów fizycznych (ps_services)
+        # 7. Usługi portów fizycznych (ps_services)
         if sections.get("ps_services"):
             services = snapshot_data.get("ps_services", {})
             for svc_name in ["multiwan", "lag", "iptv", "game"]:
                 svc_data = services.get(svc_name, {}).get(svc_name, {})
-                if svc_data:
+                if isinstance(svc_data, dict) and "enable" in svc_data:
                     try:
-                        res = self.set_ps_service(svc_name, **svc_data)
+                        payload: Dict[str, Any] = {"enable": svc_data["enable"]}
+                        if svc_name == "multiwan":
+                            pmap = svc_data.get("port_map", []) or []
+                            for pm in pmap:
+                                if pm.get("name") == "WAN2":
+                                    payload["port"] = pm.get("port", "")
+                            payload["mode"] = svc_data.get("policy", {}).get("mode", 0)
+                        elif svc_name == "lag":
+                            payload["ports"] = svc_data.get("ports", "")
+                            payload["mode"] = svc_data.get("mode", 2)
+                        elif svc_name == "iptv":
+                            payload["ports"] = svc_data.get("ports", "")
+                            payload["vid"] = svc_data.get("vid", -1)
+                            payload["profile"] = svc_data.get("profile", 0)
+                            payload["priority"] = svc_data.get("priority", -1)
+                        elif svc_name == "game":
+                            payload["ports"] = svc_data.get("ports", "")
+                        res = self.set_ps_service(svc_name, **payload)
                         if res.get("code") == 0:
-                            results["success"].append(f"Przywrócono usługę sprzętową: {svc_name}")
+                            results["success"].append(f"Usługa portów: {svc_name}")
                         else:
                             results["errors"].append(f"Usługa {svc_name}: kod {res.get('code')}")
                     except Exception as e:
                         results["errors"].append(f"Usługa {svc_name}: {e}")
 
-        # 5. QoS
+        # 8. QoS
         if sections.get("qos"):
             qos_data = snapshot_data.get("qos", {})
             st = qos_data.get("status", {})
@@ -915,11 +1170,187 @@ class MiWiFiClient:
                     self.set_qos_switch(int(st["on"]))
                 if "mode" in st:
                     self.set_qos_mode(int(st["mode"]))
-                if "upload" in band and "download" in band:
-                    self.set_qos_band(int(band["upload"]), int(band["download"]))
-                results["success"].append("Przywrócono konfigurację Inteligentnego QoS")
+                if "upload" in band and "download" in band and float(band["upload"]) > 0 and float(band["download"]) > 0:
+                    self.set_qos_band(int(float(band["upload"])), int(float(band["download"])))
+                results["success"].append("Konfiguracja Inteligentnego QoS")
             except Exception as e:
                 results["errors"].append(f"QoS: {e}")
+
+        # 9. DDNS
+        if sections.get("ddns"):
+            ddns_list = snapshot_data.get("ddns", {}).get("list", []) if isinstance(snapshot_data.get("ddns"), dict) else []
+            ok_cnt = 0
+            for item in ddns_list:
+                if not isinstance(item, dict) or not item.get("domain"):
+                    continue
+                try:
+                    res = self.add_ddns(item)
+                    if res.get("code") == 0:
+                        ok_cnt += 1
+                    else:
+                        results["errors"].append(f"DDNS {item.get('domain')}: kod {res.get('code')}")
+                except Exception as e:
+                    results["errors"].append(f"DDNS {item.get('domain')}: {e}")
+            results["success"].append(f"Usługi DDNS: {ok_cnt} z {len(ddns_list)}")
+
+        # 10. VPN i Smart VPN
+        if sections.get("vpn"):
+            vpn_list = snapshot_data.get("vpn", {}).get("list", []) if isinstance(snapshot_data.get("vpn"), dict) else []
+            ok_cnt = 0
+            for v in vpn_list:
+                if not isinstance(v, dict) or not v.get("server"):
+                    continue
+                try:
+                    res = self.set_vpn(
+                        proto=str(v.get("proto") or "pptp"),
+                        server=str(v.get("server")),
+                        username=str(v.get("username") or ""),
+                        password=str(v.get("password") or ""),
+                        auto=int(v.get("auto", 0) or 0),
+                        oname=str(v.get("oname") or v.get("server")),
+                    )
+                    if res.get("code") == 0:
+                        ok_cnt += 1
+                    else:
+                        results["errors"].append(f"VPN {v.get('server')}: kod {res.get('code')}")
+                except Exception as e:
+                    results["errors"].append(f"VPN {v.get('server')}: {e}")
+            svpn = snapshot_data.get("smartvpn", {})
+            sv_info = svpn.get("info", svpn) if isinstance(svpn, dict) else {}
+            if isinstance(sv_info, dict) and ("switch" in sv_info or "enable" in sv_info):
+                try:
+                    en = int(sv_info.get("switch", sv_info.get("enable", 0)) or 0)
+                    md = int(sv_info.get("mode", 1) or 1)
+                    self.set_smartvpn_switch(enable=en, mode=md)
+                except Exception:
+                    pass
+            results["success"].append(f"Profile VPN: {ok_cnt} z {len(vpn_list)}")
+
+        # 11. Serwer DHCP LAN (pula, dzierżawa, lokalne DNS)
+        if sections.get("lan_dhcp"):
+            dhcp_info = snapshot_data.get("lan_dhcp", {}).get("info", {}) if isinstance(snapshot_data.get("lan_dhcp"), dict) else {}
+            if isinstance(dhcp_info, dict) and "start" in dhcp_info and "limit" in dhcp_info:
+                try:
+                    res = self.set_lan_dhcp(
+                        start=int(dhcp_info["start"]),
+                        limit=int(dhcp_info["limit"]),
+                        leasetime=str(dhcp_info.get("leasetime") or "720m"),
+                        dns1=str(dhcp_info.get("dns1") or ""),
+                        dns2=str(dhcp_info.get("dns2") or ""),
+                    )
+                    if res.get("code") == 0:
+                        results["success"].append("Ustawienia serwera DHCP LAN")
+                    else:
+                        results["errors"].append(f"DHCP LAN: kod {res.get('code')}")
+                except Exception as e:
+                    results["errors"].append(f"DHCP LAN: {e}")
+
+        # 12. Łącze WAN (PPPoE / DHCP / Static, MTU, DNS, klon MAC)
+        if sections.get("wan"):
+            wan_root = snapshot_data.get("wan_info", {})
+            wan_d = wan_root.get("info", wan_root) if isinstance(wan_root, dict) else {}
+            det = wan_d.get("details", {}) if isinstance(wan_d, dict) else {}
+            w_type = str(det.get("wanType") or "").lower()
+            if w_type in ("pppoe", "dhcp", "static"):
+                try:
+                    kw: Dict[str, Any] = {}
+                    mtu_val = det.get("mtu") or wan_d.get("mtu")
+                    if mtu_val:
+                        kw["mtu"] = str(mtu_val)
+                    dns_raw = wan_d.get("dnsServer") or det.get("dns") or []
+                    if isinstance(dns_raw, list) and dns_raw and str(det.get("peerdns", "1")) == "0":
+                        kw["peerdns"] = "0"
+                        kw["dns1"] = str(dns_raw[0])
+                        if len(dns_raw) > 1:
+                            kw["dns2"] = str(dns_raw[1])
+                    else:
+                        kw["peerdns"] = "1"
+                    if w_type == "pppoe":
+                        kw["pppoeName"] = str(det.get("username") or "")
+                        kw["pppoePwd"] = str(det.get("password") or "")
+                    elif w_type == "static":
+                        ipv4 = wan_d.get("ipv4", [{}])
+                        kw["staticIp"] = str((ipv4[0].get("ip") if isinstance(ipv4, list) and ipv4 else "") or det.get("ip") or "")
+                        kw["staticMask"] = str((ipv4[0].get("mask") if isinstance(ipv4, list) and ipv4 else "") or det.get("netmask") or "")
+                        kw["staticGateway"] = str(wan_d.get("gateWay") or det.get("gateway") or "")
+                    res = self.set_wan(w_type, **kw)
+                    if res.get("code") == 0:
+                        results["success"].append(f"Ustawienia WAN ({w_type.upper()})")
+                    else:
+                        results["errors"].append(f"WAN: kod {res.get('code')}")
+                except Exception as e:
+                    results["errors"].append(f"WAN: {e}")
+
+        # 13. Wi-Fi (2.4G, 5G, opcjonalnie 5G-2 Tri-Band + opcje zaawansowane i MLO)
+        if sections.get("wifi"):
+            wifi_info = snapshot_data.get("wifi_detail", {}).get("info", [])
+            bsd = snapshot_data.get("wifi_detail", {}).get("bsd", 0)
+            if len(wifi_info) >= 2:
+                def _wpack(w: Dict[str, Any]) -> Dict[str, Any]:
+                    return {
+                        "ssid": w.get("ssid", ""),
+                        "pwd": w.get("password", ""),
+                        "encryption": w.get("encryption", "psk2+ccmp"),
+                        "channel": int(w.get("channel", 0) or 0),
+                        "bandwidth": int(w.get("bandwidth", 0) or 0),
+                        "txpwr": w.get("txpwr", "max"),
+                        "hidden": int(w.get("hidden", 0) or 0),
+                        "on": int(w.get("status", 1) if w.get("status") is not None else 1),
+                    }
+                w3 = _wpack(wifi_info[2]) if len(wifi_info) >= 3 and int(wifi_info[2].get("wifiIndex", 0) or 0) == 3 else None
+                try:
+                    res = self.set_all_wifi(bsd=int(bsd), wifi1=_wpack(wifi_info[0]), wifi2=_wpack(wifi_info[1]), wifi3=w3)
+                    if res.get("code") == 0:
+                        results["success"].append("Konfiguracja Wi-Fi (2.4G / 5G" + (" / 5G-2)" if w3 else ")"))
+                    else:
+                        results["errors"].append(f"Wi-Fi: kod {res.get('code')}")
+                except Exception as e:
+                    results["errors"].append(f"Wi-Fi: {e}")
+
+                # Opcje zaawansowane Wi-Fi (TWT, MLO, Mi Connect, Roaming)
+                try:
+                    twt_d = snapshot_data.get("twt", {})
+                    if isinstance(twt_d, dict) and "status" in twt_d:
+                        self.set_twt(int(twt_d["status"]))
+                except Exception:
+                    pass
+                try:
+                    mlo_d = snapshot_data.get("mlo", {})
+                    if isinstance(mlo_d, dict) and "mlo_enable" in mlo_d and str(self.get_feature("wifi", "mlo", "0")) == "1":
+                        self.set_mlo(int(mlo_d["mlo_enable"]))
+                except Exception:
+                    pass
+                try:
+                    miot_d = snapshot_data.get("miotrelay", {})
+                    if isinstance(miot_d, dict) and ("enabled" in miot_d or "switch" in miot_d):
+                        val = int(miot_d.get("enabled", miot_d.get("switch", 0)) or 0)
+                        self.set_miotrelay_switch(val)
+                except Exception:
+                    pass
+                try:
+                    ai_d = snapshot_data.get("aimesh", {})
+                    if isinstance(ai_d, dict) and "manual_roaming_setting" in ai_d:
+                        m_set = int(ai_d.get("manual_roaming_setting", 0) or 0)
+                        self.set_aimesh_config(
+                            m_set,
+                            ai_d.get("roam_rssi_threshold1"),
+                            ai_d.get("roam_rssi_threshold2"),
+                        )
+                except Exception:
+                    pass
+
+        # 14. Adres IP bramy LAN (zawsze jako ostatni - restartuje router!)
+        if sections.get("lan_ip"):
+            lan_ipv4 = snapshot_data.get("lan_info", {}).get("info", {}).get("ipv4", []) if isinstance(snapshot_data.get("lan_info"), dict) else []
+            if isinstance(lan_ipv4, list) and lan_ipv4 and lan_ipv4[0].get("ip"):
+                try:
+                    res = self.set_lan_ip(str(lan_ipv4[0]["ip"]), str(lan_ipv4[0].get("mask") or "255.255.255.0"))
+                    if res.get("code") == 0:
+                        results["success"].append(f"Adres IP bramy LAN: {lan_ipv4[0]['ip']} (router uruchamia się ponownie)")
+                    else:
+                        results["errors"].append(f"IP bramy LAN: kod {res.get('code')}")
+                except Exception as e:
+                    results["errors"].append(f"IP bramy LAN: {e}")
 
         return results
 
@@ -1096,21 +1527,13 @@ class MiWiFiClient:
         }
         return self.api_request("api/xqnetwork/set_wifi", method="POST", data=data)
 
-    def set_channel(self, wifi_idx: int, channel: int, bandwidth: int = 0) -> Dict[str, Any]:
-        """Samodzielna zmiana kanału i szerokości pasma dla danego radia (1=2.4G, 2=5G)."""
-        data = {
-            "wifiIndex": str(wifi_idx),
-            "channel": str(channel),
-            "bandwidth": str(bandwidth)
-        }
-        return self.api_request("api/xqnetwork/set_channel", method="POST", data=data)
-
-    def set_all_wifi(self, bsd: int, wifi1: Dict[str, Any], wifi2: Dict[str, Any]) -> Dict[str, Any]:
+    def set_all_wifi(self, bsd: int, wifi1: Dict[str, Any], wifi2: Dict[str, Any], wifi3: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
-        Konfiguruje oba pasma Wi-Fi oraz przełącznik Smart Connect (Band Steering Dual/Tri-band BSD):
+        Konfiguruje pasma Wi-Fi (2.4G, 5G, opcjonalnie 5G-2 Tri-Band dla BE7000) oraz Smart Connect (BSD):
         - bsd: 1 (Smart Connect włączony - wspólne SSID), 0 (pasma rozdzielone)
         - wifi1: parametry pasma 2.4 GHz
-        - wifi2: parametry pasma 5 GHz
+        - wifi2: parametry pasma 5 GHz (lub 5G-1)
+        - wifi3: opcjonalne parametry 3. radia 5G-2 (gdy router pracuje w trybie split5g)
         """
         c1 = str(wifi1.get("channel", 0))
         b1 = str(wifi1.get("bandwidth", 0))
@@ -1121,11 +1544,11 @@ class MiWiFiClient:
 
         data = {
             "bsd": str(bsd),
-            # Pola konwencjonalne (kompatybilne z AX3600 i starszymi)
+            # Pola konwencjonalne (kompatybilne z AX3600 i nowszymi)
             "on1": str(wifi1.get("on", 1)),
             "ssid1": wifi1.get("ssid", ""),
             "pwd1": wifi1.get("pwd", wifi1.get("password", "")),
-            "encryption1": wifi1.get("encryption", "psk2"),
+            "encryption1": wifi1.get("encryption", "psk2+ccmp"),
             "channel1": c1,
             "bandwidth1": b1,
             "hidden1": str(wifi1.get("hidden", 0)),
@@ -1133,7 +1556,7 @@ class MiWiFiClient:
             "on2": str(wifi2.get("on", 1)),
             "ssid2": wifi2.get("ssid", ""),
             "pwd2": wifi2.get("pwd", wifi2.get("password", "")),
-            "encryption2": wifi2.get("encryption", "psk2"),
+            "encryption2": wifi2.get("encryption", "psk2+ccmp"),
             "channel2": c2,
             "bandwidth2": b2,
             "hidden2": str(wifi2.get("hidden", 0)),
@@ -1147,7 +1570,18 @@ class MiWiFiClient:
             "txpwr50": t2,
             "isDFS": "0"
         }
-        return self.api_request("api/xqnetwork/set_all_wifi", method="POST", data=data)
+        if isinstance(wifi3, dict):
+            data.update({
+                "on3": str(wifi3.get("on", 1)),
+                "ssid3": wifi3.get("ssid", ""),
+                "pwd3": wifi3.get("pwd", wifi3.get("password", "")),
+                "encryption3": wifi3.get("encryption", "psk2+ccmp"),
+                "channel3": str(wifi3.get("channel", 0)),
+                "bandwidth3": str(wifi3.get("bandwidth", 0)),
+                "hidden3": str(wifi3.get("hidden", 0)),
+                "txpwr3": wifi3.get("txpwr", "max"),
+            })
+        return self.api_request("api/xqnetwork/set_all_wifi", method="POST", data=data, timeout=40)
 
     # --- Zaawansowane opcje Wi-Fi ---
 
@@ -1159,33 +1593,52 @@ class MiWiFiClient:
         """
         return self.api_request("api/xqnetwork/set_wifi_ax", method="POST", data={"ax": str(ax), "isDFS": "0"})
 
+    def get_mlo(self) -> Dict[str, Any]:
+        """Pobiera stan Wi-Fi 7 MLO (xqnetwork/get_hostap_mlo -> mlo_enable)."""
+        if str(self.get_feature("wifi", "mlo", "0")) != "1":
+            return {}
+        try:
+            return self.api_request("api/xqnetwork/get_hostap_mlo")
+        except Exception as e:
+            return {"error": str(e)}
+
+    def set_mlo(self, enable: int) -> Dict[str, Any]:
+        """Włącza (1) lub wyłącza (0) Wi-Fi 7 MLO (POST xqnetwork/set_hostap_mlo)."""
+        return self.api_request("api/xqnetwork/set_hostap_mlo", method="POST", data={"mlo_enable": str(1 if enable else 0)})
+
+    def set_wifi_split(self, split: int) -> Dict[str, Any]:
+        """Przełącza tryb Dual-Band (0) / Tri-Band 5G-1 + 5G-2 (1) na BE7000 (POST xqsystem/set_wifi_split)."""
+        return self.api_request("api/xqsystem/set_wifi_split", method="POST", data={"wifi_split": str(1 if split else 0)}, timeout=40)
+
     def get_twt(self) -> Dict[str, Any]:
         """Pobiera stan trybu oszczędzania energii TWT (Target Wake Time)."""
         return self.api_request("api/xqnetwork/get_twt")
 
     def set_twt(self, status: int) -> Dict[str, Any]:
-        """Ustawia tryb oszczędzania energii TWT: 1 = włączony, 0 = wyłączony."""
-        return self.api_request("api/xqnetwork/set_twt", method="POST", data={"on": str(status), "status": str(status)})
+        """Ustawia tryb oszczędzania energii TWT: 1 = włączony, 0 = wyłączony (oficjalny POST on=0|1)."""
+        return self.api_request("api/xqnetwork/set_twt", method="POST", data={"on": str(1 if status else 0)})
 
     def set_wifi_txbf(self, txbf: int) -> Dict[str, Any]:
         """Ustawia MU-MIMO / Beamforming: 1 = włączony, 0 = wyłączony."""
         return self.api_request("api/xqnetwork/set_wifi_txbf", method="POST", data={"txbf": str(txbf), "isDFS": "0"})
 
     def get_miotrelay_switch(self) -> Dict[str, Any]:
-        """Pobiera stan usługi szybkiego parowania Xiaomi (Changkuailian / Miot Relay)."""
+        """Pobiera stan usługi szybkiego parowania Xiaomi (Changkuailian / Miot Relay -> rsp.enabled)."""
         return self.api_request("api/xqnetwork/get_miotrelay_switch")
 
     def set_miotrelay_switch(self, switch_on: int) -> Dict[str, Any]:
-        """Ustawia szybkie parowanie Xiaomi (Changkuailian): 1 = włączone, 0 = wyłączone."""
-        return self.api_request("api/xqnetwork/miotrelay_switch", method="POST", data={"on": str(switch_on), "switch": str(switch_on)})
+        """Ustawia szybkie parowanie Xiaomi (Changkuailian): 1 = włączone, 0 = wyłączone (oficjalny POST on=0|1)."""
+        return self.api_request("api/xqnetwork/miotrelay_switch", method="POST", data={"on": str(1 if switch_on else 0)})
 
     def get_wifi_silence(self) -> Dict[str, Any]:
-        """Pobiera stan trybu cichego Wi-Fi (wyłączenie radia do restartu)."""
+        """Pobiera stan trybu cichego Wi-Fi (rsp.on; tylko jeśli wspierany przez firmware)."""
+        if str(self.get_feature("wifi", "silence_switch", "0")) != "1":
+            return {}
         return self.api_request("api/xqnetwork/get_wifi_silence")
 
     def set_wifi_silence(self, status: int) -> Dict[str, Any]:
-        """Ustawia tryb cichy: 1 = wyłącza całe Wi-Fi do restartu routera, 0 = normalny stan."""
-        return self.api_request("api/xqnetwork/set_wifi_silence", method="POST", data={"on": str(status), "status": str(status)})
+        """Ustawia tryb cichy: 1 = wyłącza całe Wi-Fi do restartu routera, 0 = normalny stan (oficjalny POST on=0|1)."""
+        return self.api_request("api/xqnetwork/set_wifi_silence", method="POST", data={"on": str(1 if status else 0)})
 
     def get_aimesh_config(self) -> Dict[str, Any]:
         """Pobiera parametry roamingu Mesh i progi sygnału RSSI."""
@@ -1350,10 +1803,19 @@ class MiWiFiClient:
 
         return last_res
 
+    def get_nfc_info(self) -> Dict[str, Any]:
+        """Pobiera stan fizycznego modułu NFC (xqnetwork/get_nfc_info)."""
+        if str(self.get_feature("apps", "nfc", "0")) != "1":
+            return {}
+        try:
+            return self.api_request("api/xqnetwork/get_nfc_info")
+        except Exception as e:
+            return {"error": str(e)}
+
     def set_nfc_status(self, enabled: bool = True) -> Dict[str, Any]:
-        """Włącza lub wyłącza fizyczny tag NFC (jeśli wspierany sprzętowo)."""
+        """Włącza lub wyłącza fizyczny tag NFC (oficjalny POST xqnetwork/set_nfc_status z nfc_enable)."""
         st = "1" if enabled else "0"
-        return self.api_request("api/xqnetwork/set_nfc_status", method="POST", data={"status": st})
+        return self.api_request("api/xqnetwork/set_nfc_status", method="POST", data={"nfc_enable": st})
 
     def get_ps_services_summary(self) -> Dict[str, Any]:
         """Pobiera zbiorczy status wszystkich 4 usług portów fizycznych."""
@@ -1389,9 +1851,14 @@ class MiWiFiClient:
             "storage_info": {},
             "router_name": {},
             "led_status": {},
+            "all_led": {},
+            "eth_led": {},
+            "effect_light": {},
+            "nfc": {},
             "reboot_task": {},
             "topo_graph": {},
             "twt": {},
+            "mlo": {},
             "miotrelay": {},
             "wifi_silence": {},
             "aimesh": {},
@@ -1399,6 +1866,7 @@ class MiWiFiClient:
             "ddns": {},
             "vpn": {},
             "vpn_status": {},
+            "smartvpn": {},
             "ps_map": {},
             "ps_services": {}
         }
@@ -1416,9 +1884,14 @@ class MiWiFiClient:
             ("storage_info", self.get_storage_info),
             ("router_name", self.get_router_name),
             ("led_status", self.get_led_status),
+            ("all_led", self.get_all_led),
+            ("eth_led", self.get_eth_led),
+            ("effect_light", self.get_effect_light),
+            ("nfc", self.get_nfc_info),
             ("reboot_task", self.get_reboot_task),
             ("topo_graph", self.get_topo_graph),
             ("twt", self.get_twt),
+            ("mlo", self.get_mlo),
             ("miotrelay", self.get_miotrelay_switch),
             ("wifi_silence", self.get_wifi_silence),
             ("aimesh", self.get_aimesh_config),
@@ -1426,6 +1899,7 @@ class MiWiFiClient:
             ("ddns", self.get_ddns),
             ("vpn", self.get_vpn_list),
             ("vpn_status", self.get_vpn_status),
+            ("smartvpn", self.get_smartvpn_info),
             ("ps_map", self.get_ps_map),
             ("ps_services", self.get_ps_services_summary),
             ("country_code", self.get_country_code),

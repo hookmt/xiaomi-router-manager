@@ -142,52 +142,52 @@ const TZ_INDEX_MAP = {
   "UTC":                 "2.48"
 };
 
-// Lista stref do selecta (skrocone etykiety dla UI mobilnego)
+// Lista stref do selecta (skrocone etykiety PL/EN dla UI mobilnego)
 const TZ_DISPLAY_LIST = [
-  { iana: "Europe/Warsaw",       label: "🇵🇱 Polska (CET/CEST, UTC+1/+2)" },
-  { iana: "Europe/Berlin",       label: "🇩🇪 Niemcy / DE (CET/CEST)" },
-  { iana: "Europe/London",       label: "🇬🇧 Wielka Brytania / UK (GMT/BST)" },
-  { iana: "Europe/Paris",        label: "🇫🇷 Francja / FR (CET/CEST)" },
-  { iana: "Europe/Prague",       label: "🇨🇿 Czechy / CZ (CET/CEST)" },
-  { iana: "Europe/Vienna",       label: "🇦🇹 Austria / AT (CET/CEST)" },
-  { iana: "Europe/Stockholm",    label: "🇸🇪 Szwecja / SE (CET/CEST)" },
-  { iana: "Europe/Amsterdam",    label: "🇳🇱 Holandia / NL (CET/CEST)" },
-  { iana: "Europe/Rome",         label: "🇮🇹 Wlochy / IT (CET/CEST)" },
-  { iana: "Europe/Madrid",       label: "🇪🇸 Hiszpania / ES (CET/CEST)" },
-  { iana: "Europe/Lisbon",       label: "🇵🇹 Portugalia / PT (WET/WEST)" },
-  { iana: "Europe/Helsinki",     label: "🇫🇮 Finlandia / FI (EET/EEST)" },
-  { iana: "Europe/Athens",       label: "🇬🇷 Grecja / GR (EET/EEST)" },
-  { iana: "Europe/Bucharest",    label: "🇷🇴 Rumunia / RO (EET/EEST)" },
-  { iana: "Europe/Kyiv",         label: "🇺🇦 Ukraina / UA (EET/EEST)" },
-  { iana: "Europe/Moscow",       label: "🇷🇺 Rosja - Moskwa (MSK, UTC+3)" },
-  { iana: "Europe/Istanbul",     label: "🇹🇷 Turcja / TR (TRT, UTC+3)" },
-  { iana: "Asia/Dubai",          label: "🇦🇪 ZEA / UAE (GST, UTC+4)" },
-  { iana: "Asia/Karachi",        label: "🇵🇰 Pakistan / PK (PKT, UTC+5)" },
-  { iana: "Asia/Kolkata",        label: "🇮🇳 Indie / IN (IST, UTC+5:30)" },
-  { iana: "Asia/Dhaka",          label: "🇧🇩 Bangladesz / BD (BDT, UTC+6)" },
-  { iana: "Asia/Bangkok",        label: "🇹🇭 Tajlandia / TH (ICT, UTC+7)" },
-  { iana: "Asia/Shanghai",       label: "🇨🇳 Chiny / CN (CST, UTC+8)" },
-  { iana: "Asia/Singapore",      label: "🇸🇬 Singapur / SG (SGT, UTC+8)" },
-  { iana: "Asia/Hong_Kong",      label: "🇭🇰 Hongkong / HK (HKT, UTC+8)" },
-  { iana: "Asia/Taipei",         label: "🇹🇼 Tajwan / TW (CST, UTC+8)" },
-  { iana: "Asia/Tokyo",          label: "🇯🇵 Japonia / JP (JST, UTC+9)" },
-  { iana: "Asia/Seoul",          label: "🇰🇷 Korea Poludniowa / KR (KST, UTC+9)" },
-  { iana: "Pacific/Sydney",      label: "🇦🇺 Australia - Sydney (AEST/AEDT)" },
-  { iana: "Pacific/Brisbane",    label: "🇦🇺 Australia - Brisbane (AEST, UTC+10)" },
-  { iana: "Pacific/Auckland",    label: "🇳🇿 Nowa Zelandia / NZ (NZST/NZDT)" },
-  { iana: "America/New_York",    label: "🇺🇸 USA - Wschod (EST/EDT, UTC-5/-4)" },
-  { iana: "America/Chicago",     label: "🇺🇸 USA - Centrum (CST/CDT, UTC-6/-5)" },
-  { iana: "America/Denver",      label: "🇺🇸 USA - Gory (MST/MDT, UTC-7/-6)" },
-  { iana: "America/Los_Angeles", label: "🇺🇸 USA - Zachod (PST/PDT, UTC-8/-7)" },
-  { iana: "America/Honolulu",    label: "🇺🇸 USA - Hawaje (HST, UTC-10)" },
-  { iana: "America/Toronto",     label: "🇨🇦 Kanada - Toronto (EST/EDT)" },
-  { iana: "America/Vancouver",   label: "🇨🇦 Kanada - Vancouver (PST/PDT)" },
-  { iana: "America/Sao_Paulo",   label: "🇧🇷 Brazylia - Sao Paulo (BRT/BRST)" },
-  { iana: "America/Mexico_City", label: "🇲🇽 Meksyk (CST/CDT)" },
-  { iana: "Africa/Cairo",        label: "🇪🇬 Egipt / EG (EET, UTC+2)" },
-  { iana: "Africa/Johannesburg", label: "🇿🇦 RPA / ZA (SAST, UTC+2)" },
-  { iana: "Africa/Nairobi",      label: "🇰🇪 Kenia / KE (EAT, UTC+3)" },
-  { iana: "UTC",                 label: "🌍 UTC (Czas Uniwersalny)" }
+  { iana: "Europe/Warsaw",       label: "🇵🇱 Polska (CET/CEST, UTC+1/+2)",       en: "🇵🇱 Poland (CET/CEST, UTC+1/+2)" },
+  { iana: "Europe/Berlin",       label: "🇩🇪 Niemcy / DE (CET/CEST)",            en: "🇩🇪 Germany / DE (CET/CEST)" },
+  { iana: "Europe/London",       label: "🇬🇧 Wielka Brytania / UK (GMT/BST)",    en: "🇬🇧 United Kingdom / UK (GMT/BST)" },
+  { iana: "Europe/Paris",        label: "🇫🇷 Francja / FR (CET/CEST)",           en: "🇫🇷 France / FR (CET/CEST)" },
+  { iana: "Europe/Prague",       label: "🇨🇿 Czechy / CZ (CET/CEST)",            en: "🇨🇿 Czechia / CZ (CET/CEST)" },
+  { iana: "Europe/Vienna",       label: "🇦🇹 Austria / AT (CET/CEST)",           en: "🇦🇹 Austria / AT (CET/CEST)" },
+  { iana: "Europe/Stockholm",    label: "🇸🇪 Szwecja / SE (CET/CEST)",           en: "🇸🇪 Sweden / SE (CET/CEST)" },
+  { iana: "Europe/Amsterdam",    label: "🇳🇱 Holandia / NL (CET/CEST)",          en: "🇳🇱 Netherlands / NL (CET/CEST)" },
+  { iana: "Europe/Rome",         label: "🇮🇹 Włochy / IT (CET/CEST)",            en: "🇮🇹 Italy / IT (CET/CEST)" },
+  { iana: "Europe/Madrid",       label: "🇪🇸 Hiszpania / ES (CET/CEST)",         en: "🇪🇸 Spain / ES (CET/CEST)" },
+  { iana: "Europe/Lisbon",       label: "🇵🇹 Portugalia / PT (WET/WEST)",        en: "🇵🇹 Portugal / PT (WET/WEST)" },
+  { iana: "Europe/Helsinki",     label: "🇫🇮 Finlandia / FI (EET/EEST)",         en: "🇫🇮 Finland / FI (EET/EEST)" },
+  { iana: "Europe/Athens",       label: "🇬🇷 Grecja / GR (EET/EEST)",            en: "🇬🇷 Greece / GR (EET/EEST)" },
+  { iana: "Europe/Bucharest",    label: "🇷🇴 Rumunia / RO (EET/EEST)",           en: "🇷🇴 Romania / RO (EET/EEST)" },
+  { iana: "Europe/Kyiv",         label: "🇺🇦 Ukraina / UA (EET/EEST)",           en: "🇺🇦 Ukraine / UA (EET/EEST)" },
+  { iana: "Europe/Moscow",       label: "🇷🇺 Rosja - Moskwa (MSK, UTC+3)",       en: "🇷🇺 Russia - Moscow (MSK, UTC+3)" },
+  { iana: "Europe/Istanbul",     label: "🇹🇷 Turcja / TR (TRT, UTC+3)",          en: "🇹🇷 Turkey / TR (TRT, UTC+3)" },
+  { iana: "Asia/Dubai",          label: "🇦🇪 ZEA / UAE (GST, UTC+4)",            en: "🇦🇪 UAE (GST, UTC+4)" },
+  { iana: "Asia/Karachi",        label: "🇵🇰 Pakistan / PK (PKT, UTC+5)",        en: "🇵🇰 Pakistan / PK (PKT, UTC+5)" },
+  { iana: "Asia/Kolkata",        label: "🇮🇳 Indie / IN (IST, UTC+5:30)",        en: "🇮🇳 India / IN (IST, UTC+5:30)" },
+  { iana: "Asia/Dhaka",          label: "🇧🇩 Bangladesz / BD (BDT, UTC+6)",      en: "🇧🇩 Bangladesh / BD (BDT, UTC+6)" },
+  { iana: "Asia/Bangkok",        label: "🇹🇭 Tajlandia / TH (ICT, UTC+7)",       en: "🇹🇭 Thailand / TH (ICT, UTC+7)" },
+  { iana: "Asia/Shanghai",       label: "🇨🇳 Chiny / CN (CST, UTC+8)",           en: "🇨🇳 China / CN (CST, UTC+8)" },
+  { iana: "Asia/Singapore",      label: "🇸🇬 Singapur / SG (SGT, UTC+8)",        en: "🇸🇬 Singapore / SG (SGT, UTC+8)" },
+  { iana: "Asia/Hong_Kong",      label: "🇭🇰 Hongkong / HK (HKT, UTC+8)",        en: "🇭🇰 Hong Kong / HK (HKT, UTC+8)" },
+  { iana: "Asia/Taipei",         label: "🇹🇼 Tajwan / TW (CST, UTC+8)",          en: "🇹🇼 Taiwan / TW (CST, UTC+8)" },
+  { iana: "Asia/Tokyo",          label: "🇯🇵 Japonia / JP (JST, UTC+9)",         en: "🇯🇵 Japan / JP (JST, UTC+9)" },
+  { iana: "Asia/Seoul",          label: "🇰🇷 Korea Południowa / KR (KST, UTC+9)", en: "🇰🇷 South Korea / KR (KST, UTC+9)" },
+  { iana: "Pacific/Sydney",      label: "🇦🇺 Australia - Sydney (AEST/AEDT)",    en: "🇦🇺 Australia - Sydney (AEST/AEDT)" },
+  { iana: "Pacific/Brisbane",    label: "🇦🇺 Australia - Brisbane (AEST, UTC+10)", en: "🇦🇺 Australia - Brisbane (AEST, UTC+10)" },
+  { iana: "Pacific/Auckland",    label: "🇳🇿 Nowa Zelandia / NZ (NZST/NZDT)",    en: "🇳🇿 New Zealand / NZ (NZST/NZDT)" },
+  { iana: "America/New_York",    label: "🇺🇸 USA - Wschód (EST/EDT, UTC-5/-4)",  en: "🇺🇸 USA - Eastern (EST/EDT, UTC-5/-4)" },
+  { iana: "America/Chicago",     label: "🇺🇸 USA - Centrum (CST/CDT, UTC-6/-5)", en: "🇺🇸 USA - Central (CST/CDT, UTC-6/-5)" },
+  { iana: "America/Denver",      label: "🇺🇸 USA - Góry (MST/MDT, UTC-7/-6)",    en: "🇺🇸 USA - Mountain (MST/MDT, UTC-7/-6)" },
+  { iana: "America/Los_Angeles", label: "🇺🇸 USA - Zachód (PST/PDT, UTC-8/-7)",  en: "🇺🇸 USA - Pacific (PST/PDT, UTC-8/-7)" },
+  { iana: "America/Honolulu",    label: "🇺🇸 USA - Hawaje (HST, UTC-10)",        en: "🇺🇸 USA - Hawaii (HST, UTC-10)" },
+  { iana: "America/Toronto",     label: "🇨🇦 Kanada - Toronto (EST/EDT)",        en: "🇨🇦 Canada - Toronto (EST/EDT)" },
+  { iana: "America/Vancouver",   label: "🇨🇦 Kanada - Vancouver (PST/PDT)",      en: "🇨🇦 Canada - Vancouver (PST/PDT)" },
+  { iana: "America/Sao_Paulo",   label: "🇧🇷 Brazylia - Sao Paulo (BRT/BRST)",   en: "🇧🇷 Brazil - Sao Paulo (BRT/BRST)" },
+  { iana: "America/Mexico_City", label: "🇲🇽 Meksyk (CST/CDT)",                  en: "🇲🇽 Mexico (CST/CDT)" },
+  { iana: "Africa/Cairo",        label: "🇪🇬 Egipt / EG (EET, UTC+2)",           en: "🇪🇬 Egypt / EG (EET, UTC+2)" },
+  { iana: "Africa/Johannesburg", label: "🇿🇦 RPA / ZA (SAST, UTC+2)",            en: "🇿🇦 South Africa / ZA (SAST, UTC+2)" },
+  { iana: "Africa/Nairobi",      label: "🇰🇪 Kenia / KE (EAT, UTC+3)",           en: "🇰🇪 Kenya / KE (EAT, UTC+3)" },
+  { iana: "UTC",                 label: "🌍 UTC (Czas Uniwersalny)",            en: "🌍 UTC (Coordinated Universal Time)" }
 ];
 
 // Lista kodow regionow regulacyjnych (country code -> opis, profil CE/FCC)
@@ -263,6 +263,36 @@ function cleanModelName(raw) {
 function isFactoryReset(initInfo) {
   if (!initInfo || typeof initInfo !== "object") return false;
   return initInfo.inited === 0 || String(initInfo.inited) === "0";
+}
+
+function getFeature(category, key, fallback = null) {
+  const f = state.initInfo?.features;
+  if (!f || typeof f !== "object") return fallback;
+  const cat = f[category];
+  if (!cat || typeof cat !== "object" || cat[key] === undefined || cat[key] === null) return fallback;
+  return String(cat[key]);
+}
+
+const DDNS_PROVIDER_IDS = {
+  "oray": 1, "oray.com": 1,
+  "no-ip": 2, "no-ip.com": 2, "noip": 2,
+  "pubyun": 3, "pubyun.com": 3, "3322": 3, "3322.org": 3,
+  "alidns": 4, "alidns.com": 4, "aliyun": 4,
+  "dnspod": 5, "dnspod.cn": 5, "dnspod.com": 5,
+  "huawei": 6, "huaweicloud": 6, "huaweicloud.com": 6,
+  "baidu": 7, "baidu.com": 7,
+  "cloudflare": 8, "cloudflare.com": 8,
+  "dyndns": 9, "dyndns.com": 9, "dyn.com": 9
+};
+
+function resolveDdnsProviderId(service) {
+  if (/^\d+$/.test(String(service ?? "").trim())) return Number(service);
+  const key = String(service || "").trim().toLowerCase();
+  if (DDNS_PROVIDER_IDS[key]) return DDNS_PROVIDER_IDS[key];
+  for (const [k, v] of Object.entries(DDNS_PROVIDER_IDS)) {
+    if (key.includes(k)) return v;
+  }
+  return 2;
 }
 
 function extractWanDns(wanDetails) {
@@ -468,6 +498,7 @@ async function loginWithStok(stokOrUrl) {
     }
   } catch (e) {}
   state.stok = null;
+  state.savedPwd = "";
   setConnected(false);
   return false;
 }
@@ -502,6 +533,7 @@ async function loginWithPassword(pwd, user = "admin", isInit = false) {
     if (resp.code !== 0) return false;
     state.stok = extractStok(resp.token || resp.url || "");
     if (!state.stok) return false;
+    state.savedPwd = pwd;
     setConnected(true);
     void refreshData();
     return true;
@@ -541,6 +573,7 @@ function disconnect() {
   const led=document.getElementById("led-switch"), ledSave=document.getElementById("btn-save-led");
   if (led) led.disabled=true; if (ledSave) ledSave.disabled=true;
   state.stok = null;
+  state.savedPwd = "";
   setConnected(false);
   const resetText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   resetText("dash-router-title", state.lang === "en" ? "Router: disconnected" : "Router: brak połączenia");
@@ -1116,14 +1149,15 @@ function renderBinds() {
   });
   sortNetworkEntries(filtered, document.getElementById("bind-sort-select")?.value);
 
+  const isEn = state.lang === "en";
   if (filtered.length === 0) {
-    container.innerHTML = `<div class="empty-state">Brak skonfigurowanych rezerwacji DHCP.</div>`;
+    container.innerHTML = `<div class="empty-state">${isEn ? "No static DHCP reservations configured." : "Brak skonfigurowanych rezerwacji DHCP."}</div>`;
     return;
   }
 
   container.innerHTML = filtered.map(b => {
     const ipStr = extractIpString(b.ip);
-    const bName = b.name || b.origin_name || "Bez nazwy";
+    const bName = b.name || b.origin_name || (isEn ? "Unnamed" : "Bez nazwy");
     return `
       <div class="device-card">
         <div class="dev-main">
@@ -1137,8 +1171,8 @@ function renderBinds() {
             </div>
           </div>
           <div class="dev-actions">
-            <button class="btn-secondary btn-sm" onclick="openReserveModal(${escapeHtml(JSON.stringify(b.mac))}, ${escapeHtml(JSON.stringify(ipStr))}, ${escapeHtml(JSON.stringify(bName))})">Edytuj</button>
-            <button class="btn-danger btn-sm" onclick="deleteMacBind(${escapeHtml(JSON.stringify(b.mac))}, ${escapeHtml(JSON.stringify(bName))})">Usuń</button>
+            <button class="btn-secondary btn-sm" onclick="openReserveModal(${escapeHtml(JSON.stringify(b.mac))}, ${escapeHtml(JSON.stringify(ipStr))}, ${escapeHtml(JSON.stringify(bName))})">${isEn ? "Edit" : "Edytuj"}</button>
+            <button class="btn-danger btn-sm" onclick="deleteMacBind(${escapeHtml(JSON.stringify(b.mac))}, ${escapeHtml(JSON.stringify(bName))})">${isEn ? "Delete" : "Usuń"}</button>
           </div>
         </div>
       </div>
@@ -1175,8 +1209,15 @@ function setWifiPresentation(bsdOn) {
     (bsdOn ? common : slot).appendChild(fields);
     common.classList.toggle("hidden", !bsdOn);
   }
-  byId("wifi-bsd-banner")?.classList.toggle("hidden", !bsdOn);
-  byId("wifi-5g-sync-banner")?.classList.toggle("hidden", !bsdOn);
+  const banner = byId("wifi-bsd-banner");
+  if (banner) {
+    banner.classList.toggle("hidden", !bsdOn);
+    if (bsdOn) {
+      banner.textContent = state.lang === "en"
+        ? "★ Smart Connect is ENABLED: 2.4 GHz and 5 GHz bands share the same network name and password."
+        : "★ Smart Connect jest WŁĄCZONY: pasma 2.4 GHz i 5 GHz korzystają ze wspólnej nazwy i hasła.";
+    }
+  }
   byId("wifi-5g-credentials-box")?.classList.toggle("hidden", bsdOn);
   const text = (id, pl, en) => { const el=byId(id); if (el) el.textContent=state.lang === "en" ? en : pl; };
   text("wifi-common-heading", "Wspólna sieć Wi-Fi", "Shared Wi-Fi network");
@@ -1262,7 +1303,7 @@ function renderAimeshConfig(data) {
   const roamBox = document.getElementById("wifi-roam-box");
 
   if (roamChk) roamChk.checked = isManual;
-  if (roamLbl) roamLbl.textContent = isManual ? "Ręczne progi" : "Domyślne";
+  if (roamLbl) roamLbl.textContent = state.lang === "en" ? (isManual ? "Manual thresholds" : "Default") : (isManual ? "Ręczne progi" : "Domyślne");
   if (roamBox) {
     if (isManual) {
       roamBox.classList.remove("hidden");
@@ -1302,20 +1343,21 @@ function getPortRecord(index, ports = state.portsStatus, links = state.portLinks
   return null;
 }
 function renderPortsStatus(ports, links = []) {
+  const isEn = state.lang === "en";
   const roles = {wan:"role_wan1",wan2:"role_dualwan",lag:"role_lag",iptv:"role_iptv",game:"role_game",lan:"role_lan"};
   document.querySelectorAll("#ports-hardware-grid .port-card").forEach((card,idx) => {
     const port=getPortRecord(idx,ports,links), status=card.querySelector(".port-status"), badge=card.querySelector(".port-badge");
     card.className="port-card";
-    if (!port) { card.classList.add("port-unknown"); status.textContent="Stan nieznany"; badge.textContent="Rola nieznana"; return; }
+    if (!port) { card.classList.add("port-unknown"); status.textContent=isEn ? "Unknown state" : "Stan nieznany"; badge.textContent=isEn ? "Unknown role" : "Rola nieznana"; return; }
     const role=portRole(port), linkInfo=links[idx];
     let linked=role === "wan" ? state.wanInfo?.link : (linkInfo && typeof linkInfo === "object" ? (linkInfo.link ?? linkInfo.status) : linkInfo);
     if (linked == null) linked=port.link;
     const known=linked !== undefined && linked !== null && (Number(linked) === 0 || Number(linked) === 1), up=known && Number(linked) === 1;
     const speed=(linkInfo && typeof linkInfo === "object" ? (linkInfo.negotiated_speed ?? linkInfo.link_speed) : null) ?? port.negotiated_speed ?? port.link_speed;
-    badge.textContent=roles[role] ? t(roles[role]) : "Rola nieznana"; badge.className="port-badge";
+    badge.textContent=roles[role] ? t(roles[role]) : (isEn ? "Unknown role" : "Rola nieznana"); badge.className="port-badge";
     card.classList.add(!known ? "port-unknown" : !up ? "port-inactive" : `port-role-${roles[role] ? role : "unknown"}`);
     status.className=`port-status ${up ? "status-up" : "status-down"}`;
-    status.textContent=!known ? "Stan nieznany" : !up ? "○ Rozłączony" : `● Połączony${speed != null && speed !== "" ? ` (${speed})` : ""}`;
+    status.textContent=!known ? (isEn ? "Unknown state" : "Stan nieznany") : !up ? (isEn ? "○ Disconnected" : "○ Rozłączony") : `${isEn ? "● Connected" : "● Połączony"}${speed != null && speed !== "" ? ` (${speed})` : ""}`;
   });
 }
 
@@ -1380,10 +1422,7 @@ function setupUI() {
         item.classList.toggle("active", item === btn);
       });
       applyStaticTranslation();
-      setWifiPresentation(document.getElementById("wifi-switch-smartconnect").checked);
-      setConnected(state.connected);
-      if (state.portsStatus.length) renderPortsStatus(state.portsStatus,state.portLinks || []);
-      if (state.natSnapshot) renderNat();
+      refreshDynamicTranslations();
     });
   });
 
@@ -1712,8 +1751,44 @@ function renderMesh(graph) {
       renderClientChips(chipsBox, sClients);
       card.append(chipsBox);
     }
+    if (sIp && sIp !== "-" && sIp !== state.ip) {
+      const actions = document.createElement("div");
+      actions.style.marginTop = "10px";
+      const btnSwitch = document.createElement("button");
+      btnSwitch.className = "btn-primary btn-sm";
+      btnSwitch.textContent = state.lang === "en" ? "🔀 Switch to this node" : "🔀 Przełącz na ten węzeł";
+      btnSwitch.onclick = () => switchToMeshNode(sIp, sat.name || "");
+      actions.append(btnSwitch);
+      card.append(actions);
+    }
     container.append(card);
   });
+}
+
+async function switchToMeshNode(nodeIp, nodeName = "") {
+  const isEn = state.lang === "en";
+  const label = nodeName ? `'${nodeName}' (${nodeIp})` : nodeIp;
+  const q = isEn
+    ? `Switch active session to Mesh node ${label}?\n\nNote: In Mesh satellite mode only local controls (LED, OTA, Rename, LAN LAG, Reboot, Factory Reset) are active. Resetting or reconfiguring a satellite as an independent router while wired via its WAN port will cut off access from the main LAN.`
+    : `Przełączyć bieżącą sesję na węzeł Mesh ${label}?\n\nUwaga: W trybie satelity Mesh działają tylko ustawienia lokalne (LED, OTA, Nazwa, LAG LAN, Restart, Reset fabryczny). Reset lub przełączenie satelity w tryb niezależnego routera (wpiętego przez port WAN) przerwie dostęp z sieci głównej.`;
+  if (!confirm(q)) return;
+  const pwd = state.savedPwd || "";
+  disconnect();
+  state.ip = nodeIp;
+  localStorage.setItem("xrm_ip", nodeIp);
+  const ipInput = $id("login-ip-input");
+  if (ipInput) ipInput.value = nodeIp;
+  const drawerIp = $id("drawer-ip-text");
+  if (drawerIp) drawerIp.textContent = `${isEn ? "Gateway" : "Brama"}: ${nodeIp}`;
+  if (pwd) {
+    const ok = await loginWithPassword(pwd);
+    if (!ok) {
+      alert(isEn ? `Could not auto-login to ${nodeIp}. Please enter password.` : `Nie udało się zalogować automatycznie do ${nodeIp}. Wpisz hasło.`);
+      openLoginModal();
+    }
+  } else {
+    openLoginModal();
+  }
 }
 
 // Data are loaded on demand so auto-refresh does not overwrite an edited form.
@@ -1732,9 +1807,21 @@ async function loadViewData(view) {
       state.topoGraph = topo.graph;
       renderMesh(topo.graph);
     } else if (view === "reboot") {
-      const [timeResult,ledResult]=await Promise.allSettled([apiRequest("misystem/sys_time"),apiRequest("misystem/led")]);
-      const time=timeResult.status === "fulfilled" ? timeResult.value : null;
-      const led=ledResult.status === "fulfilled" ? ledResult.value : null;
+      const isEn = state.lang === "en";
+      const ledCtrl = getFeature("apps", "LED_control", "1");
+      const hasNfc = getFeature("apps", "nfc", "0") === "1";
+      const nfcBox = $id("nfc-controls-box");
+      if (nfcBox) nfcBox.classList.toggle("hidden", !hasNfc);
+      const reqs = [apiRequest("misystem/sys_time"), apiRequest("misystem/led")];
+      if (ledCtrl === "3") {
+        reqs.push(apiRequest("misystem/allled"), apiRequest("misystem/ethled"), apiRequest("misystem/effect_light"));
+      }
+      const results = await Promise.allSettled(reqs);
+      const time = results[0].status === "fulfilled" ? results[0].value : null;
+      const led = results[1].status === "fulfilled" ? results[1].value : null;
+      const allLed = results[2]?.status === "fulfilled" ? results[2].value : null;
+      const ethLed = results[3]?.status === "fulfilled" ? results[3].value : null;
+      const effLed = results[4]?.status === "fulfilled" ? results[4].value : null;
       if (time && Number(time.code) === 0) {
         let tStr = "--";
         const tObj = (typeof time.time === "object" && time.time !== null) ? time.time : null;
@@ -1770,29 +1857,76 @@ async function loadViewData(view) {
         } else if (time.datetime || time.localtime) {
           tStr = String(time.datetime || time.localtime);
         }
-        $id("system-router-time").textContent = `Czas routera: ${tStr}`;
+        state.routerTimeStr = tStr;
+        $id("system-router-time").textContent = `${isEn ? "Router time:" : "Czas routera:"} ${tStr}`;
       }
       const ledAvailable=led && (led.code === undefined || Number(led.code) === 0) && [0,1].includes(Number(led.status)) && led.status !== null && led.status !== undefined;
       $id("led-switch").disabled=!ledAvailable;$id("btn-save-led").disabled=!ledAvailable;
       if (ledAvailable) {
         state.ledStatus = Number(led.status);
         $id("led-switch").checked=state.ledStatus===1;
-        $id("led-status-lbl").textContent=state.ledStatus===1 ? "Włączone" : "Wyłączone";
+        $id("led-status-lbl").textContent=state.ledStatus===1 ? (isEn ? "Enabled" : "Włączone") : (isEn ? "Disabled" : "Wyłączone");
         const dashLed = $id("dash-led-status");
-        if (dashLed) dashLed.textContent = state.ledStatus===1 ? (state.lang === "en" ? "Enabled" : "Włączone") : (state.lang === "en" ? "Disabled" : "Wyłączone");
+        if (dashLed) dashLed.textContent = state.ledStatus===1 ? (isEn ? "Enabled" : "Włączone") : (isEn ? "Disabled" : "Wyłączone");
+      }
+      const extraBox = $id("extra-leds-box");
+      if (extraBox) {
+        const showExtra = ledCtrl === "3";
+        extraBox.classList.toggle("hidden", !showExtra);
+        if (showExtra) {
+          if (allLed && allLed.status !== undefined) $id("all-led-switch").checked = Number(allLed.status) === 1;
+          if (ethLed && ethLed.status !== undefined) $id("eth-led-switch").checked = Number(ethLed.status) === 1;
+          const effRow = $id("effect-light-row");
+          if (effRow) {
+            const hasEff = effLed && Number(effLed.code) === 0 && (effLed.status !== undefined || effLed.func !== undefined);
+            effRow.classList.toggle("hidden", !hasEff);
+            if (hasEff) {
+              $id("effect-light-switch").checked = Number(effLed.status) === 1 || String(effLed.func || "").toLowerCase() === "on";
+            }
+          }
+        }
       }
     } else if (view === "wifi") {
       if (!state.wifiInfo.length) throw Error("Brak danych Wi-Fi");
+      const isEn = state.lang === "en";
       const first = state.wifiInfo[0] || {};
-      const calls = await Promise.allSettled([apiRequest("xqnetwork/get_twt"),apiRequest("xqnetwork/get_miotrelay_switch"),apiRequest("xqnetwork/get_wifi_silence"),apiRequest("xqnetwork/get_aimesh_config")]);
-      const set = (id,value) => { if (value === undefined || value === null) return; const el=$id(`wifi-adv-${id}`); el.checked=Boolean(Number(value)); el.disabled=false; const label=$id(`wifi-adv-${id}-lbl`); if(label) label.textContent=el.checked ? "Włączone" : "Wyłączone"; };
+      const hasSilence = getFeature("wifi", "silence_switch", "0") === "1";
+      const hasMlo = getFeature("wifi", "mlo", "1") === "1";
+      const hasSplit5g = getFeature("wifi", "split5g", "0") === "1";
+      $id("wifi-adv-silence-row")?.classList.toggle("hidden", !hasSilence);
+      $id("wifi-adv-mlo-row")?.classList.toggle("hidden", !hasMlo);
+      $id("wifi-adv-split5g-row")?.classList.toggle("hidden", !hasSplit5g);
+
+      const calls = await Promise.allSettled([
+        apiRequest("xqnetwork/get_twt"),
+        apiRequest("xqnetwork/get_miotrelay_switch"),
+        hasSilence ? apiRequest("xqnetwork/get_wifi_silence") : Promise.resolve({ code: -1 }),
+        apiRequest("xqnetwork/get_aimesh_config"),
+        hasMlo ? apiRequest("xqnetwork/get_hostap_mlo") : Promise.resolve({ code: -1 })
+      ]);
+      const set = (id,value) => {
+        if (value === undefined || value === null) return;
+        const el=$id(`wifi-adv-${id}`);
+        if (!el) return;
+        el.checked=Boolean(Number(value));
+        el.disabled=false;
+        const label=$id(`wifi-adv-${id}-lbl`);
+        if(label) label.textContent=el.checked ? (isEn ? "Enabled" : "Włączone") : (isEn ? "Disabled" : "Wyłączone");
+      };
       if (first.ax !== undefined) set("w5", Number(first.ax) === 0 ? 1 : 0);
       if (first.txbf !== undefined) set("mimo", [1,3].includes(Number(first.txbf)) ? 1 : 0);
-      if (calls[0].status === "fulfilled" && calls[0].value.code === 0) set("twt",calls[0].value.status);
-      if (calls[1].status === "fulfilled" && calls[1].value.code === 0) set("miotrelay",calls[1].value.switch);
-      if (calls[2].status === "fulfilled" && calls[2].value.code === 0) set("silence",calls[2].value.status);
+      if (calls[0].status === "fulfilled" && calls[0].value.code === 0) set("twt", calls[0].value.status);
+      if (calls[1].status === "fulfilled" && calls[1].value.code === 0) set("miotrelay", calls[1].value.enabled ?? calls[1].value.switch);
+      if (hasSilence && calls[2].status === "fulfilled" && calls[2].value.code === 0) set("silence", calls[2].value.on ?? calls[2].value.status);
       if (calls[3].status === "fulfilled" && calls[3].value.code === 0 && calls[3].value.manual_roaming_setting !== undefined) {
+        state.aimesh = calls[3].value;
         renderAimeshConfig(calls[3].value); $id("wifi-adv-roam").disabled=false;
+      }
+      if (hasMlo && calls[4].status === "fulfilled" && calls[4].value.code === 0) {
+        set("mlo", calls[4].value.mlo_enable);
+      }
+      if (hasSplit5g) {
+        set("split5g", state.wifiInfo.length >= 3 ? 1 : 0);
       }
     } else if (view === "lan") {
       const [lan, dhcp] = await Promise.all([apiRequest("xqnetwork/lan_info"), apiRequest("xqnetwork/lan_dhcp")]);
@@ -2124,7 +2258,7 @@ function setupAdditionalControls() {
     if (!Number.isInteger(down) || down < 1 || !Number.isInteger(up) || up < 1) return alert("Podaj prędkości pobierania i wysyłania w Mbps.");
     if (!state.connected || !viewLoaded.has("qos")) return alert("Najpierw odczytaj ustawienia QoS.");
     if (!state.qosActive) { state.pendingQosBand={upload:up,download:down}; return alert("Prędkości zapamiętano w aplikacji. Zostaną wysłane po włączeniu QoS."); }
-    sendChange("qos", `misystem/set_band?upload=${up}&download=${down}`, null, "Zapisać deklarowaną prędkość łącza?", "GET");
+    sendChange("qos", "misystem/set_band", {upload:String(up),download:String(down),manual:"1"}, "Zapisać deklarowaną prędkość łącza?", "POST");
   });
   document.querySelectorAll("#qos-mode-selector button").forEach(b=>b.addEventListener("click",()=>document.querySelectorAll("#qos-mode-selector button").forEach(x=>x.classList.toggle("active",x===b))));
   $id("btn-save-qos").addEventListener("click", async () => {
@@ -2136,7 +2270,7 @@ function setupAdditionalControls() {
       const a=await apiRequest(`misystem/qos_switch?on=${on}`); if (a.code !== 0) throw Error(a.msg || a.code);
       if (on) {
         const b=await apiRequest(`misystem/qos_mode?mode=${mode}`); if (b.code !== 0) throw Error(b.msg || b.code);
-        if (state.pendingQosBand) { const {upload,download}=state.pendingQosBand; const c=await apiRequest(`misystem/set_band?upload=${upload}&download=${download}`); if(c.code!==0) throw Error(c.msg || c.code); state.pendingQosBand=null; }
+        if (state.pendingQosBand) { const {upload,download}=state.pendingQosBand; const c=await apiRequest("misystem/set_band", "POST", {upload:String(upload),download:String(download),manual:"1"}); if(c.code!==0) throw Error(c.msg || c.code); state.pendingQosBand=null; }
       }
       alert("Router potwierdził zapis QoS."); viewLoaded.delete("qos"); await loadViewData("qos");
     } catch(e) { alert("Nie udało się potwierdzić całej zmiany QoS: " + e.message); }
@@ -2146,22 +2280,27 @@ function setupAdditionalControls() {
 // Obsługa zaawansowanych przełączników Wi-Fi
 function setupAdvancedWifiSwitches() {
   const mapping = {
+    mlo: ["xqnetwork/set_hostap_mlo", on => ({mlo_enable:String(on)})],
+    split5g: ["xqsystem/set_wifi_split", on => ({wifi_split:String(on)})],
     w5: ["xqnetwork/set_wifi_ax", on => ({ax:on ? "0" : "1",isDFS:"0"})],
-    twt: ["xqnetwork/set_twt", on => ({on:String(on),status:String(on)})],
+    twt: ["xqnetwork/set_twt", on => ({on:String(on)})],
     mimo: ["xqnetwork/set_wifi_txbf", on => ({txbf:String(on),isDFS:"0"})],
-    miotrelay: ["xqnetwork/miotrelay_switch", on => ({on:String(on),switch:String(on)})],
-    silence: ["xqnetwork/set_wifi_silence", on => ({on:String(on),status:String(on)})]
+    miotrelay: ["xqnetwork/miotrelay_switch", on => ({on:String(on)})],
+    silence: ["xqnetwork/set_wifi_silence", on => ({on:String(on)})]
   };
   for (const [name,[endpoint,payload]] of Object.entries(mapping)) {
-    const el=$id(`wifi-adv-${name}`); el.disabled=true;
+    const el=$id(`wifi-adv-${name}`); if (!el) continue; el.disabled=true;
     el.addEventListener("change", async () => {
       const next=el.checked ? 1 : 0;
-      if (!state.connected || (name === "silence" && next && !confirm("Wyłączyć Wi-Fi do restartu routera? Połączenie zostanie przerwane."))) { el.checked=!el.checked; return; }
+      if (!state.connected) { el.checked=!el.checked; return; }
+      if (name === "silence" && next && !confirm("Wyłączyć Wi-Fi do restartu routera? Połączenie zostanie przerwane.")) { el.checked=!el.checked; return; }
+      if (name === "split5g" && !confirm(state.lang === "en" ? "Changing Dual-Band / Tri-Band (5G-1 + 5G-2) mode will reboot the router and disconnect all devices. Continue?" : "Zmiana trybu Dual-Band / Tri-Band (5G-1 + 5G-2) zrestartuje router i rozłączy urządzenia. Kontynuować?")) { el.checked=!el.checked; return; }
       el.disabled=true;
       try {
         const result=await apiRequest(endpoint,"POST",payload(next));
         if (result.code !== 0) throw Error(result.msg || result.code);
-        $id(`wifi-adv-${name}-lbl`).textContent=next ? "Włączone" : "Wyłączone";
+        const lbl = $id(`wifi-adv-${name}-lbl`);
+        if (lbl) lbl.textContent = state.lang === "en" ? (next ? "Enabled" : "Disabled") : (next ? "Włączone" : "Wyłączone");
       } catch(e) { el.checked=!el.checked; alert("Nie udało się potwierdzić zmiany: " + e.message); }
       finally { el.disabled=false; }
     });
@@ -2362,7 +2501,10 @@ function setupReserveModal() {
 }
 
 window.openReserveModal = function(mac = "", ip = "", name = "") {
-  document.getElementById("modal-reserve-title").textContent = mac ? "Edycja / Zapis Rezerwacji DHCP" : "Nowa Rezerwacja DHCP";
+  const isEn = state.lang === "en";
+  document.getElementById("modal-reserve-title").textContent = mac
+    ? (isEn ? "Edit / Save DHCP Reservation" : "Edycja / Zapis Rezerwacji DHCP")
+    : (isEn ? "New DHCP Reservation" : "Nowa Rezerwacja DHCP");
   document.getElementById("reserve-name-input").value = name;
   document.getElementById("reserve-mac-input").value = mac;
   document.getElementById("reserve-ip-input").value = extractIpString(ip);
@@ -2427,12 +2569,12 @@ window.toggleDeviceWanAccess = async function(mac, currentAllowed) {
 // NARZĘDZIA SYSTEMOWE (LED, PING, REBOOT)
 // ==========================================================================
 function setupSystemTools() {
-  // LED
+  // LED (główna dioda + dodatkowe LED dla modeli z LED_control == 3)
   const ledSw = document.getElementById("led-switch");
   const ledLbl = document.getElementById("led-status-lbl");
   if (ledSw) {
     ledSw.addEventListener("change", () => {
-      ledLbl.textContent = ledSw.checked ? "Włączone" : "Wyłączone";
+      ledLbl.textContent = state.lang === "en" ? (ledSw.checked ? "Enabled" : "Disabled") : (ledSw.checked ? "Włączone" : "Wyłączone");
     });
   }
 
@@ -2440,7 +2582,19 @@ function setupSystemTools() {
     if (!state.connected || !viewLoaded.has("reboot")) return alert("Najpierw odczytaj stan diod.");
     const stateVal = ledSw.checked ? "1" : "0";
     try {
-      const res = await apiRequest("misystem/led", "POST", { state: stateVal });
+      const res = await apiRequest("misystem/led", "POST", { on: stateVal });
+      const extraBox = $id("extra-leds-box");
+      if (extraBox && !extraBox.classList.contains("hidden")) {
+        const allSw = $id("all-led-switch");
+        const ethSw = $id("eth-led-switch");
+        const effRow = $id("effect-light-row");
+        const effSw = $id("effect-light-switch");
+        if (allSw) await apiRequest("misystem/allled", "POST", { on: allSw.checked ? "1" : "0" }).catch(() => {});
+        if (ethSw) await apiRequest("misystem/ethled", "POST", { on: ethSw.checked ? "1" : "0" }).catch(() => {});
+        if (effRow && !effRow.classList.contains("hidden") && effSw) {
+          await apiRequest("misystem/effect_light", "POST", { func: effSw.checked ? "on" : "off" }).catch(() => {});
+        }
+      }
       alert(res.code === 0 ? t("msg_save_success") : "Błąd routera: " + (res.msg || res.code));
     } catch (e) { alert("Nie udało się zapisać stanu diod."); }
   });
@@ -2568,7 +2722,7 @@ function setupSystemTools() {
       alert((state.lang === "en" ? "Wi-Fi scan error: " : "Błąd skanowania Wi-Fi: ") + e.message);
     } finally {
       btn.disabled = false;
-      btn.textContent = "✨ Optymalizuj kanały Wi-Fi";
+      btn.textContent = state.lang === "en" ? "✨ Optimize Wi-Fi channels" : "✨ Optymalizuj kanały Wi-Fi";
       fetchBindsAndPorts();
     }
   });
@@ -2714,17 +2868,42 @@ window.xrmSaveComplete = ok => alert(ok ? "Plik został zapisany." : "Nie udało
 function fileStamp() { return new Date().toISOString().replace(/[:.]/g,"-").replace("T","_").slice(0,19); }
 async function buildSnapshot() {
   if (!state.connected) throw Error("Najpierw połącz się z routerem.");
-  const endpoints={status:"misystem/status",wan_info:"xqnetwork/wan_info",lan_info:"xqnetwork/lan_info",lan_dhcp:"xqnetwork/lan_dhcp",wifi_detail:"xqnetwork/wifi_detail_all",device_list:"misystem/devicelist",mac_bind:"xqnetwork/macbind_info",dmz:"xqsystem/dmz",upnp:"xqsystem/upnp",qos:"misystem/qos_info",topo_graph:"misystem/topo_graph",led_status:"misystem/led",ps_map:"misystem/get_ps_map",router_name:"misystem/router_name",reboot_task:"xqsystem/reboot_task",twt:"xqnetwork/get_twt",miotrelay:"xqnetwork/get_miotrelay_switch",wifi_silence:"xqnetwork/get_wifi_silence",aimesh:"xqnetwork/get_aimesh_config",ddns:"xqnetwork/ddns",vpn:"xqsystem/vpn",vpn_status:"xqsystem/vpn_status",country_code:"xqsystem/country_code",sys_time:"misystem/sys_time"};
+  const hasSilence = getFeature("wifi", "silence_switch", "0") === "1";
+  const hasNfc = getFeature("apps", "nfc", "0") === "1";
+  const hasMlo = getFeature("wifi", "mlo", "1") === "1";
+  const hasTask = getFeature("system", "task", "1") !== "0";
+  const ledCtrl = getFeature("apps", "LED_control", "1");
+  const endpoints={
+    status:"misystem/status", wan_info:"xqnetwork/wan_info", lan_info:"xqnetwork/lan_info",
+    lan_dhcp:"xqnetwork/lan_dhcp", wifi_detail:"xqnetwork/wifi_detail_all", device_list:"misystem/devicelist",
+    mac_bind:"xqnetwork/macbind_info", dmz:"xqsystem/dmz", upnp:"xqsystem/upnp",
+    qos:"misystem/qos_info", topo_graph:"misystem/topo_graph", led:"misystem/led",
+    ps_map:"misystem/get_ps_map", router_name:"misystem/router_name",
+    twt:"xqnetwork/get_twt", miotrelay:"xqnetwork/get_miotrelay_switch",
+    aimesh:"xqnetwork/get_aimesh_config", ddns:"xqnetwork/ddns", vpn:"xqsystem/vpn",
+    vpn_status:"xqsystem/vpn_status", smartvpn:"misystem/smartvpn_info",
+    country_code:"xqsystem/country_code", sys_time:"misystem/sys_time"
+  };
+  if (hasSilence) endpoints.wifi_silence = "xqnetwork/get_wifi_silence";
+  if (hasTask) endpoints.reboot_task = "xqsystem/reboot_task";
+  if (hasNfc) endpoints.nfc = "xqnetwork/get_nfc_info";
+  if (hasMlo) endpoints.mlo = "xqnetwork/get_hostap_mlo";
+  if (ledCtrl === "3") {
+    endpoints.all_led = "misystem/allled";
+    endpoints.eth_led = "misystem/ethled";
+    endpoints.effect_light = "misystem/effect_light";
+  }
   const snap={fetch_date:new Date().toISOString(),router_ip:state.ip,init_info:state.initInfo,errors:[]};
   for (const [key,endpoint] of Object.entries(endpoints)) {
     try { const res=await apiRequest(endpoint); if (!res || (res.code !== undefined && Number(res.code) !== 0)) throw Error(); snap[key]=res; }
-    catch(e) {snap.errors.push(key);}
+    catch(e) {
+      if (!["effect_light", "smartvpn", "nfc", "mlo"].includes(key)) snap.errors.push(key);
+    }
   }
+  if (snap.led) snap.led_status = snap.led;
   snap.port_forward={single:[],range:[]};
-  // Match the Windows snapshot layout: DMZ and UPnP belong to the NAT section.
   if (snap.dmz) snap.port_forward.dmz=snap.dmz;
   if (snap.upnp) snap.port_forward.upnp=snap.upnp;
-  delete snap.dmz; delete snap.upnp;
   for(const [key,ftype] of [["single",1],["range",2]]) {
     try { const res=await apiRequest(`xqsystem/portforward?ftype=${ftype}`); if(!res || (res.code !== undefined && Number(res.code)!==0) || !Array.isArray(res.list)) throw Error(); snap.port_forward[key]=res.list; }
     catch(e) {snap.errors.push(`port_forward_${key}`);}
@@ -2775,14 +2954,105 @@ function buildTzSelect(selectId) {
   const sel = $id(selectId);
   if (!sel || sel.dataset.built) return;
   sel.dataset.built = "1";
+  sel.innerHTML = "";
   const deviceTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   TZ_DISPLAY_LIST.forEach(item => {
     const opt = document.createElement("option");
     opt.value = item.iana;
-    opt.textContent = item.label;
+    opt.textContent = state.lang === "en" ? (item.en || item.label) : item.label;
     if (item.iana === deviceTz) opt.selected = true;
     sel.appendChild(opt);
   });
+}
+
+function refreshTzSelectLabels() {
+  for (const id of ["system-tz-select", "wiz-tz-select"]) {
+    const sel = $id(id);
+    if (!sel) continue;
+    [...sel.options].forEach(opt => {
+      const item = TZ_DISPLAY_LIST.find(x => x.iana === opt.value);
+      if (item) opt.textContent = state.lang === "en" ? (item.en || item.label) : item.label;
+    });
+  }
+}
+
+function refreshDynamicTranslations() {
+  const isEn = state.lang === "en";
+  const drawerIp = $id("drawer-ip-text");
+  if (drawerIp) drawerIp.textContent = `${isEn ? "Gateway" : "Brama"}: ${state.ip}`;
+  setConnected(state.connected);
+  refreshTzSelectLabels();
+  updateWizardFactoryBanner();
+  if (state.wifiInfo.length) {
+    renderWifiInfo(state.wifiInfo, state.wifiBsd);
+  } else {
+    setWifiPresentation(Boolean($id("wifi-switch-smartconnect")?.checked));
+  }
+  if (state.aimesh && Object.keys(state.aimesh).length) renderAimeshConfig(state.aimesh);
+  for (const key of ["mlo", "split5g", "w5", "twt", "mimo", "miotrelay", "silence"]) {
+    const el = $id(`wifi-adv-${key}`), lbl = $id(`wifi-adv-${key}-lbl`);
+    if (el && lbl) lbl.textContent = isEn ? (el.checked ? "Enabled" : "Disabled") : (el.checked ? "Włączone" : "Wyłączone");
+  }
+  if (state.binds.length || state.connected) renderBinds();
+  if (state.devices.length) renderDevices();
+  if (state.portsStatus.length || state.connected) renderPortsStatus(state.portsStatus, state.portLinks || []);
+  if (state.natSnapshot) renderNat();
+  if (state.serviceSnapshot) renderServices();
+  if (state.topoGraph && Object.keys(state.topoGraph).length) renderMesh(state.topoGraph);
+  if (state.routerTimeStr) {
+    const rt = $id("system-router-time");
+    if (rt) rt.textContent = `${isEn ? "Router time:" : "Czas routera:"} ${state.routerTimeStr}`;
+  }
+  const ledSw = $id("led-switch"), ledLbl = $id("led-status-lbl");
+  if (ledSw && ledLbl && state.ledStatus !== null) {
+    ledLbl.textContent = isEn ? (ledSw.checked ? "Enabled" : "Disabled") : (ledSw.checked ? "Włączone" : "Wyłączone");
+  }
+  const dashLed = $id("dash-led-status");
+  if (dashLed && state.ledStatus !== null) {
+    dashLed.textContent = state.ledStatus === 1 ? (isEn ? "Enabled" : "Włączone") : (isEn ? "Disabled" : "Wyłączone");
+  }
+}
+
+function renameRouterDialog() {
+  if (!state.connected) return alert("Najpierw połącz się z routerem.");
+  const isEn = state.lang === "en";
+  const curName = String(state.initInfo?.routername || "");
+  const curLoc = String(state.initInfo?.locale || "");
+  const allowLoc = getFeature("system", "set_router_location", "1") !== "0";
+  const dialog = document.createElement("dialog");
+  dialog.className = "nat-dialog";
+  dialog.innerHTML = `<form method="dialog">
+    <h3>${isEn ? "Rename Router" : "Zmiana nazwy routera"}</h3>
+    <label>${isEn ? "Router name" : "Nazwa routera"}<input name="rname" type="text" required value="${escapeHtml(curName)}"></label>
+    ${allowLoc ? `<label>${isEn ? "Location (optional)" : "Lokalizacja (opcjonalnie)"}<input name="rloc" type="text" value="${escapeHtml(curLoc)}"></label>` : ""}
+    <div class="nat-dialog-actions">
+      <button type="button" class="btn-secondary cancel">${isEn ? "Cancel" : "Anuluj"}</button>
+      <button type="submit" class="btn-primary">${isEn ? "Save" : "Zapisz"}</button>
+    </div>
+  </form>`;
+  document.body.append(dialog);
+  const form = dialog.querySelector("form");
+  const close = () => { dialog.close?.(); dialog.remove(); };
+  dialog.querySelector(".cancel").onclick = close;
+  dialog.addEventListener("cancel", () => dialog.remove());
+  form.onsubmit = async ev => {
+    ev.preventDefault();
+    const name = form.elements.rname.value.trim();
+    const locale = allowLoc ? (form.elements.rloc?.value.trim() || "") : "";
+    if (!name) return alert(isEn ? "Router name cannot be empty." : "Nazwa routera nie może być pusta.");
+    try {
+      const q = new URLSearchParams({ name });
+      if (locale) q.set("locale", locale);
+      const res = await apiRequest(`misystem/set_router_name?${q.toString()}`);
+      if (res.code !== 0) throw Error(res.msg || res.code);
+      close();
+      alert(isEn ? `Router name changed to '${name}'.` : `Zmieniono nazwę routera na '${name}'.`);
+      void refreshData();
+    } catch (e) {
+      alert((isEn ? "Failed to rename router: " : "Nie udało się zmienić nazwy routera: ") + e.message);
+    }
+  };
+  if (dialog.showModal) dialog.showModal(); else dialog.setAttribute("open", "");
 }
 
 // Buduje select kodow regionow
@@ -2801,9 +3071,18 @@ function buildRegionSelect(selectId, currentCode) {
 
 function setupSystemEnhancements() {
   $id("system-change-password").onclick=passwordDialog;
+  if ($id("system-rename-router")) $id("system-rename-router").onclick=renameRouterDialog;
   for(const [id,on] of [["btn-nfc-enable",1],["btn-nfc-disable",0]]) $id(id).onclick=async()=>{
-    if(!state.connected || !confirm(`${on ? "Włączyć" : "Wyłączyć"} NFC na routerze?`)) return;
-    try {const r=await apiRequest("xqnetwork/set_nfc_status","POST",{status:on});if(r.code!==0)throw Error(r.msg||r.code);alert("Router potwierdził zmianę NFC.");}catch(e){alert("Nie udało się potwierdzić zmiany NFC: "+e.message);}
+    const isEn = state.lang === "en";
+    const prompt = isEn ? `${on ? "Enable" : "Disable"} NFC on the router?` : `${on ? "Włączyć" : "Wyłączyć"} NFC na routerze?`;
+    if(!state.connected || !confirm(prompt)) return;
+    try {
+      const r=await apiRequest("xqnetwork/set_nfc_status","POST",{nfc_enable:on});
+      if(r.code!==0)throw Error(r.msg||r.code);
+      alert(isEn ? "Router confirmed NFC change." : "Router potwierdził zmianę NFC.");
+    }catch(e){
+      alert((isEn ? "Failed to confirm NFC change: " : "Nie udało się potwierdzić zmiany NFC: ")+e.message);
+    }
   };
   // Buduj selektory strefy po zaladowaniu DOM
   buildTzSelect("system-tz-select");
@@ -2811,40 +3090,58 @@ function setupSystemEnhancements() {
 
   // Synchronizacja czasu z urzadzeniem + strefa z selecta (POST zgodnie z LuCI Xiaomi)
   $id("btn-sync-time").onclick=async()=>{
-    if(!state.connected) return;const d=new Date(),pad=n=>String(n).padStart(2,"0");
+    if(!state.connected) return;const isEn = state.lang === "en";
+    const d=new Date(),pad=n=>String(n).padStart(2,"0");
     const time=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     const selEl = $id("system-tz-select");
     const tz = selEl ? selEl.value : Intl.DateTimeFormat().resolvedOptions().timeZone;
     const posix = TZ_POSIX_MAP[tz] || "";
     const tzIdx = TZ_INDEX_MAP[tz] || "2.54";
-    if(!confirm(`Ustawić czas routera na ${time}\nStrefa: ${tz}${posix ? " (" + posix + ")" : ""}?`))return;
+    const prompt = isEn
+      ? `Set router time to ${time}\nTimezone: ${tz}${posix ? " (" + posix + ")" : ""}?`
+      : `Ustawić czas routera na ${time}\nStrefa: ${tz}${posix ? " (" + posix + ")" : ""}?`;
+    if(!confirm(prompt))return;
     try {
       const r = await setRouterTimeAndZone({ time, timezone: posix || null, index: tzIdx });
       if(r.code!==0)throw Error(r.msg||r.code);
-      alert("Router potwierdził ustawienie czasu i strefy.");
+      alert(isEn ? "Router confirmed time and timezone update." : "Router potwierdził ustawienie czasu i strefy.");
       viewLoaded.delete("reboot");
       await loadViewData("reboot");
-    }catch(e){alert("Nie udało się ustawić czasu: "+e.message);}
+    }catch(e){alert((isEn ? "Failed to set time: " : "Nie udało się ustawić czasu: ")+e.message);}
   };
   // Zapisz strefę czasową (POST z timezone + index, identycznie jak panel Xiaomi)
   const btnSaveTz = $id("btn-save-tz");
   if (btnSaveTz) btnSaveTz.onclick = async () => {
+    const isEn = state.lang === "en";
     if (!state.connected) return alert("Najpierw połącz się z routerem.");
     const selEl = $id("system-tz-select");
     const tz = selEl ? selEl.value : "";
     const posix = TZ_POSIX_MAP[tz] || "";
     const tzIdx = TZ_INDEX_MAP[tz] || "2.54";
-    if (!posix) return alert("Nieznana strefa czasowa. Wybierz strefę z listy.");
-    if (!confirm(`Ustawić strefę czasową routera na: ${tz} (${posix})?`)) return;
+    if (!posix) return alert(isEn ? "Unknown timezone. Please select a timezone from the list." : "Nieznana strefa czasowa. Wybierz strefę z listy.");
+    const prompt = isEn
+      ? `Set router timezone to: ${tz} (${posix})?`
+      : `Ustawić strefę czasową routera na: ${tz} (${posix})?`;
+    if (!confirm(prompt)) return;
     try {
       const r = await setRouterTimeAndZone({ timezone: posix, index: tzIdx });
       if (r.code !== 0) throw Error(r.msg || r.code);
-      alert("Router potwierdził zmianę strefy czasowej.");
+      alert(isEn ? "Router confirmed timezone change." : "Router potwierdził zmianę strefy czasowej.");
       viewLoaded.delete("reboot");
       await loadViewData("reboot");
-    } catch(e) { alert("Nie udało się zmienić strefy: " + e.message); }
+    } catch(e) { alert((isEn ? "Failed to change timezone: " : "Nie udało się zmienić strefy: ") + e.message); }
   };
-  $id("btn-check-firmware").onclick=async()=>{if(!state.connected)return;try{const r=await apiRequest("xqsystem/check_rom_update");if(r.code!==0)throw Error(r.msg||r.code);alert(Number(r.needUpdate)===1 ? "Router zgłasza dostępną aktualizację firmware." : "Router nie zgłasza dostępnej aktualizacji firmware.");}catch(e){alert("Nie udało się sprawdzić aktualizacji: "+e.message);}};
+  $id("btn-check-firmware").onclick=async()=>{
+    if(!state.connected)return;
+    const isEn = state.lang === "en";
+    try{
+      const r=await apiRequest("xqsystem/check_rom_update");
+      if(r.code!==0)throw Error(r.msg||r.code);
+      alert(Number(r.needUpdate)===1
+        ? (isEn ? "Router reports a new firmware update is available." : "Router zgłasza dostępną aktualizację firmware.")
+        : (isEn ? "Router firmware is up to date (no update available)." : "Router nie zgłasza dostępnej aktualizacji firmware."));
+    }catch(e){alert((isEn ? "Failed to check updates: " : "Nie udało się sprawdzić aktualizacji: ")+e.message);}
+  };
   $id("btn-factory-reset").onclick=()=>{
     if(!state.connected) return alert("Najpierw połącz się z routerem.");
     const { role, model, rname, ip } = getRouterRoleInfo();
@@ -2859,6 +3156,12 @@ function setupSystemEnhancements() {
       <p style="color:#fca5a5;font-size:13px;">${isEn
         ? "WARNING: This will erase all router settings, Wi-Fi networks and DHCP leases! Make sure you are NOT wiping your main production router."
         : "UWAGA: Ta operacja usunie wszystkie ustawienia, sieci Wi-Fi i konfigurację tego routera! Upewnij się, że NIE resetujesz przypadkiem głównego routera produkcyjnego."}</p>
+      <p style="color:#fde68a;font-size:13px;font-weight:bold;">${isEn
+        ? "IMPORTANT: After factory reset, the administrator password will be restored to default: admin"
+        : "WAŻNE: Po resecie fabrycznym hasło administratora zostanie przywrócone do domyślnego: admin"}</p>
+      ${role === "SATELITA / AP" ? `<p style="color:#fde68a;font-size:12px;">${isEn
+        ? "MESH TIP: If you want this router to stay in factory state or be configured as an independent router, UNPLUG the LAN cable from the Main Router (Master). Otherwise Xiaomi auto-Mesh will automatically re-pair it as a satellite!"
+        : "WSKAZÓWKA MESH: Jeśli router ma pozostać w stanie fabrycznym lub zostać skonfigurowany jako niezależny router, ODŁĄCZ kabel sieciowy od sieci z Masterem. W przeciwnym razie sam ponownie skonfiguruje się jako satelita Mesh!"}</p>` : ""}
       <label>${isEn ? "Type RESET in capital letters to confirm:" : "Aby ostatecznie potwierdzić kasowanie, wpisz słowo RESET wielkimi literami:"}
         <input name="confirmWord" type="text" placeholder="RESET" autocomplete="off" required>
       </label>
@@ -2896,7 +3199,7 @@ function setupSystemEnhancements() {
   $id("btn-save-snapshot").onclick=async()=>{
     if(!state.connected || !confirm("Utworzyć kopię? Plik może zawierać hasła i inne wrażliwe dane konfiguracji."))return;
     const button=$id("btn-save-snapshot");button.disabled=true;
-    try {const snap=await buildSnapshot();if(snap.errors.length)alert(`Nie udało się odczytać wszystkich sekcji: ${snap.errors.join(", ")}. Kopia będzie niepełna.`);saveTextToDevice(`miwifi_backup_${fileStamp()}.json`,"application/json",JSON.stringify(snap,null,2));}catch(e){alert("Nie udało się utworzyć kopii: "+e.message);}finally{button.disabled=false;}
+    try {const snap=await buildSnapshot();if(snap.errors.length)alert(state.lang === "en" ? `Could not read all sections: ${snap.errors.join(", ")}. Backup will be partial.` : `Nie udało się odczytać wszystkich sekcji: ${snap.errors.join(", ")}. Kopia będzie niepełna.`);saveTextToDevice(`miwifi_backup_${fileStamp()}.json`,"application/json",JSON.stringify(snap,null,2));}catch(e){alert((state.lang === "en" ? "Failed to create backup: " : "Nie udało się utworzyć kopii: ")+e.message);}finally{button.disabled=false;}
   };
   let loadedBackup=null;
   $id("backup-file-input").onchange=async event=>{
@@ -2905,8 +3208,7 @@ function setupSystemEnhancements() {
     try {
       if(file.size>4_000_000)throw Error(state.lang === "en" ? "File is too large." : "Plik jest za duży.");
       const parsed=JSON.parse(await file.text());
-      if(!parsed || Array.isArray(parsed) || typeof parsed!=="object" || !["mac_bind","port_forward","dmz","upnp","qos","ps_services","wifi_detail"].some(key=>parsed[key])) throw Error(state.lang === "en" ? "No supported backup sections found." : "Nie znaleziono obsługiwanych sekcji kopii.");
-      // Windows stores these sections inside port_forward; newer Android copies use top-level fields.
+      if(!parsed || Array.isArray(parsed) || typeof parsed!=="object" || !["mac_bind","port_forward","dmz","upnp","qos","ps_services","wifi_detail","wan_info","lan_dhcp","lan_info","lan_ip","ddns","vpn","sys_time","init_info"].some(key=>parsed[key])) throw Error(state.lang === "en" ? "No supported backup sections found." : "Nie znaleziono obsługiwanych sekcji kopii.");
       if (parsed.dmz == null && parsed.port_forward?.dmz) parsed.dmz=parsed.port_forward.dmz;
       if (parsed.upnp == null && parsed.port_forward?.upnp) parsed.upnp=parsed.port_forward.upnp;
       loadedBackup=parsed;$id("btn-apply-json").disabled=false;$id("backup-file-status").dataset.filename=file.name;
@@ -2918,37 +3220,124 @@ function setupSystemEnhancements() {
     event.target.value="";
   };
   $id("btn-apply-json").onclick=()=>{if(loadedBackup)openSelectiveRestore(loadedBackup);};
-  $id("btn-official-backup").onclick=async()=>{if(!state.connected)return;try{const q=new URLSearchParams({keys:"mi_wifi_info,mi_network_info,mi_lan_info,mi_basic_info"});const r=await apiRequest(`misystem/c_backup?${q}`);if(r.code!==0 || !/^[A-Za-z0-9._-]+$/.test(r.file || ""))throw Error(r.msg || "Router nie podał nazwy kopii.");if(!window.AndroidRouter?.saveRouterFile)throw Error("Pobieranie pliku wymaga aplikacji Android.");window.AndroidRouter.saveRouterFile(state.ip,`/cgi-bin/luci/;stok=${state.stok}/api/misystem/c_download/${r.file}`,`xiaomi_backup_${fileStamp()}.tar.gz`);}catch(e){alert("Nie udało się przygotować kopii: "+e.message);}};
+  $id("btn-official-backup").onclick=async()=>{
+    if(!state.connected)return;
+    const isEn = state.lang === "en";
+    try{
+      const q=new URLSearchParams({keys:"mi_wifi_info,mi_network_info,mi_lan_info,mi_basic_info"});
+      const r=await apiRequest(`misystem/c_backup?${q}`);
+      const fname = String(r.file || "").replace(/^\/+/, "");
+      if(r.code!==0 || !fname || fname.includes("..") || !/^[A-Za-z0-9._\/-]+$/.test(fname)) throw Error(r.msg || (isEn ? "Router did not return a backup file name." : "Router nie podał nazwy kopii."));
+      if(!window.AndroidRouter?.saveRouterFile) throw Error(isEn ? "File download requires the Android app." : "Pobieranie pliku wymaga aplikacji Android.");
+      window.AndroidRouter.saveRouterFile(state.ip,`/cgi-bin/luci/;stok=${state.stok}/api/misystem/c_download/${fname}`,`xiaomi_backup_${fileStamp()}.tar.gz`);
+    }catch(e){alert((isEn ? "Failed to prepare official backup: " : "Nie udało się przygotować kopii: ")+e.message);}
+  };
 }
 
 function openSelectiveRestore(snapshot) {
   if (!state.connected) return alert("Najpierw połącz się z routerem.");
+  const isEn = state.lang === "en";
   const errors=Array.isArray(snapshot.errors) ? snapshot.errors : [];
   const validSwitch=value=>value===0 || value===1 || value==="0" || value==="1";
-  const wifi=snapshot.wifi_detail, radios=wifi?.info;
   const validResponse=r=>r && typeof r==="object" && !r.error && (r.code===undefined || Number(r.code)===0);
-  const possible={wan:false,lan:false,wifi:validResponse(wifi) && Array.isArray(radios) && radios.length>=2 && wifi.bsd!==undefined && radios.slice(0,2).every(r=>r && r.ssid && r.encryption && (r.encryption==="none" || r.password)) && !errors.includes("wifi_detail"),mac_bind:validResponse(snapshot.mac_bind) && Array.isArray(snapshot.mac_bind?.list) && !errors.includes("mac_bind"),port_forward:validResponse(snapshot.port_forward) && Array.isArray(snapshot.port_forward?.single) && Array.isArray(snapshot.port_forward?.range) && !errors.some(x=>String(x).startsWith("port_forward_")),dmz:validResponse(snapshot.dmz) && validSwitch(snapshot.dmz?.status) && (Number(snapshot.dmz.status)===0 || validIPv4(String(snapshot.dmz.ip || snapshot.dmz.lanip || ""))) && !errors.includes("dmz"),upnp:validResponse(snapshot.upnp) && validSwitch(snapshot.upnp?.status) && !errors.includes("upnp"),ps_services:["multiwan","lag","iptv","game"].every(name=>validResponse(snapshot.ps_services?.[name]) && snapshot.ps_services?.[name]?.[name]?.enable!==undefined) && !errors.some(x=>String(x).startsWith("ps_")),qos:validResponse(snapshot.qos) && validSwitch(snapshot.qos?.status?.on) && !errors.includes("qos"),vpn:false,password:false};
-  const names={wan:"WAN",lan:"LAN i serwer DHCP",wifi:"Wi-Fi",mac_bind:"Rezerwacje DHCP",port_forward:"Przekierowania portów",dmz:"DMZ",upnp:"UPnP",ps_services:"Funkcje portów",qos:"QoS",vpn:"VPN",password:"Hasło administratora"};
+  const wifi=snapshot.wifi_detail, radios=wifi?.info;
+  const lanIpv4 = snapshot.lan_info?.info?.ipv4?.[0] || snapshot.lan_ip?.info || null;
+  const wanDetails = snapshot.wan_info?.info || null;
+  const dmzObj = snapshot.dmz || snapshot.port_forward?.dmz || null;
+  const upnpObj = snapshot.upnp || snapshot.port_forward?.upnp || null;
+  const ledObj = snapshot.led || snapshot.led_status || null;
+  const possible={
+    router_name: Boolean(snapshot.init_info?.routername || snapshot.router_name?.name),
+    sys_time: Boolean(snapshot.sys_time?.time?.timezone),
+    led_nfc: Boolean(validResponse(ledObj) || validResponse(snapshot.all_led) || validResponse(snapshot.eth_led) || validResponse(snapshot.nfc)),
+    mac_bind: validResponse(snapshot.mac_bind) && Array.isArray(snapshot.mac_bind?.list) && !errors.includes("mac_bind"),
+    port_forward: validResponse(snapshot.port_forward) && Array.isArray(snapshot.port_forward?.single) && Array.isArray(snapshot.port_forward?.range) && !errors.some(x=>String(x).startsWith("port_forward_")),
+    dmz: validResponse(dmzObj) && validSwitch(dmzObj?.status) && (Number(dmzObj.status)===0 || validIPv4(String(dmzObj.ip || dmzObj.lanip || ""))),
+    upnp: validResponse(upnpObj) && validSwitch(upnpObj?.status),
+    ps_services: Boolean(snapshot.ps_services && ["multiwan","lag","iptv","game"].some(name=>validResponse(snapshot.ps_services?.[name]) && snapshot.ps_services?.[name]?.[name]?.enable!==undefined)),
+    qos: validResponse(snapshot.qos) && validSwitch(snapshot.qos?.status?.on) && !errors.includes("qos"),
+    ddns: validResponse(snapshot.ddns) && Array.isArray(snapshot.ddns?.list) && snapshot.ddns.list.length > 0,
+    vpn: (validResponse(snapshot.vpn) && Array.isArray(snapshot.vpn?.list) && snapshot.vpn.list.length > 0) || Boolean(validResponse(snapshot.smartvpn)),
+    lan_dhcp: validResponse(snapshot.lan_dhcp) && Boolean(snapshot.lan_dhcp?.info?.start !== undefined),
+    wan: validResponse(snapshot.wan_info) && Boolean(wanDetails?.details?.wanType),
+    wifi: validResponse(wifi) && Array.isArray(radios) && radios.length>=2 && wifi.bsd!==undefined && radios.slice(0,2).every(r=>r && r.ssid && r.encryption && (r.encryption==="none" || r.password)) && !errors.includes("wifi_detail"),
+    lan_ip: Boolean(lanIpv4?.ip && validIPv4(String(lanIpv4.ip)))
+  };
+  const names = isEn ? {
+    router_name: "Router Name & Location",
+    sys_time: "System Timezone",
+    led_nfc: "LED Lights & NFC",
+    mac_bind: `DHCP Reservations (${snapshot.mac_bind?.list?.length || 0})`,
+    port_forward: `Port Forwarding NAT (${(snapshot.port_forward?.single?.length || 0) + (snapshot.port_forward?.range?.length || 0)})`,
+    dmz: "DMZ",
+    upnp: "UPnP",
+    ps_services: "2.5G Port Functions (Dual WAN, LAG, IPTV, Game)",
+    qos: "Smart QoS & Bandwidth",
+    ddns: `Dynamic DNS / DDNS (${snapshot.ddns?.list?.length || 0})`,
+    vpn: `VPN Profiles & SmartVPN (${snapshot.vpn?.list?.length || 0})`,
+    lan_dhcp: "LAN DHCP Server (pool, lease, DNS)",
+    wan: "⚠ WAN / Internet Settings",
+    wifi: "⚠ Wi-Fi Bands + MLO / TWT / Roaming",
+    lan_ip: "⚠ Router LAN Gateway IP (applied last)"
+  } : {
+    router_name: "Nazwa i lokalizacja routera",
+    sys_time: "Strefa czasowa systemu",
+    led_nfc: "Diody LED i moduł NFC",
+    mac_bind: `Rezerwacje DHCP (${snapshot.mac_bind?.list?.length || 0})`,
+    port_forward: `Przekierowania portów NAT (${(snapshot.port_forward?.single?.length || 0) + (snapshot.port_forward?.range?.length || 0)})`,
+    dmz: "Strefa DMZ",
+    upnp: "Usługa UPnP",
+    ps_services: "Funkcje portów 2.5G (Dual WAN, LAG, IPTV, Gry)",
+    qos: "Inteligentny QoS i pasmo",
+    ddns: `Dynamiczny DNS / DDNS (${snapshot.ddns?.list?.length || 0})`,
+    vpn: `Profile VPN i SmartVPN (${snapshot.vpn?.list?.length || 0})`,
+    lan_dhcp: "Serwer DHCP LAN (pula, dzierżawa, DNS)",
+    wan: "⚠ Ustawienia WAN / Internet",
+    wifi: "⚠ Sieć Wi-Fi + MLO / TWT / Roaming",
+    lan_ip: "⚠ Adres IP bramy LAN (na końcu)"
+  };
   const dialog=document.createElement("dialog");dialog.className="nat-dialog";
   const form=document.createElement("form");form.method="dialog";
-  const heading=document.createElement("h3");heading.textContent="Przywracanie wybranych sekcji";form.append(heading);
-  const selectAll=document.createElement("label"), all=document.createElement("input"), allName=document.createElement("span");all.type="checkbox";all.name="select_all";all.disabled=!Object.values(possible).some(Boolean);allName.textContent="Zaznacz wszystkie dostępne sekcje";selectAll.className="restore-option";selectAll.append(all,allName);form.append(selectAll);
-  for(const key of Object.keys(possible)) {const label=document.createElement("label"), input=document.createElement("input"), name=document.createElement("span");label.className="restore-option";input.type="checkbox";input.name=key;input.disabled=!possible[key];name.textContent=names[key];label.append(input,name);if(!possible[key]){const unavailable=document.createElement("span");unavailable.textContent=["wan","lan","vpn","password"].includes(key) ? " (jeszcze nieobsługiwane)" : " (brak pełnych danych)";label.append(unavailable);}form.append(label);}
+  const heading=document.createElement("h3");heading.textContent=isEn ? "Restore selected sections" : "Przywracanie wybranych sekcji";form.append(heading);
+  const selectAll=document.createElement("label"), all=document.createElement("input"), allName=document.createElement("span");all.type="checkbox";all.name="select_all";all.disabled=!Object.values(possible).some(Boolean);allName.textContent=isEn ? "Select all available sections" : "Zaznacz wszystkie dostępne sekcje";selectAll.className="restore-option";selectAll.append(all,allName);form.append(selectAll);
+  for(const key of Object.keys(possible)) {
+    const label=document.createElement("label"), input=document.createElement("input"), name=document.createElement("span");
+    label.className="restore-option";input.type="checkbox";input.name=key;input.disabled=!possible[key];
+    name.textContent=names[key];label.append(input,name);
+    if(!possible[key]){const unavailable=document.createElement("span");unavailable.textContent=isEn ? " (not in backup)" : " (brak w kopii)";label.append(unavailable);}
+    form.append(label);
+  }
   all.onchange=()=>{for(const key of Object.keys(possible))if(possible[key])form.elements[key].checked=all.checked;};
   form.addEventListener("change",event=>{if(event.target!==all)all.checked=Object.keys(possible).filter(key=>possible[key]).every(key=>form.elements[key].checked);});
-  const warn=document.createElement("p");warn.textContent="Zmiany są wykonywane kolejno. Wi-Fi zostanie przywrócone jako ostatnie i może przerwać połączenie.";form.append(warn);
-  const limits=document.createElement("p");limits.textContent="Rezerwacje i przekierowania są dodawane. Istniejące wpisy nie są usuwane. UPnP przywraca stan usługi, nie jej tymczasowe mapowania.";form.append(limits);
+  const warn=document.createElement("p");warn.textContent=isEn ? "Changes are applied in safe order. WAN, Wi-Fi and LAN IP are restored last and may interrupt your connection." : "Zmiany są wykonywane w bezpiecznej kolejności. WAN, Wi-Fi i IP LAN są przywracane na końcu i mogą przerwać połączenie.";form.append(warn);
   const actions=document.createElement("div");actions.className="nat-dialog-actions";
-  const cancel=document.createElement("button");cancel.type="button";cancel.className="btn-secondary";cancel.textContent="Anuluj";
-  const save=document.createElement("button");save.type="submit";save.className="btn-primary";save.textContent="Przywróć";actions.append(cancel,save);form.append(actions);dialog.append(form);document.body.append(dialog); if (state.lang === "en") applyStaticTranslation();
+  const cancel=document.createElement("button");cancel.type="button";cancel.className="btn-secondary";cancel.textContent=isEn ? "Cancel" : "Anuluj";
+  const save=document.createElement("button");save.type="submit";save.className="btn-primary";save.textContent=isEn ? "Restore" : "Przywróć";actions.append(cancel,save);form.append(actions);dialog.append(form);document.body.append(dialog);
   const close=()=>{dialog.close?.();dialog.remove();};cancel.onclick=close;dialog.addEventListener("cancel",()=>dialog.remove());
-  form.onsubmit=async event=>{event.preventDefault();const selected=Object.keys(possible).filter(key=>form.elements[key].checked);
-    if(!selected.length)return alert("Wybierz co najmniej jedną sekcję.");
-    if(!confirm("Przywrócić wybrane sekcje? Operacja może zmienić dostęp do sieci."))return;
+  form.onsubmit=async event=>{
+    event.preventDefault();const selected=Object.keys(possible).filter(key=>form.elements[key].checked);
+    if(!selected.length)return alert(isEn ? "Select at least one section." : "Wybierz co najmniej jedną sekcję.");
+    if(!confirm(isEn ? "Restore selected sections? Network connectivity may change." : "Przywrócić wybrane sekcje? Operacja może zmienić dostęp do sieci."))return;
     save.disabled=true;const done=[];
     const checked=async(endpoint,method="GET",payload=null)=>{const res=await apiRequest(endpoint,method,payload);if(res.code!==0)throw Error(res.msg||`kod ${res.code}`);return res;};
     try {
-      if(selected.includes("dmz") && Number(snapshot.dmz.status)===1) {
+      if(selected.includes("router_name")) {
+        const rn = snapshot.init_info?.routername || snapshot.router_name?.name || "";
+        const loc = snapshot.init_info?.locale || snapshot.router_name?.locale || "";
+        if(rn) { const q=new URLSearchParams({name:rn}); if(loc) q.set("locale",loc); await checked(`misystem/set_router_name?${q.toString()}`); done.push("RouterName"); }
+      }
+      if(selected.includes("sys_time")) {
+        const st = snapshot.sys_time?.time || {};
+        if(st.timezone) { const r=await setRouterTimeAndZone({timezone:st.timezone,index:st.index||null}); if(r.code!==0)throw Error(r.msg||r.code); done.push("Timezone"); }
+      }
+      if(selected.includes("led_nfc")) {
+        if(validResponse(ledObj) && ledObj.status !== undefined) await checked("misystem/led","POST",{on:String(ledObj.status)});
+        if(validResponse(snapshot.all_led) && snapshot.all_led.status !== undefined) await apiRequest("misystem/allled","POST",{on:String(snapshot.all_led.status)}).catch(()=>{});
+        if(validResponse(snapshot.eth_led) && snapshot.eth_led.status !== undefined) await apiRequest("misystem/ethled","POST",{on:String(snapshot.eth_led.status)}).catch(()=>{});
+        if(validResponse(snapshot.nfc) && snapshot.nfc.nfc_enable !== undefined && getFeature("apps","nfc","0")==="1") await apiRequest("xqnetwork/set_nfc_status","POST",{nfc_enable:Number(snapshot.nfc.nfc_enable)}).catch(()=>{});
+        done.push("LED/NFC");
+      }
+      if(selected.includes("dmz") && Number(dmzObj.status)===1) {
         const current=await Promise.all([apiRequest("xqsystem/portforward?ftype=1"),apiRequest("xqsystem/portforward?ftype=2")]);
         if(current.some(r=>!r || (r.code!==undefined && Number(r.code)!==0) || !Array.isArray(r.list)))throw Error("Nie udało się sprawdzić istniejących przekierowań przed włączeniem DMZ.");
         if(current.some(r=>r.list.length) || (selected.includes("port_forward") && (snapshot.port_forward.single.length || snapshot.port_forward.range.length)))throw Error("Nie można włączyć DMZ, gdy istnieją lub mają zostać dodane przekierowania.");
@@ -2959,26 +3348,89 @@ function openSelectiveRestore(snapshot) {
         for(const rule of snapshot.port_forward.range){const p=natPayload(rule,true);if(!validIPv4(String(p.ip)) || !p.fport || !p.tport)throw Error("Niepoprawny zakres portów w kopii.");await checked("xqsystem/add_range_redirect","POST",p);}
         await checked("xqsystem/redirect_apply","POST",{});done.push("NAT");
       }
-      if(selected.includes("dmz")) {const d=snapshot.dmz;if(Number(d.status)===1)await checked("xqsystem/set_dmz","POST",{ip:d.ip || d.lanip});else await checked("xqsystem/dmz_off");done.push("DMZ");}
-      if(selected.includes("upnp")) {await checked(`xqsystem/upnp_switch?switch=${Number(snapshot.upnp.status)}`);done.push("UPnP");}
+      if(selected.includes("dmz")) {if(Number(dmzObj.status)===1)await checked("xqsystem/set_dmz","POST",{ip:dmzObj.ip || dmzObj.lanip});else await checked("xqsystem/dmz_off");done.push("DMZ");}
+      if(selected.includes("upnp")) {await checked(`xqsystem/upnp_switch?switch=${Number(upnpObj.status)}`);done.push("UPnP");}
       if(selected.includes("ps_services")) {
-        for(const name of ["multiwan","lag","iptv","game"]) {const info=snapshot.ps_services[name]?.[name];if(!info || info.enable === undefined)throw Error(`Brak ustawień portów: ${name}`);
+        for(const name of ["multiwan","lag","iptv","game"]) {
+          const info=snapshot.ps_services?.[name]?.[name];if(!info || info.enable === undefined)continue;
           const payload={service:name,enable:info.enable};
           if(name==="multiwan"){payload.port=(info.port_map||[]).find(x=>x.name==="WAN2")?.port ?? "";payload.mode=info.policy?.mode ?? 0;}
           else {payload.ports=info.ports ?? "";if(name==="lag")payload.mode=info.mode ?? 2;if(name==="iptv"){payload.vid=info.vid ?? -1;payload.profile=info.profile ?? 0;payload.priority=info.priority ?? -1;}}
-          if(Number(payload.enable)===1 && !(payload.port||payload.ports))throw Error(`Brak portu usługi ${name}.`);
+          if(Number(payload.enable)===1 && !(payload.port||payload.ports))continue;
           await checked("misystem/set_ps_service","POST",payload);
-        }done.push("porty");
+        }done.push("Ports");
       }
-      if(selected.includes("qos")) {const q=snapshot.qos;if(q.status.on!==undefined)await checked(`misystem/qos_switch?on=${Number(q.status.on)}`);if(q.status.mode!==undefined)await checked(`misystem/qos_mode?mode=${Number(q.status.mode)}`);if(q.band?.upload!==undefined&&q.band?.download!==undefined)await checked(`misystem/set_band?upload=${Number(q.band.upload)}&download=${Number(q.band.download)}`);done.push("QoS");}
-      if(selected.includes("wifi")) {const w=snapshot.wifi_detail.info, a=w[0], b=w[1], bsd=snapshot.wifi_detail.bsd;
-        if(bsd===undefined || !a.ssid || !b.ssid || !a.encryption || !b.encryption || (a.encryption!=="none"&&!a.password) || (b.encryption!=="none"&&!b.password))throw Error("Kopia nie zawiera pełnych danych obu pasm Wi-Fi.");
-        const x={bsd:String(bsd),isDFS:"0"};for(const [idx,radio] of [[1,a],[2,b]]){x[`on${idx}`]=String(radio.status ?? 1);x[`ssid${idx}`]=radio.ssid;x[`pwd${idx}`]=radio.password || "";x[`encryption${idx}`]=radio.encryption;x[`channel${idx}`]=String(radio.channel ?? 0);x[`bandwidth${idx}`]=String(radio.bandwidth ?? 0);x[`hidden${idx}`]=String(radio.hidden ?? 0);x[`txpwr${idx}`]=radio.txpwr || "max";}
+      if(selected.includes("qos")) {
+        const q=snapshot.qos;
+        if(q.status.on!==undefined)await checked(`misystem/qos_switch?on=${Number(q.status.on)}`);
+        if(q.status.mode!==undefined)await checked(`misystem/qos_mode?mode=${Number(q.status.mode)}`);
+        if(q.band?.upload!==undefined&&q.band?.download!==undefined&&Number(q.band.upload)>0&&Number(q.band.download)>0)await checked("misystem/set_band","POST",{upload:String(q.band.upload),download:String(q.band.download),manual:"1"});
+        done.push("QoS");
+      }
+      if(selected.includes("ddns")) {
+        for(const item of snapshot.ddns.list) {
+          const pid = resolveDdnsProviderId(item.id || item.service);
+          const user = pid === 8 ? (item.username || "Bearer") : (item.username || "");
+          if(!item.domain || !user || !item.password) continue;
+          await checked("xqnetwork/ddns_add","POST",{id:String(pid),enable:String(item.on ?? 1),domain:item.domain,username:user,password:item.password,wanindex:String(item.wanindex ?? 1),iptype:String(item.iptype ?? 0),checkinterval:String(item.checkinterval ?? 10),forceinterval:String(item.forceinterval ?? 12)});
+        }done.push("DDNS");
+      }
+      if(selected.includes("vpn")) {
+        if(Array.isArray(snapshot.vpn?.list)) {
+          for(const v of snapshot.vpn.list) {
+            if(!v.server || !v.username || !v.password) continue;
+            await checked("xqsystem/set_vpn","POST",{proto:v.proto||"l2tp",server:v.server,username:v.username,password:v.password,oname:v.oname||v.server,auto:String(v.auto??0)});
+          }
+        }
+        const sv = snapshot.smartvpn;
+        if(validResponse(sv) && (sv.enable !== undefined || sv.status !== undefined)) {
+          await apiRequest(`misystem/smartvpn_switch?enable=${Number(sv.enable ?? sv.status)}&mode=${Number(sv.mode ?? 1)}`).catch(()=>{});
+        }
+        done.push("VPN");
+      }
+      if(selected.includes("lan_dhcp")) {
+        const inf = snapshot.lan_dhcp.info;
+        const p = {start:inf.start,limit:inf.limit,leasetime:inf.leasetime||"720m",ignore:String(inf.ignore??0)};
+        if(inf.dns1) p.dns1=inf.dns1; if(inf.dns2) p.dns2=inf.dns2;
+        await checked("xqnetwork/set_lan_dhcp","POST",p); done.push("DHCP-Server");
+      }
+      if(selected.includes("wan")) {
+        const d = wanDetails.details || {};
+        const p = {wanType:d.wanType || "dhcp",mtu:String(wanDetails.mtu || 1500)};
+        if(p.wanType==="pppoe"){p.pppoeName=d.username||"";p.pppoePwd=d.password||"";}
+        else if(p.wanType==="static"){p.staticIp=d.ipaddr||"";p.staticMask=d.netmask||"";p.staticGateway=d.gateway||"";}
+        if(d.dns1) p.dns1=d.dns1; if(d.dns2) p.dns2=d.dns2;
+        await checked("xqnetwork/set_wan","POST",p); done.push("WAN");
+      }
+      if(selected.includes("wifi")) {
+        const w=snapshot.wifi_detail.info, a=w[0], b=w[1], c=w[2], bsd=snapshot.wifi_detail.bsd;
+        const x={bsd:String(bsd),isDFS:"0"};
+        const bands=[[1,a],[2,b]]; if(c) bands.push([3,c]);
+        for(const [idx,radio] of bands){x[`on${idx}`]=String(radio.status ?? 1);x[`ssid${idx}`]=radio.ssid;x[`pwd${idx}`]=radio.password || "";x[`encryption${idx}`]=radio.encryption;x[`channel${idx}`]=String(radio.channel ?? 0);x[`bandwidth${idx}`]=String(radio.bandwidth ?? 0);x[`hidden${idx}`]=String(radio.hidden ?? 0);x[`txpwr${idx}`]=radio.txpwr || "max";}
         Object.assign(x,{channel:x.channel1,bandwidth:x.bandwidth1,txpwr:x.txpwr1,channel50:x.channel2,bandwidth50:x.bandwidth2,txpwr50:x.txpwr2});
-        await checked("xqnetwork/set_all_wifi","POST",x);done.push("Wi-Fi");
+        await checked("xqnetwork/set_all_wifi","POST",x);
+        if(validResponse(snapshot.twt) && snapshot.twt.status !== undefined) await apiRequest("xqnetwork/set_twt","POST",{on:String(snapshot.twt.status)}).catch(()=>{});
+        if(validResponse(snapshot.mlo) && snapshot.mlo.mlo_enable !== undefined && getFeature("wifi","mlo","1")==="1") await apiRequest("xqnetwork/set_hostap_mlo","POST",{mlo_enable:String(snapshot.mlo.mlo_enable)}).catch(()=>{});
+        if(validResponse(snapshot.miotrelay) && (snapshot.miotrelay.enabled !== undefined || snapshot.miotrelay.switch !== undefined)) await apiRequest("xqnetwork/miotrelay_switch","POST",{on:String(snapshot.miotrelay.enabled ?? snapshot.miotrelay.switch)}).catch(()=>{});
+        if(validResponse(snapshot.aimesh) && snapshot.aimesh.manual_roaming_setting !== undefined) {
+          const ap={manual_roaming_setting:String(snapshot.aimesh.manual_roaming_setting)};
+          if(Number(ap.manual_roaming_setting)===1){ap.roam_rssi_thr_2g=String(snapshot.aimesh.roam_rssi_threshold1||-65);ap.roam_rssi_threshold1=ap.roam_rssi_thr_2g;ap.roam_rssi_thr_5g=String(snapshot.aimesh.roam_rssi_threshold2||-70);ap.roam_rssi_threshold2=ap.roam_rssi_thr_5g;}
+          await apiRequest("xqnetwork/set_aimesh_config","POST",ap).catch(()=>{});
+        }
+        done.push("Wi-Fi");
       }
-      close();viewLoaded.clear();void refreshData();alert("Router potwierdził przywrócenie: "+done.join(", "));
-    }catch(e){save.disabled=false;viewLoaded.clear();void refreshData();alert(`Operacja została przerwana. Potwierdzone sekcje: ${done.join(", ") || "brak"}. Powód: ${e.message}. Sprawdź stan routera.`);}
+      if(selected.includes("lan_ip")) {
+        await checked("xqnetwork/set_lan_ip","POST",{ip:lanIpv4.ip,mask:lanIpv4.mask || "255.255.255.0"});
+        done.push("LAN-IP");
+      }
+      close();viewLoaded.clear();void refreshData();
+      alert((isEn ? "Router confirmed restore: " : "Router potwierdził przywrócenie: ")+done.join(", "));
+    }catch(e){
+      save.disabled=false;viewLoaded.clear();void refreshData();
+      alert(isEn
+        ? `Operation interrupted. Confirmed sections: ${done.join(", ") || "none"}. Reason: ${e.message}.`
+        : `Operacja została przerwana. Potwierdzone sekcje: ${done.join(", ") || "brak"}. Powód: ${e.message}. Sprawdź stan routera.`);
+    }
   };
   if(dialog.showModal)dialog.showModal();else dialog.setAttribute("open","");
 }
@@ -2987,27 +3439,45 @@ async function serviceAction(endpoint,method="GET",payload=null,question="Wykona
   if (!state.connected || !viewLoaded.has("services")) return alert("Najpierw odczytaj ustawienia usług.");
   if (!confirm(question)) return;
   try {const res=await apiRequest(endpoint,method,payload);if(res.code!==0)throw Error(res.msg||res.code);viewLoaded.delete("services");await loadViewData("services");alert("Router potwierdził operację.");}
-  catch(e){alert("Nie udało się potwierdzić operacji: "+e.message);}
+  catch(e){alert((state.lang === "en" ? "Operation failed: " : "Nie udało się potwierdzić operacji: ")+e.message);}
 }
 function serviceButton(text,fn) {const b=document.createElement("button");b.className="btn-secondary btn-sm";b.textContent=text;b.onclick=fn;return b;}
 function renderServices() {
+  const isEn = state.lang === "en";
   const data=state.serviceSnapshot || {};
   for(const kind of ["ddns","vpn"]) {
     const target=$id(`${kind}-list`),response=data[kind];target.replaceChildren();
-    if(!response || response.code!==0 || !Array.isArray(response.list)) {target.textContent="Router nie udostępnił danych.";continue;}
-    if(!response.list.length){target.textContent=kind==="vpn"?"Brak profili VPN.":"Brak usług DDNS.";continue;}
+    if(!response || response.code!==0 || !Array.isArray(response.list)) {target.textContent=isEn ? "Router did not provide data." : "Router nie udostępnił danych.";continue;}
+    if(!response.list.length){target.textContent=kind==="vpn"?(isEn ? "No VPN profiles." : "Brak profili VPN."):(isEn ? "No DDNS services." : "Brak usług DDNS.");continue;}
     response.list.forEach(item=>{
       const row=document.createElement("div");row.className="nat-rule";const label=document.createElement("span");label.className="nat-rule-info";
-      label.textContent=kind==="ddns" ? `${item.service || "DDNS"}: ${item.domain || ""} (${Number(item.on)===1 ? "włączone" : "wyłączone"})` : `${item.proto || "VPN"}: ${item.server || ""}`;row.append(label);
+      const onTxt = Number(item.on)===1 ? (isEn ? "enabled" : "włączone") : (isEn ? "disabled" : "wyłączone");
+      label.textContent=kind==="ddns" ? `${item.service || "DDNS"}: ${item.domain || ""} (${onTxt})` : `${(item.proto || "VPN").toUpperCase()}: ${item.oname || item.server || ""}`;row.append(label);
       const id=String(item.id ?? "");
       if(/^\d+$/.test(id)) {
-        if(kind==="ddns") {row.append(serviceButton(Number(item.on)===1?"Wyłącz":"Włącz",()=>serviceAction(`xqnetwork/ddns_switch?id=${id}&on=${Number(item.on)===1?0:1}`)),serviceButton("Odśwież",()=>serviceAction(`xqnetwork/ddns_reload?id=${id}`)),serviceButton("Usuń",()=>serviceAction(`xqnetwork/ddns_del?id=${id}`,"GET",null,"Usunąć usługę DDNS?")));}
-        else row.append(serviceButton("Połącz",()=>serviceAction(`xqsystem/vpn_connect?id=${id}`)),serviceButton("Usuń",()=>serviceAction(`xqsystem/del_vpn?id=${id}`,"GET",null,"Usunąć profil VPN?")));
+        if(kind==="ddns") {
+          row.append(
+            serviceButton(Number(item.on)===1?(isEn?"Disable":"Wyłącz"):(isEn?"Enable":"Włącz"),()=>serviceAction(`xqnetwork/ddns_switch?id=${id}&on=${Number(item.on)===1?0:1}`)),
+            serviceButton(isEn?"Refresh":"Odśwież",()=>serviceAction("xqnetwork/ddns_reload")),
+            serviceButton(isEn?"Delete":"Usuń",()=>serviceAction(`xqnetwork/ddns_del?id=${id}`,"GET",null,"Usunąć usługę DDNS?"))
+          );
+        } else {
+          row.append(
+            serviceButton(isEn?"Connect":"Połącz",()=>serviceAction(`xqsystem/vpn_switch?conn=1&id=${id}`)),
+            serviceButton(isEn?"Delete":"Usuń",()=>serviceAction(`xqsystem/del_vpn?id=${id}`,"GET",null,"Usunąć profil VPN?"))
+          );
+        }
       }
       target.append(row);
     });
   }
-  $id("vpn-status").textContent=data.status?.code===0 ? `Stan VPN: ${String(data.status.status ?? "--")}` : "Stan VPN niedostępny";
+  const stCode = data.status?.code === 0 ? Number(data.status.status ?? 3) : -1;
+  const stMap = isEn
+    ? {0: "● Connected", 1: "● Connecting...", 2: "● Connection failed", 3: "○ Disconnected"}
+    : {0: "● Połączony", 1: "● Łączenie...", 2: "● Błąd połączenia", 3: "○ Rozłączony"};
+  $id("vpn-status").textContent = stCode >= 0
+    ? `${isEn ? "VPN Status" : "Stan VPN"}: ${stMap[stCode] || String(stCode)}`
+    : (isEn ? "VPN status unavailable" : "Stan VPN niedostępny");
   const smart=data.smart, val=smart?.enable ?? smart?.status;
   $id("smartvpn-enabled").disabled=val===undefined || smart?.code!==0;
   $id("smartvpn-mode").disabled=$id("smartvpn-enabled").disabled; $id("smartvpn-save").disabled=$id("smartvpn-enabled").disabled;
@@ -3016,16 +3486,24 @@ function renderServices() {
 }
 function setupServices() {
   $id("ddns-add").onclick=async()=>{
-    const payload={service:$id("ddns-provider").value,domain:$id("ddns-domain").value.trim(),username:$id("ddns-user").value.trim(),password:$id("ddns-password").value};
-    if(!payload.domain || !payload.username || !payload.password)return alert("Uzupełnij dane DDNS.");
+    const prov = $id("ddns-provider").value;
+    const pid = resolveDdnsProviderId(prov);
+    let user = $id("ddns-user").value.trim();
+    if (pid === 8 && !user) user = "Bearer";
+    const domain = $id("ddns-domain").value.trim();
+    const password = $id("ddns-password").value;
+    if(!domain || !user || !password)return alert("Uzupełnij dane DDNS.");
+    const payload={id:String(pid),enable:"1",domain,username:user,password,wanindex:"1",iptype:"0",checkinterval:"10",forceinterval:"12"};
     await serviceAction("xqnetwork/ddns_add","POST",payload,"Dodać usługę DDNS?");$id("ddns-password").value="";
   };
   $id("vpn-add").onclick=async()=>{
-    const payload={proto:$id("vpn-proto").value,server:$id("vpn-server").value.trim(),username:$id("vpn-user").value.trim(),password:$id("vpn-password").value,auto:$id("vpn-auto").checked?1:0};
-    if(!payload.server || !payload.username || !payload.password)return alert("Uzupełnij dane VPN.");
+    const server=$id("vpn-server").value.trim(), username=$id("vpn-user").value.trim(), password=$id("vpn-password").value;
+    const oname=($id("vpn-name")?.value.trim()) || server;
+    if(!server || !username || !password)return alert("Uzupełnij dane VPN.");
+    const payload={proto:$id("vpn-proto").value,server,username,password,oname,auto:$id("vpn-auto").checked?"1":"0"};
     await serviceAction("xqsystem/set_vpn","POST",payload,"Dodać profil VPN?");$id("vpn-password").value="";
   };
-  $id("vpn-disconnect").onclick=()=>serviceAction("xqsystem/vpn_disconnect","GET",null,"Rozłączyć VPN?");
+  $id("vpn-disconnect").onclick=()=>serviceAction("xqsystem/vpn_switch?conn=0","GET",null,"Rozłączyć VPN?");
   $id("smartvpn-save").onclick=()=>serviceAction(`misystem/smartvpn_switch?enable=${$id("smartvpn-enabled").checked?1:0}&mode=${Number($id("smartvpn-mode").value)}`,"GET",null,"Zapisać Smart VPN?");
 }
 
@@ -3038,7 +3516,7 @@ document.addEventListener("DOMContentLoaded", () => {
   applyLayoutMode(state.layout);
   document.querySelectorAll("#lang-toggle button").forEach(btn=>btn.classList.toggle("active",btn.dataset.lang===state.lang));
   document.querySelectorAll("#layout-toggle button").forEach(btn=>btn.classList.toggle("active",btn.dataset.layout===state.layout));
-  applyStaticTranslation(); setConnected(state.connected);
+  applyStaticTranslation(); refreshDynamicTranslations();
   if (window.AndroidRouter?.isPreview?.()) {
     const banner = document.createElement("div");
     banner.textContent = "WERSJA TESTOWA: podgląd i logowanie. Zmiana ustawień routera jest zablokowana.";

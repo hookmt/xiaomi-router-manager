@@ -2,6 +2,40 @@
 
 All notable changes to **Xiaomi Router Manager (XRM)** will be documented in this file.
 
+## [1.1.0] - 2026-11-28
+
+### Added & Improved
+- **Feature-Driven Hardware UI (`init_info.features`, Windows & Android):**
+  - Audited complete sanitized LuCI dumps of **Xiaomi BE7000 (`RC06 1.1.38`)** and **Xiaomi BE6500 (`RN02 1.0.64`)**.
+  - UI now adapts automatically per router model: hides NFC controls when `apps.nfc != "1"`, hides Wi-Fi Silence when `wifi.silence_switch != "1"`, shows Tri-Band 5G Split only when `wifi.split5g == "1"`, and reveals Master/Ethernet/Effect LED controls when `apps.LED_control == "3"`.
+- **New Verified Router Controls (Windows & Android):**
+  - **Wi-Fi 7 MLO:** Real `xqnetwork/get_hostap_mlo` & `set_hostap_mlo` toggle.
+  - **Tri-Band 5G Split:** `xqsystem/set_wifi_split` switch (5G-1 + 5G-2) with reboot confirmation on supported routers.
+  - **Multi-LED Controls:** `misystem/allled`, `misystem/ethled`, and conditional `misystem/effect_light`.
+  - **Router Name & Location:** In-app rename dialog using `misystem/set_router_name`.
+  - **One-Click Mesh Node Switching:** Added a `Switch to this node` button on every Mesh satellite card (Windows & Android) that switches the gateway IP and logs in automatically with the current session password.
+- **Full 14-Section Selective JSON Backup & Restore (Windows & Android):**
+  - Expanded snapshot backup (`all_led`, `eth_led`, `effect_light`, `nfc`, `mlo`, `smartvpn`) and unlocked full selective restore across 14 router sections in safe execution order (ending with WAN, Wi-Fi, and LAN IP).
+- **Official Xiaomi `.tar.gz` Archive Restore (Windows):**
+  - Added `misystem/c_upload` + `misystem/c_restore` workflow allowing users to upload and selectively restore native Xiaomi `.tar.gz` backup archives directly from XRM.
+- **Factory Reset Pre-Confirmation Warning (Windows & Android):**
+  - Added an explicit reminder inside the red Factory Reset modal (before confirming `RESET`) that the administrator password will be restored to default `admin`.
+
+### Fixed
+- **10 Verified 1:1 LuCI API Fixes (Windows & Android):**
+  - `misystem/led`: fixed payload to `POST {on: 0|1}` (was `state`).
+  - `xqnetwork/set_nfc_status`: fixed payload to `POST {nfc_enable: 0|1}` (was `status`).
+  - `xqnetwork/get_miotrelay_switch` & `get_wifi_silence`: fixed status reads to `enabled` / `on` (was `switch` / `status`) and toggle payloads to `POST {on: 0|1}`.
+  - `xqsystem/vpn_switch` & `vpn_status`: fixed connect/disconnect endpoints (`?conn=1&id=...` / `?conn=0`), added required `oname` in `set_vpn`, and fixed `vpn_status` code mapping (`0`=Connected, `1`=Connecting, `2`=Failed, `3`=Disconnected).
+  - `xqnetwork/ddns_add` & `ddns_reload`: mapped provider names to numeric IDs (`1..9`, adding Cloudflare `id=8` with `Bearer` token support), added required DDNS fields, and fixed `ddns_reload`.
+  - `misystem/set_band`: switched to `POST` with `manual=1`.
+  - `misystem/c_backup` & `c_download`: fixed `GET` query string parameters on Windows and allowed safe relative `/` paths in returned backup filenames on Android & Windows.
+- **Android 100% English Localization & UI Alignment:**
+  - Translated all remaining Polish static labels, placeholders, tooltips, timezone options, and dynamic alert/confirm dialogs on Android, with immediate re-rendering on `PL`/`EN` switch.
+  - Removed duplicate Smart Connect banner inside the right 5 GHz card on both Windows and Android so 2.4 GHz and 5 GHz radio cards align evenly.
+  - Unified Windows desktop scrolling across `WAN`, `Ports 2.5G`, `QoS / DDNS / VPN`, `Tools & Maintenance`, and `Setup Wizard` tabs (one clean full-tab vertical scrollbar without cramped nested scroll frames or clipped buttons).
+  - Removed leftover Chinese `(Wi-Fi 双频合一)` label from Smart Connect banners and wizard text, hardcoded `(Xiaomi BE7000)` in the Android Ports header, and personal placeholder text.
+
 ## [1.0.9] - 2026-11-27
 
 ### Added & Improved

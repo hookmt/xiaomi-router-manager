@@ -154,7 +154,7 @@ TRANSLATIONS = {
         "wiz_step2_mtu_hint": "1472 dla części łącz światłowodowych / tunelowanych ISP, 1492 dla PPPoE, 1500 standard.",
         "wiz_step3_h": "Konfiguracja Sieci Wi-Fi",
         "wiz_step3_sub": "Ustal nazwę sieci bezprzewodowej i hasło dostępowe dla urządzeń domowych.",
-        "wiz_step3_smart": "Smart Connect (Wi-Fi 双频合一) - Jedno wspólne SSID i hasło dla pasma 2.4G i 5G",
+        "wiz_step3_smart": "Smart Connect - Jedno wspólne SSID i hasło dla pasma 2.4G i 5G",
         "wiz_step3_ssid": "Nazwa sieci Wi-Fi (SSID):",
         "wiz_step3_pwd": "Hasło do sieci Wi-Fi:",
         "wiz_step3_pwd_hint": "Minimum 8 znaków (litery, cyfry lub znaki specjalne).",
@@ -184,7 +184,7 @@ TRANSLATIONS = {
         "wifi_btn_card": "Karta Dostępowa Wi-Fi",
         "wifi_btn_opt": "Optymalizuj kanały Wi-Fi",
         "wifi_smart_connect": "Smart Connect (Wspólne SSID)",
-        "wifi_bsd_banner_on": "★ Smart Connect (Wi-Fi 双频合一) jest WŁĄCZONY - Pasma 2.4 GHz i 5 GHz współdzielą jedno SSID i hasło. Router automatycznie dobiera pasmo.",
+        "wifi_bsd_banner_on": "★ Smart Connect jest WŁĄCZONY - Pasma 2.4 GHz i 5 GHz współdzielą jedno SSID i hasło. Router automatycznie dobiera pasmo.",
         "wifi_bsd_banner_off": "○ Smart Connect jest WYŁĄCZONY - Pasma 2.4 GHz i 5 GHz pracują niezależnie z osobnymi nazwami SSID i hasłami.",
         "wifi_2g_title": "Pasmo 2.4 GHz (Zasięg / Urządzenia IoT)",
         "wifi_5g_title": "Pasmo 5 GHz (Wysoka Wydajność / Wi-Fi 6 & 7)",
@@ -628,7 +628,25 @@ TRANSLATIONS = {
         "adv_status_toggled": '{feature} zostało: {status}',
         "mesh_node_reboot_title": 'Restart Węzła Mesh',
         "mesh_node_reboot_prompt": 'Czy na pewno chcesz zrestartować węzeł satelicki Mesh ({ip})?',
-        "mesh_node_reboot_sent": 'Polecenie restartu zostało wysłane do węzła {ip}.'
+        "mesh_node_reboot_sent": 'Polecenie restartu zostało wysłane do węzła {ip}.',
+        # v1.1.0 new keys
+        "wifi_adv_mlo_title": "Wi-Fi 7 MLO (Multi-Link Operation)",
+        "wifi_adv_mlo_desc": "Jednoczesna transmisja na pasmach 2.4 GHz i 5 GHz dla urządzeń Wi-Fi 7.",
+        "wifi_adv_split5g_title": "Tryb Tri-Band (Rozdzielenie 5G-1 i 5G-2)",
+        "wifi_adv_split5g_desc": "Rozdziela radio 5 GHz na dwa osobne pasma (np. 5G-1 + 5G-2 Gaming). Zmiana restartuje router.",
+        "tools_btn_router_name": "🏷️  Zmień Nazwę i Lokalizację Routera...",
+        "tools_btn_rest_official": "📥  Przywróć Oficjalną Kopię Xiaomi (.tar.gz)...",
+        "tools_all_led_label": "Wszystkie diody (Master LED):",
+        "tools_eth_led_label": "Diody portów Ethernet (LAN):",
+        "tools_effect_light_label": "Podświetlenie obudowy (Effect Light):",
+        "vpn_status_connecting": "Status: ● Łączenie z tunelem VPN...",
+        "vpn_status_failed": "Status: ● Błąd połączenia VPN",
+        "vpn_btn_disconnect": "Rozłącz",
+        "vpn_dlg_name": "Nazwa profilu:",
+        "ddns_cloudflare_hint": "Cloudflare: jako Użytkownik wpisz Bearer (lub zostaw puste), a jako Hasło wklej API Token.",
+        "rest_dlg_select_all": "Zaznacz wszystko",
+        "rest_dlg_select_none": "Odznacz wszystko",
+        "mesh_switch_node": "🔀 Przełącz na ten węzeł"
     },
     "en": {
         # Top bar
@@ -795,7 +813,7 @@ TRANSLATIONS = {
         "wifi_btn_card": "Wi-Fi Access Card",
         "wifi_btn_opt": "Optimize Wi-Fi Channels",
         "wifi_smart_connect": "Smart Connect (Combined SSID)",
-        "wifi_bsd_banner_on": "★ Smart Connect (Wi-Fi 双频合一) is ENABLED - 2.4 GHz and 5 GHz bands share one SSID and password. The router automatically assigns bands.",
+        "wifi_bsd_banner_on": "★ Smart Connect is ENABLED - 2.4 GHz and 5 GHz bands share one SSID and password. The router automatically assigns bands.",
         "wifi_bsd_banner_off": "○ Smart Connect is DISABLED - 2.4 GHz and 5 GHz bands operate independently with separate SSIDs and passwords.",
         "wifi_2g_title": "2.4 GHz Band (Range / IoT Devices)",
         "wifi_5g_title": "5 GHz Band (High Performance / Wi-Fi 6 & 7)",
@@ -1239,7 +1257,25 @@ TRANSLATIONS = {
         "adv_status_toggled": '{feature} set to: {status}',
         "mesh_node_reboot_title": 'Reboot Mesh Node',
         "mesh_node_reboot_prompt": 'Are you sure you want to reboot the satellite Mesh node ({ip})?',
-        "mesh_node_reboot_sent": 'Reboot command was sent to Mesh node {ip}.'
+        "mesh_node_reboot_sent": 'Reboot command was sent to Mesh node {ip}.',
+        # v1.1.0 new keys
+        "wifi_adv_mlo_title": "Wi-Fi 7 MLO (Multi-Link Operation)",
+        "wifi_adv_mlo_desc": "Simultaneous dual-band transmission on 2.4 GHz and 5 GHz for Wi-Fi 7 devices.",
+        "wifi_adv_split5g_title": "Tri-Band Mode (Split 5G-1 & 5G-2)",
+        "wifi_adv_split5g_desc": "Splits 5 GHz radio into two separate bands (5G-1 + 5G-2 Gaming). Changing this reboots the router.",
+        "tools_btn_router_name": "🏷️  Rename Router & Location...",
+        "tools_btn_rest_official": "📥  Restore Official Xiaomi Backup (.tar.gz)...",
+        "tools_all_led_label": "All Router LEDs (Master):",
+        "tools_eth_led_label": "Ethernet Port LEDs (LAN):",
+        "tools_effect_light_label": "Chassis Effect Light:",
+        "vpn_status_connecting": "Status: ● Connecting to VPN tunnel...",
+        "vpn_status_failed": "Status: ● VPN connection failed",
+        "vpn_btn_disconnect": "Disconnect",
+        "vpn_dlg_name": "Profile Name:",
+        "ddns_cloudflare_hint": "Cloudflare: enter Bearer as Username (or leave blank), and paste API Token as Password.",
+        "rest_dlg_select_all": "Select All",
+        "rest_dlg_select_none": "Deselect All",
+        "mesh_switch_node": "🔀 Switch to this node"
     }
 }
 

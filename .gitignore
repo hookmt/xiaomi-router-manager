@@ -12,6 +12,7 @@ dist/
 !Xiaomi_Router_Manager_v1.0.7.spec
 !Xiaomi_Router_Manager_v1.0.8.spec
 !Xiaomi_Router_Manager_v1.0.9.spec
+!Xiaomi_Router_Manager_v1.1.0.spec
 
 # User local data & sensitive snapshots (passwords, MACs, tokens)
 settings.json

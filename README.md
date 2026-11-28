@@ -1,6 +1,6 @@
 # Xiaomi Router Manager (XRM)
 
-[![Version](https://img.shields.io/badge/version-v1.0.9-blue.svg)](version.py)
+[![Version](https://img.shields.io/badge/version-v1.1.0-blue.svg)](version.py)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-blue.svg)](https://microsoft.com/windows)
 [![Android](https://img.shields.io/badge/Android-APK%20%7C%20Adaptive%20Tablet%20%26%20Phone-green.svg)](#9-adaptive-mobile--tablet-app-android-apk--offline-web-client)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
@@ -67,7 +67,7 @@ Many high-performance Xiaomi routers (such as Chinese models with high-power RF 
 
 ### 4. Advanced Wireless (Wi-Fi 7 / 6) Configuration
 - Dual-band controls for 2.4 GHz and 5 GHz radios.
-- **Smart Connect (Wi-Fi 双频合一):** Combined SSID with automated band steering.
+- **Smart Connect:** Combined SSID with automated band steering.
 - Security modes: WPA2-PSK AES, WPA3-Personal SAE, mixed WPA2/WPA3, and open.
 - Channel selection and bandwidth switching up to **160 MHz**.
 - Global and per-band Transmission Power (TX Power) selection: **Maximum (Boosted)**, **Medium (Standard)**, and **Low (Power Save)**.

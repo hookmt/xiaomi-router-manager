@@ -18,7 +18,7 @@
         <div class="logo-box">
           <span class="logo-icon">📶</span>
           <div class="logo-text">
-            <span class="logo-title">Xiaomi Router Manager <span class="version-badge">v1.0.9</span></span>
+            <span class="logo-title">Xiaomi Router Manager <span class="version-badge">v1.1.0</span></span>
             <span class="logo-subtitle" id="header-model-badge">BE7000 / BE6500 / AX3600</span>
           </div>
         </div>
@@ -162,7 +162,7 @@
             <span class="wiz-icon">🪄</span>
             <span class="wiz-text">Kreator Szybkiego Startu</span>
           </button>
-          <div class="drawer-version-footer">XRM Mobile v1.0.9</div>
+          <div class="drawer-version-footer">XRM Mobile v1.1.0</div>
         </div>
       </nav>
     </aside>
@@ -582,9 +582,9 @@
           </div>
         </div>
 
-        <!-- Baner informacyjny Smart Connect (Wi-Fi 双频合一) -->
+        <!-- Baner informacyjny Smart Connect -->
         <div id="wifi-bsd-banner" class="wifi-banner-info">
-          ★ Smart Connect (Wi-Fi 双频合一) jest WŁĄCZONY - Pasma 2.4 GHz i 5 GHz współdzielą jedno SSID i hasło. Router automatycznie dobiera pasmo.
+          ★ Smart Connect jest WŁĄCZONY - Pasma 2.4 GHz i 5 GHz współdzielą jedno SSID i hasło. Router automatycznie dobiera pasmo.
         </div>
 
         <div class="card" id="wifi-common-credentials"><h3 id="wifi-common-heading">Wspólna sieć Wi-Fi</h3>
@@ -688,11 +688,6 @@
               <input type="checkbox" id="wifi-5g-enable" checked hidden><span id="wifi-5g-enable-txt" class="status-lbl" hidden></span>
             </div>
 
-            <!-- Baner synchronizacji z 2.4 GHz przy Smart Connect -->
-            <div id="wifi-5g-sync-banner" class="wifi-sync-info">
-              ★ Smart Connect włączony: Pasmo 5 GHz korzysta ze wspólnych danych podanych powyżej.
-            </div>
-
             <!-- Pola 5G (widoczne tylko gdy Smart Connect jest wyłączony) -->
             <div id="wifi-5g-credentials-box" class="hidden">
               <div class="form-group">
@@ -785,6 +780,32 @@
           </div>
 
           <div class="adv-wifi-list">
+            <!-- 0a. Wi-Fi 7 MLO -->
+            <div class="adv-item" id="wifi-adv-mlo-row">
+              <div class="adv-info">
+                <div class="adv-title">Wi-Fi 7 MLO (Multi-Link Operation)</div>
+                <div class="adv-desc">Jednoczesna transmisja na pasmach 2.4 GHz i 5 GHz dla urządzeń Wi-Fi 7.</div>
+              </div>
+              <label class="toggle-switch-label">
+                <input type="checkbox" id="wifi-adv-mlo">
+                <span class="toggle-slider"></span>
+                <span id="wifi-adv-mlo-lbl" class="status-lbl">Wyłączone</span>
+              </label>
+            </div>
+
+            <!-- 0b. Tri-Band 5G Split (widoczne tylko gdy features.wifi.split5g == 1, np. BE7000) -->
+            <div class="adv-item hidden" id="wifi-adv-split5g-row">
+              <div class="adv-info">
+                <div class="adv-title">Tryb Tri-Band (Rozdzielenie 5G-1 i 5G-2)</div>
+                <div class="adv-desc text-warning">Rozdziela radio 5 GHz na dwa osobne pasma (5G-1 + 5G-2). Zmiana restartuje router.</div>
+              </div>
+              <label class="toggle-switch-label">
+                <input type="checkbox" id="wifi-adv-split5g">
+                <span class="toggle-slider"></span>
+                <span id="wifi-adv-split5g-lbl" class="status-lbl">Wyłączone</span>
+              </label>
+            </div>
+
             <!-- 1. Wi-Fi 5 Kompatybilność -->
             <div class="adv-item">
               <div class="adv-info">
@@ -838,7 +859,7 @@
             </div>
 
             <!-- 5. Tryb cichy -->
-            <div class="adv-item">
+            <div class="adv-item" id="wifi-adv-silence-row">
               <div class="adv-info">
                 <div class="adv-title">Tryb cichy Wi-Fi (Tymczasowe wyłączenie)</div>
                 <div class="adv-desc text-danger">Wyłącza wszystkie radia Wi-Fi do restartu routera. Po restarcie Wi-Fi włącza się ponownie automatycznie.</div>
@@ -889,7 +910,7 @@
       <section id="view-ports" class="content-view">
         <div class="view-header">
           <div>
-            <h2 class="view-title">Zarządzanie Portami 4x 2.5 Gbps (Xiaomi BE7000)</h2>
+            <h2 class="view-title">Zarządzanie Portami 4x 2.5 Gbps</h2>
             <p class="view-desc">Kliknij w port fizyczny, aby sprawdzić stan lub wybierz zaawansowaną funkcję sprzętową.</p>
           </div>
         </div>
@@ -1172,10 +1193,10 @@
         <div class="view-header"><div><h2 class="view-title">DDNS i VPN</h2><p class="view-desc">Usługi dynamicznego DNS i profile klienta VPN.</p></div></div>
         <div class="grid-2-col">
           <div class="card"><h3>Dynamiczny DNS (DDNS)</h3><div id="ddns-list" class="nat-list">Brak danych</div>
-            <h4>Dodaj usługę DDNS</h4><div class="form-group"><label class="form-label">Dostawca</label><select id="ddns-provider" class="form-select"><option>no-ip.com</option><option>oray.com</option><option>pubyun.com</option><option>3322.org</option><option>dyndns.com</option></select></div>
-            <div class="form-group"><label class="form-label">Domena</label><input id="ddns-domain" class="form-input"></div><div class="form-group"><label class="form-label">Nazwa użytkownika</label><input id="ddns-user" class="form-input"></div><div class="form-group"><label class="form-label">Hasło</label><input id="ddns-password" class="form-input" type="password"></div><button id="ddns-add" class="btn-primary">Dodaj DDNS</button></div>
+            <h4>Dodaj usługę DDNS</h4><div class="form-group"><label class="form-label">Dostawca</label><select id="ddns-provider" class="form-select"><option>no-ip.com</option><option>cloudflare.com</option><option>dyndns.com</option><option>oray.com</option><option>pubyun.com</option><option>3322.org</option><option>alidns.com</option><option>dnspod.cn</option><option>huaweicloud.com</option><option>baidu.com</option></select></div>
+            <div class="form-group"><label class="form-label">Domena</label><input id="ddns-domain" class="form-input"></div><div class="form-group"><label class="form-label">Nazwa użytkownika</label><input id="ddns-user" class="form-input" placeholder="Dla Cloudflare wpisz Bearer lub zostaw puste"></div><div class="form-group"><label class="form-label">Hasło</label><input id="ddns-password" class="form-input" type="password"></div><button id="ddns-add" class="btn-primary">Dodaj DDNS</button></div>
           <div class="card"><h3>Klient VPN</h3><p id="vpn-status">Brak danych</p><div id="vpn-list" class="nat-list">Brak danych</div><button id="vpn-disconnect" class="btn-secondary">Rozłącz VPN</button><h4>Dodaj profil VPN</h4>
-            <div class="form-group"><label class="form-label">Protokół</label><select id="vpn-proto" class="form-select"><option>l2tp</option><option>pptp</option></select></div><div class="form-group"><label class="form-label">Serwer</label><input id="vpn-server" class="form-input"></div><div class="form-group"><label class="form-label">Nazwa użytkownika</label><input id="vpn-user" class="form-input"></div><div class="form-group"><label class="form-label">Hasło</label><input id="vpn-password" class="form-input" type="password"></div><label class="checkbox-inline"><input type="checkbox" id="vpn-auto"><span>Automatyczne łączenie</span></label><button id="vpn-add" class="btn-primary">Dodaj VPN</button>
+            <div class="form-group"><label class="form-label">Nazwa profilu</label><input id="vpn-name" class="form-input" placeholder="np. VPN Praca"></div><div class="form-group"><label class="form-label">Protokół</label><select id="vpn-proto" class="form-select"><option>l2tp</option><option>pptp</option></select></div><div class="form-group"><label class="form-label">Serwer</label><input id="vpn-server" class="form-input"></div><div class="form-group"><label class="form-label">Nazwa użytkownika</label><input id="vpn-user" class="form-input"></div><div class="form-group"><label class="form-label">Hasło</label><input id="vpn-password" class="form-input" type="password"></div><label class="checkbox-inline"><input type="checkbox" id="vpn-auto"><span>Automatyczne łączenie</span></label><button id="vpn-add" class="btn-primary">Dodaj VPN</button>
           </div>
         </div>
         <div class="card"><h3>Smart VPN</h3><p>Dzielenie ruchu VPN według domen lub urządzeń.</p><label class="checkbox-inline"><input type="checkbox" id="smartvpn-enabled" disabled><span>Włącz Smart VPN</span></label><select id="smartvpn-mode" class="form-select" disabled><option value="1">Domeny</option><option value="2">Urządzenia</option></select><button id="smartvpn-save" class="btn-primary" disabled>Zapisz Smart VPN</button></div>
@@ -1200,11 +1221,11 @@
           </div>
         </div>
         <div class="grid-2-col system-overview">
-          <div class="card"><h3>Strefa bezpieczeństwa i hasła</h3><p class="card-desc">Zmiana hasła administratora routera.</p><button class="btn-primary" id="system-change-password">Zmień hasło administratora</button></div>
-          <div class="card"><h3>Kopia i przywracanie</h3><p>Kopia JSON obejmuje dostępne dane routera i może zawierać hasła. Przywracanie obsługuje tylko dostępne sekcje wskazane w kolejnym oknie.</p><div class="backup-actions-bar"><button class="btn-primary" id="btn-save-snapshot">Utwórz kopię zapasową (.json)</button><label class="btn-secondary">Wczytaj kopię JSON <input type="file" id="backup-file-input" accept="application/json,.json" hidden></label><button class="btn-warn" id="btn-apply-json" disabled>Wybierz sekcje do przywrócenia</button><button class="btn-secondary" id="btn-official-backup">Pobierz oficjalną kopię Xiaomi (.tar.gz)</button></div><p id="backup-file-status" role="status">Nie wczytano kopii JSON.</p><p>Oficjalna kopia Xiaomi jest osobnym plikiem. Jej zakres i przywracanie nie zostały potwierdzone.</p></div>
+          <div class="card"><h3>Strefa bezpieczeństwa i hasła</h3><p class="card-desc">Zmiana hasła administratora oraz nazwy routera.</p><button class="btn-primary" id="system-change-password">Zmień hasło administratora</button><button class="btn-secondary" id="system-rename-router" style="margin-top:8px">Zmień nazwę routera</button></div>
+          <div class="card"><h3>Kopia i przywracanie</h3><p>Kopia JSON obejmuje pełną konfigurację routera (w tym hasła). Przy przywracaniu wybierzesz dokładne sekcje do wgrania.</p><div class="backup-actions-bar"><button class="btn-primary" id="btn-save-snapshot">Utwórz kopię zapasową (.json)</button><label class="btn-secondary">Wczytaj kopię JSON <input type="file" id="backup-file-input" accept="application/json,.json" hidden></label><button class="btn-warn" id="btn-apply-json" disabled>Wybierz sekcje do przywrócenia</button><button class="btn-secondary" id="btn-official-backup">Pobierz oficjalną kopię Xiaomi (.tar.gz)</button></div><p id="backup-file-status" role="status">Nie wczytano kopii JSON.</p><p>Oficjalna kopia Xiaomi (.tar.gz) zapisuje natywne archiwum konfiguracji z routera.</p></div>
           <div class="card"><h3>Raporty i dokumentacja sieci</h3><p class="card-desc">Raport stanu routera i urządzeń.</p><button class="btn-primary" id="btn-export-md">Eksportuj raport do Markdown (.md)</button></div>
-          <div class="card"><h3>Diody LED routera</h3><div class="form-group"><label class="toggle-switch"><input type="checkbox" id="led-switch" disabled><span class="toggle-slider"></span></label><span id="led-status-lbl" class="bold">Brak danych</span></div><button class="btn-primary" id="btn-save-led" disabled>Zapisz stan diod</button></div>
-          <div class="card"><h3>Konserwacja i system</h3><p id="system-router-time">Czas routera: --</p><button class="btn-secondary" id="btn-nfc-enable">Włącz NFC</button><button class="btn-secondary" id="btn-nfc-disable">Wyłącz NFC</button><button class="btn-secondary" id="btn-sync-time">Synchronizuj czas z urządzeniem</button><button class="btn-secondary" id="btn-check-firmware">Sprawdź aktualizacje firmware</button></div>
+          <div class="card"><h3>Diody LED routera</h3><div class="form-group"><label class="toggle-switch"><input type="checkbox" id="led-switch" disabled><span class="toggle-slider"></span></label><span id="led-status-lbl" class="bold">Brak danych</span></div><div id="extra-leds-box" class="hidden"><div class="form-group" style="margin-top:8px"><label class="checkbox-inline"><input type="checkbox" id="all-led-switch"><span>Wszystkie diody (Master LED)</span></label></div><div class="form-group"><label class="checkbox-inline"><input type="checkbox" id="eth-led-switch"><span>Diody portów Ethernet (LAN)</span></label></div><div class="form-group hidden" id="effect-light-row"><label class="checkbox-inline"><input type="checkbox" id="effect-light-switch"><span>Podświetlenie obudowy (Effect Light)</span></label></div></div><button class="btn-primary" id="btn-save-led" disabled>Zapisz stan diod</button></div>
+          <div class="card"><h3>Konserwacja i system</h3><p id="system-router-time">Czas routera: --</p><div id="nfc-controls-box"><button class="btn-secondary" id="btn-nfc-enable">Włącz NFC</button><button class="btn-secondary" id="btn-nfc-disable">Wyłącz NFC</button></div><button class="btn-secondary" id="btn-sync-time">Synchronizuj czas z urządzeniem</button><button class="btn-secondary" id="btn-check-firmware">Sprawdź aktualizacje firmware</button></div>
           <div class="card"><h3>Strefa czasowa routera</h3><p class="card-desc">Ustaw strefę czasową routera niezależnie od synchronizacji czasu. Wpływa na harmonogramy, logi i chmurę Xiaomi Cloud.</p><div class="form-group"><label class="form-label">Strefa czasowa (Timezone):</label><select id="system-tz-select" class="form-select"><option value="">-- ładowanie... --</option></select></div><button class="btn-primary" id="btn-save-tz">Zapisz strefę czasową</button></div>
         </div>
         <div class="card danger-card">
@@ -1360,7 +1381,7 @@
         <div class="modal-body">
           <div class="form-group">
             <label class="form-label">Nazwa / Opis Urządzenia:</label>
-            <input type="text" id="reserve-name-input" class="form-input" placeholder="np. HOOKMTSRV">
+            <input type="text" id="reserve-name-input" class="form-input" placeholder="np. Serwer NAS">
           </div>
           <div class="form-group">
             <label class="form-label">Adres MAC:</label>
